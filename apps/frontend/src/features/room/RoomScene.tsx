@@ -8,6 +8,95 @@ import { usePortfolioStore } from '@/lib/store';
 import { Player } from './Player';
 import { roomObjects, type RoomObject } from './room-objects';
 
+function MailboxProp() {
+  return (
+    <group position={[3.02, 0, -1.16]}>
+      <mesh castShadow position={[0, 0.5, 0]}>
+        <cylinderGeometry args={[0.08, 0.1, 1, 14]} />
+        <meshStandardMaterial color="#7a573d" />
+      </mesh>
+      <mesh castShadow position={[0.02, 0.88, 0]}>
+        <boxGeometry args={[0.5, 0.34, 0.34]} />
+        <meshStandardMaterial color="#bf5a4f" roughness={0.82} />
+      </mesh>
+      <mesh castShadow rotation={[0, 0, -0.24]} position={[0.03, 1.02, 0.17]}>
+        <boxGeometry args={[0.5, 0.08, 0.14]} />
+        <meshStandardMaterial color="#d86b5f" />
+      </mesh>
+      <mesh castShadow position={[0.24, 0.95, 0]}>
+        <boxGeometry args={[0.06, 0.28, 0.04]} />
+        <meshStandardMaterial color="#f2d0a4" />
+      </mesh>
+      <mesh castShadow position={[0.26, 1.06, 0]}>
+        <boxGeometry args={[0.12, 0.04, 0.04]} />
+        <meshStandardMaterial color="#d44343" />
+      </mesh>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+        <circleGeometry args={[0.28, 18]} />
+        <meshStandardMaterial color="#000000" transparent opacity={0.18} />
+      </mesh>
+    </group>
+  );
+}
+
+function PortraitProp() {
+  return (
+    <group position={[-3.69, 0, 0.42]}>
+      <mesh castShadow position={[0, 1.62, 0]}>
+        <boxGeometry args={[0.08, 1.44, 1.06]} />
+        <meshStandardMaterial color="#73492f" />
+      </mesh>
+      <mesh castShadow position={[0.05, 1.62, 0]}>
+        <boxGeometry args={[0.03, 1.24, 0.88]} />
+        <meshStandardMaterial color="#c7b38a" />
+      </mesh>
+      <mesh castShadow position={[0.07, 1.82, 0]}>
+        <boxGeometry args={[0.02, 0.18, 0.72]} />
+        <meshStandardMaterial color="#35506a" emissive="#6a9dbe" emissiveIntensity={0.08} />
+      </mesh>
+      <mesh castShadow position={[0.07, 1.48, 0]}>
+        <boxGeometry args={[0.02, 0.36, 0.52]} />
+        <meshStandardMaterial color="#d9c39d" />
+      </mesh>
+      <mesh castShadow position={[0.07, 1.46, -0.17]}>
+        <boxGeometry args={[0.02, 0.12, 0.14]} />
+        <meshStandardMaterial color="#4f3529" />
+      </mesh>
+    </group>
+  );
+}
+
+function PosterWallProps() {
+  return (
+    <group position={[2.02, 0, -2.95]}>
+      <mesh castShadow position={[-0.52, 1.75, 0.02]}>
+        <boxGeometry args={[0.9, 1.28, 0.03]} />
+        <meshStandardMaterial color="#2f4b68" />
+      </mesh>
+      <mesh castShadow position={[-0.52, 1.76, 0.03]}>
+        <boxGeometry args={[0.74, 1.06, 0.02]} />
+        <meshStandardMaterial color="#f3ecd7" />
+      </mesh>
+      <mesh castShadow position={[0.38, 1.98, 0.02]}>
+        <boxGeometry args={[0.96, 0.9, 0.03]} />
+        <meshStandardMaterial color="#394e63" />
+      </mesh>
+      <mesh castShadow position={[0.38, 1.98, 0.03]}>
+        <boxGeometry args={[0.8, 0.74, 0.02]} />
+        <meshStandardMaterial color="#8db8e6" emissive="#99ceff" emissiveIntensity={0.08} />
+      </mesh>
+      <mesh castShadow rotation={[0, 0, 0.09]} position={[0.88, 1.34, 0.03]}>
+        <boxGeometry args={[0.26, 0.34, 0.02]} />
+        <meshStandardMaterial color="#f4a261" />
+      </mesh>
+      <mesh castShadow rotation={[0, 0, -0.07]} position={[0.58, 1.22, 0.03]}>
+        <boxGeometry args={[0.28, 0.22, 0.02]} />
+        <meshStandardMaterial color="#f1d78c" />
+      </mesh>
+    </group>
+  );
+}
+
 function InteractableObject({
   object,
   active,
@@ -17,23 +106,52 @@ function InteractableObject({
   active: boolean;
   onOpen: () => void;
 }) {
+  const markerPosition: [number, number, number] = object.markerPosition ?? [
+    object.position[0],
+    Math.max(0.2, object.size[1] * 0.2),
+    object.position[2],
+  ];
+  const markerHeight = markerPosition[1];
+
   return (
-    <group position={object.position}>
-      <mesh castShadow receiveShadow onClick={onOpen}>
-        <boxGeometry args={object.size} />
-        <meshStandardMaterial color={object.color} emissive={active ? '#4b8f8c' : '#000000'} />
+    <group>
+      <group position={object.position}>
+        <mesh onClick={onOpen}>
+          <boxGeometry args={object.size} />
+          <meshStandardMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            color={object.color}
+            emissive={active ? '#4b8f8c' : '#000000'}
+          />
+        </mesh>
+      </group>
+      <mesh castShadow position={markerPosition}>
+        <cylinderGeometry args={[0.1, 0.13, 0.08, 14]} />
+        <meshStandardMaterial color={active ? '#f4a261' : '#5a4a3b'} />
       </mesh>
-      <Text
-        position={[0, object.size[1] / 2 + 0.22, 0]}
-        color="#f8f4e3"
-        fontSize={0.14}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {object.label}
-      </Text>
+      <mesh position={[markerPosition[0], markerHeight + 0.09, markerPosition[2]]}>
+        <sphereGeometry args={[0.07, 14, 14]} />
+        <meshStandardMaterial
+          color={active ? '#ffd89a' : '#8f7e67'}
+          emissive={active ? '#ffbe63' : '#000000'}
+          emissiveIntensity={active ? 0.55 : 0}
+        />
+      </mesh>
       {active ? (
-        <Html center position={[0, object.size[1] / 2 + 0.55, 0]}>
+        <Text
+          position={[markerPosition[0], markerHeight + 0.35, markerPosition[2]]}
+          color="#f8f4e3"
+          fontSize={0.14}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {object.label}
+        </Text>
+      ) : null}
+      {active ? (
+        <Html center position={[markerPosition[0], markerHeight + 0.6, markerPosition[2]]}>
           <button className="world-prompt" onClick={onOpen} type="button">
             E - {object.hint}
           </button>
@@ -174,38 +292,9 @@ function RoomShell() {
         </mesh>
       </group>
 
-      <group position={[-3.67, 0, 0.45]}>
-        <mesh castShadow position={[0, 1.65, 0]}>
-          <boxGeometry args={[0.07, 1.35, 1.1]} />
-          <meshStandardMaterial color="#7c5436" />
-        </mesh>
-        <mesh castShadow position={[0.06, 1.65, 0]}>
-          <boxGeometry args={[0.03, 1.2, 0.95]} />
-          <meshStandardMaterial color="#cfbf9e" />
-        </mesh>
-      </group>
-
-      <group position={[2.2, 0, -2.95]}>
-        <mesh castShadow position={[0, 1.7, 0.01]}>
-          <boxGeometry args={[1.2, 1.4, 0.03]} />
-          <meshStandardMaterial color="#304965" />
-        </mesh>
-        <mesh castShadow position={[-0.45, 1.7, 0.02]}>
-          <boxGeometry args={[0.03, 1.4, 0.05]} />
-          <meshStandardMaterial color="#f8f4e3" />
-        </mesh>
-      </group>
-
-      <group position={[0.4, 0, -2.95]}>
-        <mesh castShadow position={[0, 2.05, 0.01]}>
-          <boxGeometry args={[1.45, 0.9, 0.03]} />
-          <meshStandardMaterial color="#364f66" />
-        </mesh>
-        <mesh castShadow position={[0, 2.05, 0.03]}>
-          <boxGeometry args={[1.27, 0.72, 0.02]} />
-          <meshStandardMaterial color="#8db8e6" emissive="#99ceff" emissiveIntensity={0.08} />
-        </mesh>
-      </group>
+      <PortraitProp />
+      <PosterWallProps />
+      <MailboxProp />
 
       <mesh castShadow position={[0, 2.78, 0.2]}>
         <cylinderGeometry args={[0.22, 0.22, 0.08, 18]} />

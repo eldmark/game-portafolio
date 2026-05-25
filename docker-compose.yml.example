@@ -29,7 +29,7 @@ services:
     environment:
       DATABASE_URL: postgresql://portfolio:portfolio@postgres:5432/portfolio
       PORT: 4000
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3001,http://localhost:3000
     ports:
       - "4000:4000"
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Info, Laptop, Mail, Map, Settings, Volume2, VolumeX } from 'lucide-react';
 import { logDialogue, trackVisit, endVisit } from '@/lib/api';
 import { usePortfolioData } from '@/lib/usePortfolioData';
@@ -101,16 +101,32 @@ function RecruiterNav() {
   );
 }
 
-function TutorialMascot() {
+function TutorialMascot({
+  nearestHint,
+  hasMoved,
+  hasInteracted,
+}: {
+  nearestHint: string | null;
+  hasMoved: boolean;
+  hasInteracted: boolean;
+}) {
   const tutorialSeen = usePortfolioStore((state) => state.tutorialSeen);
   const markTutorialSeen = usePortfolioStore((state) => state.markTutorialSeen);
 
   if (tutorialSeen) return null;
 
+  const tutorialText = !hasMoved
+    ? 'Use WASD or arrow keys to move around the room.'
+    : !hasInteracted
+      ? nearestHint
+        ? `Good. Now press E near an object: ${nearestHint}.`
+        : 'Good. Walk near a glowing marker, then press E to interact.'
+      : 'Great. You can keep exploring or use Recruiter shortcuts at the top.';
+
   return (
     <aside className="mascot-dialogue">
       <p className="speaker">Pixel</p>
-      <p>Use WASD or arrow keys to move. Stand near an object and press E to interact.</p>
+      <p>{tutorialText}</p>
       <div className="dialogue-actions">
         <button onClick={markTutorialSeen} type="button">
           Got it
@@ -155,6 +171,8 @@ export default function RoomExperience() {
   const recruiterMode = usePortfolioStore((state) => state.recruiterMode);
   const sessionRef = useRef<string | null>(null);
   const startedAtRef = useRef<number>(Date.now());
+  const [hasMoved, setHasMoved] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const nearestObject = useMemo(() => getNearestObject(playerPosition), [playerPosition]);
 
@@ -173,7 +191,16 @@ export default function RoomExperience() {
     if (!sessionRef.current || !activeOverlay) return;
 
     void logDialogue(sessionRef.current, activeOverlay).catch(() => undefined);
+    setHasInteracted(true);
   }, [activeOverlay]);
+
+  useEffect(() => {
+    const dx = Math.abs(playerPosition[0]);
+    const dz = Math.abs(playerPosition[2] - 2.2);
+    if (dx > 0.2 || dz > 0.2) {
+      setHasMoved(true);
+    }
+  }, [playerPosition]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -221,7 +248,11 @@ export default function RoomExperience() {
               <p>{nearestObject ? `Press E: ${nearestObject.hint}` : 'Move near an object'}</p>
             </div>
           </section>
-          <TutorialMascot />
+          <TutorialMascot
+            hasInteracted={hasInteracted}
+            hasMoved={hasMoved}
+            nearestHint={nearestObject?.hint ?? null}
+          />
           <MobileControls />
           <button className="floating-contact" onClick={() => setOverlay('mailbox')} type="button">
             <Mail size={18} />

@@ -70,7 +70,7 @@ Start the full stack:
 docker compose up --build
 ```
 
-Frontend: `http://localhost:3000`
+Frontend: `http://localhost:3001`
 
 Backend health check: `http://localhost:4000/health`
 
