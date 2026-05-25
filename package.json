@@ -1,0 +1,32 @@
+{
+  "name": "interactive-portfolio-room",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A full-stack interactive portfolio presented as an explorable room game.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run build --workspace @portfolio/shared && npm run build --workspace @portfolio/ui && npm run dev --workspace @portfolio/backend & npm run dev --workspace @portfolio/frontend",
+    "build": "npm run build --workspace @portfolio/shared && npm run build --workspace @portfolio/ui && npm run build --workspace @portfolio/backend && npm run build --workspace @portfolio/frontend",
+    "lint": "npm run lint --workspace @portfolio/backend && npm run lint --workspace @portfolio/frontend",
+    "typecheck": "npm run typecheck --workspace @portfolio/shared && npm run typecheck --workspace @portfolio/ui && npm run typecheck --workspace @portfolio/backend && npm run typecheck --workspace @portfolio/frontend",
+    "format": "prettier --write .",
+    "db:migrate": "npm run db:migrate --workspace @portfolio/backend",
+    "db:seed": "npm run db:seed --workspace @portfolio/backend",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20.11.0",
+    "npm": ">=10.2.0"
+  }
+}
