@@ -9,3 +9,5 @@ coverage
 *.log
 .DS_Store
 apps/backend/prisma/migrations/dev.db
+docker-compose.yml
+docs
