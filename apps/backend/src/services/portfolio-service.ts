@@ -17,6 +17,12 @@ function asStringArray(value: unknown): string[] {
     : [];
 }
 
+function normalizeSkillLevel(level: number) {
+  const fivePointLevel = level > 5 ? Math.round(level / 20) : level;
+
+  return Math.min(5, Math.max(1, fivePointLevel));
+}
+
 function mapProjectMedia(media: ProjectRecord['media'] = []): ProjectMedia[] {
   return media.map((item) => ({
     id: item.id,
@@ -74,7 +80,7 @@ export async function getSkills(): Promise<Skill[]> {
     name: skill.name,
     category: skill.category,
     icon: skill.icon,
-    level: skill.level,
+    level: normalizeSkillLevel(skill.level),
     reasoning: skill.reasoning,
     appliedIn: asStringArray(skill.appliedIn),
   }));

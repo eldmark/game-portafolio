@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Info, Laptop, Mail, Map, Settings, Volume2, VolumeX } from 'lucide-react';
@@ -93,7 +93,7 @@ function RecruiterNav() {
       <button onClick={() => setOverlay('mailbox')} type="button">
         Contact
       </button>
-      <Link href="/recruiter">Full recruiter page</Link>
+      <Link to="/recruiter">Full recruiter page</Link>
       <button aria-label="Toggle audio" onClick={() => setMuted(!muted)} type="button">
         {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       </button>

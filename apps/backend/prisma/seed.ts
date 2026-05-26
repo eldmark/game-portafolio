@@ -22,7 +22,7 @@ async function main() {
       {
         name: 'TypeScript',
         category: 'Programming Language',
-        level: 90,
+        level: 5,
         reasoning:
           'Selected for large-scale frontend and backend projects due to type safety, maintainability, and scalability.',
         appliedIn: ['Backend APIs', 'Interactive Portfolio', 'React Applications'],
@@ -30,7 +30,7 @@ async function main() {
       {
         name: 'JavaScript',
         category: 'Programming Language',
-        level: 92,
+        level: 5,
         reasoning:
           'Core language for frontend and full-stack development with strong ecosystem support.',
         appliedIn: ['Movie Blog', 'Zoo Management System', 'Frontend Development'],
@@ -38,7 +38,7 @@ async function main() {
       {
         name: 'Node.js',
         category: 'Backend',
-        level: 88,
+        level: 4,
         reasoning:
           'Used to build scalable backend services and REST APIs with asynchronous architecture.',
         appliedIn: ['Authentication Systems', 'REST APIs', 'Portfolio Backend'],
@@ -46,7 +46,7 @@ async function main() {
       {
         name: 'React',
         category: 'Frontend',
-        level: 90,
+        level: 5,
         reasoning:
           'Chosen for component-based architecture, ecosystem maturity, and SPA capabilities.',
         appliedIn: ['Interactive Portfolio', 'Movie Blog', 'Scholarship Hours Platform'],
@@ -54,7 +54,7 @@ async function main() {
       {
         name: 'Next.js',
         category: 'Frontend Framework',
-        level: 82,
+        level: 4,
         reasoning:
           'Provides excellent routing, optimization, and compatibility with React Three Fiber.',
         appliedIn: ['Interactive Portfolio', 'SSR Applications'],
@@ -62,7 +62,7 @@ async function main() {
       {
         name: 'React Three Fiber',
         category: '3D Frontend',
-        level: 75,
+        level: 4,
         reasoning:
           'Selected to build interactive 3D experiences integrated with React architecture.',
         appliedIn: ['Interactive Portfolio Room', '3D UI Experiments'],
@@ -70,42 +70,42 @@ async function main() {
       {
         name: 'PostgreSQL',
         category: 'Database',
-        level: 85,
+        level: 4,
         reasoning: 'Reliable relational database with strong consistency and scalability.',
         appliedIn: ['Backend APIs', 'Authentication Systems', 'Portfolio Analytics'],
       },
       {
         name: 'Prisma ORM',
         category: 'Database Tooling',
-        level: 84,
+        level: 4,
         reasoning: 'Improves schema management, query safety, and developer productivity.',
         appliedIn: ['PostgreSQL APIs', 'Authentication Systems', 'Portfolio Backend'],
       },
       {
         name: 'Docker',
         category: 'DevOps',
-        level: 86,
+        level: 4,
         reasoning: 'Used to create reproducible environments and containerized full-stack systems.',
         appliedIn: ['Scholarship Hours Platform', 'Movie Blog', 'Portfolio Infrastructure'],
       },
       {
         name: 'Spring Boot',
         category: 'Backend Framework',
-        level: 78,
+        level: 4,
         reasoning: 'Used for structured enterprise-style backend systems and REST APIs.',
         appliedIn: ['Scholarship Hours Platform', 'REST API Systems'],
       },
       {
         name: 'Go',
         category: 'Programming Language',
-        level: 70,
+        level: 3,
         reasoning: 'Explored for lightweight backend services and low-level HTTP understanding.',
         appliedIn: ['HTTP Server in Go', 'Concurrency Experiments'],
       },
       {
         name: 'Java',
         category: 'Programming Language',
-        level: 82,
+        level: 4,
         reasoning:
           'Used for backend systems, interpreters, and academic software engineering projects.',
         appliedIn: ['Lisp Interpreter', 'Scholarship Hours Platform'],
@@ -113,21 +113,21 @@ async function main() {
       {
         name: 'Git & GitHub',
         category: 'Tooling',
-        level: 90,
+        level: 5,
         reasoning: 'Essential for collaboration, version control, and project organization.',
         appliedIn: ['All Projects', 'Collaborative Development'],
       },
       {
         name: 'REST APIs',
         category: 'Architecture',
-        level: 92,
+        level: 5,
         reasoning: 'Main communication architecture used across backend and full-stack projects.',
         appliedIn: ['Movie Blog', 'Scholarship Hours Platform', 'Authentication Systems'],
       },
       {
         name: 'JWT & OAuth2',
         category: 'Security',
-        level: 80,
+        level: 4,
         reasoning: 'Implemented for secure authentication, authorization, and route protection.',
         appliedIn: ['Enterprise Backend System', 'Protected APIs'],
       },

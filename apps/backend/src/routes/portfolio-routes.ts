@@ -8,6 +8,7 @@ import {
 } from '@portfolio/shared';
 import { asyncHandler, notFound } from '../lib/errors.js';
 import { prisma } from '../lib/prisma.js';
+import { sendContactEmail } from '../services/email-service.js';
 import {
   ensureVisit,
   getAnalyticsSummary,
@@ -71,6 +72,13 @@ portfolioRouter.post(
   asyncHandler(async (req, res) => {
     const input = contactMessageInputSchema.parse(req.body);
     const message = await prisma.message.create({ data: input });
+
+    // Send email asynchronously
+    void sendContactEmail({
+      name: input.name,
+      email: input.email,
+      message: input.message,
+    });
 
     res.status(201).json({
       data: {

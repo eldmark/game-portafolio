@@ -14,46 +14,70 @@ const pressedKeys = new Set<string>();
 
 const SPRITE_SHEET_URL = '/assets/models/man-character-spritesheet.png';
 
-const FRAME_WIDTH = 96;
-const FRAME_HEIGHT = 96;
+const COLUMNS = 10;
+const ROWS = 6;
 
-const WALK_FPS = 8;
+const WALK_FPS = 10;
+
+/* -------------------------------------------------------------------------- */
+/*                             ANIMATION MAPPING                              */
+/* -------------------------------------------------------------------------- */
 
 const ANIMATIONS = {
   idleDown: {
     row: 0,
-    frames: [0, 1, 2, 3, 4],
-  },
-
-  idleLeft: {
-    row: 1,
-    frames: [0, 1, 2, 3, 4],
-  },
-
-  walkLeft: {
-    row: 2,
-    frames: [0, 1, 2, 3, 4],
+    frames: [0, 1, 2],
   },
 
   walkRight: {
+    row: 0,
+    frames: [3, 4, 5, 6, 7, 8, 9],
+  },
+
+  idleUp: {
+    row: 1,
+    frames: [0, 1, 2],
+  },
+
+  walkLeft: {
+    row: 1,
+    frames: [3, 4, 5, 6, 7, 8, 9],
+  },
+
+  idleLeft: {
+    row: 2,
+    frames: [0, 1, 2],
+  },
+
+  walkLeftAlt: {
+    row: 2,
+    frames: [3, 4, 5, 6, 7, 8, 9],
+  },
+
+  idleRight: {
     row: 3,
-    frames: [0, 1, 2, 3, 4],
+    frames: [0, 1, 2],
+  },
+
+  walkRightAlt: {
+    row: 3,
+    frames: [3, 4, 5, 6, 7, 8, 9],
+  },
+
+  idleDownAlt: {
+    row: 5,
+    frames: [0, 1, 2],
   },
 
   walkDown: {
-    row: 4,
-    frames: [0, 1, 2, 3, 4],
-  },
-
-  walkUp: {
     row: 5,
-    frames: [0, 1, 2, 3, 4],
+    frames: [3, 4, 5, 6, 7, 8, 9],
   },
 } as const;
 
-type AnimationKey = keyof typeof ANIMATIONS;
-
 type FacingDirection = 'down' | 'left' | 'right' | 'up';
+
+type AnimationKey = keyof typeof ANIMATIONS;
 
 type Collider = {
   minX: number;
@@ -87,13 +111,9 @@ const ROOM_COLLIDERS: Collider[] = [
 
 function collidesAt(x: number, z: number) {
   for (const collider of ROOM_COLLIDERS) {
-    const overlapsX =
-      x + PLAYER_RADIUS > collider.minX &&
-      x - PLAYER_RADIUS < collider.maxX;
+    const overlapsX = x + PLAYER_RADIUS > collider.minX && x - PLAYER_RADIUS < collider.maxX;
 
-    const overlapsZ =
-      z + PLAYER_RADIUS > collider.minZ &&
-      z - PLAYER_RADIUS < collider.maxZ;
+    const overlapsZ = z + PLAYER_RADIUS > collider.minZ && z - PLAYER_RADIUS < collider.maxZ;
 
     if (overlapsX && overlapsZ) return true;
   }
@@ -102,7 +122,7 @@ function collidesAt(x: number, z: number) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              KEYBOARD INPUT                                */
+/*                             KEYBOARD CONTROLS                              */
 /* -------------------------------------------------------------------------- */
 
 export function setVirtualKey(key: string, active: boolean) {
@@ -143,19 +163,15 @@ export function Player() {
 
   const groupRef = useRef<THREE.Group>(null);
 
-  const position = useMemo(
-    () => new THREE.Vector3(0, 0.45, 2.2),
-    []
-  );
+  const position = useMemo(() => new THREE.Vector3(0, 0.45, 2.2), []);
 
   const facingDirectionRef = useRef<FacingDirection>('down');
 
   const currentFrameRef = useRef(0);
-  const animationTimeRef = useRef(0);
 
-  const setPlayerPosition = usePortfolioStore(
-    (state) => state.setPlayerPosition
-  );
+  const animationTimerRef = useRef(0);
+
+  const setPlayerPosition = usePortfolioStore((state) => state.setPlayerPosition);
 
   const spriteSheet = useTexture(SPRITE_SHEET_URL);
 
@@ -172,18 +188,13 @@ export function Player() {
     spriteSheet.wrapS = THREE.ClampToEdgeWrapping;
     spriteSheet.wrapT = THREE.ClampToEdgeWrapping;
 
-    if (spriteSheet.image) {
-      spriteSheet.repeat.set(
-        FRAME_WIDTH / spriteSheet.image.width,
-        FRAME_HEIGHT / spriteSheet.image.height
-      );
-    }
+    spriteSheet.repeat.set(1 / COLUMNS, 1 / ROWS);
 
     spriteSheet.needsUpdate = true;
   }, [spriteSheet]);
 
   /* ------------------------------------------------------------------------ */
-  /*                                ANIMATION                                 */
+  /*                                  UPDATE                                  */
   /* ------------------------------------------------------------------------ */
 
   useFrame((_state, delta) => {
@@ -219,13 +230,13 @@ export function Player() {
       const nextX = THREE.MathUtils.clamp(
         position.x + direction.x * speed * delta,
         ROOM_LIMITS.minX,
-        ROOM_LIMITS.maxX
+        ROOM_LIMITS.maxX,
       );
 
       const nextZ = THREE.MathUtils.clamp(
         position.z + direction.z * speed * delta,
         ROOM_LIMITS.minZ,
-        ROOM_LIMITS.maxZ
+        ROOM_LIMITS.maxZ,
       );
 
       const canMoveX = !collidesAt(nextX, position.z);
@@ -245,32 +256,24 @@ export function Player() {
       /* -------------------------------------------------------------------- */
 
       if (Math.abs(direction.x) > Math.abs(direction.z)) {
-        facingDirectionRef.current =
-          direction.x < 0 ? 'left' : 'right';
+        facingDirectionRef.current = direction.x < 0 ? 'left' : 'right';
       } else {
-        facingDirectionRef.current =
-          direction.z < 0 ? 'up' : 'down';
+        facingDirectionRef.current = direction.z < 0 ? 'up' : 'down';
       }
 
-      /* -------------------------------------------------------------------- */
-      /*                              FRAME TIMER                              */
-      /* -------------------------------------------------------------------- */
+      animationTimerRef.current += delta;
 
-      animationTimeRef.current += delta;
+      if (animationTimerRef.current >= 1 / WALK_FPS) {
+        animationTimerRef.current = 0;
 
-      if (animationTimeRef.current >= 1 / WALK_FPS) {
-        animationTimeRef.current = 0;
-
-        currentFrameRef.current =
-          (currentFrameRef.current + 1) % 5;
+        currentFrameRef.current++;
       }
     } else {
       currentFrameRef.current = 0;
-      animationTimeRef.current = 0;
     }
 
     /* ---------------------------------------------------------------------- */
-    /*                          SELECT ANIMATION                              */
+    /*                            SELECT ANIMATION                            */
     /* ---------------------------------------------------------------------- */
 
     let animationKey: AnimationKey = 'idleDown';
@@ -278,15 +281,15 @@ export function Player() {
     if (moving) {
       switch (facingDirectionRef.current) {
         case 'left':
-          animationKey = 'walkLeft';
+          animationKey = 'walkLeftAlt';
           break;
 
         case 'right':
-          animationKey = 'walkRight';
+          animationKey = 'walkRightAlt';
           break;
 
         case 'up':
-          animationKey = 'walkUp';
+          animationKey = 'walkLeft';
           break;
 
         case 'down':
@@ -300,11 +303,11 @@ export function Player() {
           break;
 
         case 'right':
-          animationKey = 'walkRight';
+          animationKey = 'idleRight';
           break;
 
         case 'up':
-          animationKey = 'walkUp';
+          animationKey = 'idleUp';
           break;
 
         case 'down':
@@ -316,67 +319,43 @@ export function Player() {
     const animation = ANIMATIONS[animationKey];
 
     const frame =
-      animation.frames[currentFrameRef.current] ?? 0;
+      animation.frames[currentFrameRef.current % animation.frames.length] ?? animation.frames[0];
 
-    const textureWidth = spriteSheet.image?.width ?? FRAME_WIDTH;
-    const textureHeight = spriteSheet.image?.height ?? FRAME_HEIGHT;
+    /* ---------------------------------------------------------------------- */
+    /*                            SPRITE OFFSETS                              */
+    /* ---------------------------------------------------------------------- */
 
-    const columns = textureWidth / FRAME_WIDTH;
-    const rows = textureHeight / FRAME_HEIGHT;
+    const offsetX = frame / COLUMNS;
 
-    const offsetX = (frame % columns) / columns;
-
-    const offsetY =
-      1 - (animation.row + 1) / rows;
+    const offsetY = 1 - (animation.row + 1) / ROWS;
 
     spriteSheet.offset.set(offsetX, offsetY);
 
     /* ---------------------------------------------------------------------- */
-    /*                              POSITIONING                               */
+    /*                               POSITIONING                              */
     /* ---------------------------------------------------------------------- */
 
     if (groupRef.current) {
       groupRef.current.position.copy(position);
     }
 
-    setPlayerPosition([
-      position.x,
-      position.y,
-      position.z,
-    ]);
+    setPlayerPosition([position.x, position.y, position.z]);
   });
 
   return (
-    <group
-      ref={groupRef}
-      position={[0, 0.45, 2.2]}
-    >
-      {/* Shadow */}
+    <group ref={groupRef} position={[0, 0.45, 2.2]}>
+      {/* SHADOW */}
 
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, 0.02, 0]}
-      >
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
         <circleGeometry args={[0.16, 24]} />
 
-        <meshStandardMaterial
-          color='#000000'
-          transparent
-          opacity={0.3}
-        />
+        <meshStandardMaterial color="#000000" transparent opacity={0.25} />
       </mesh>
 
-      {/* Character Sprite */}
+      {/* SPRITE */}
 
-      <sprite
-        position={[0, 0.58, 0]}
-        scale={[1.15, 1.15, 1]}
-      >
-        <spriteMaterial
-          map={spriteSheet}
-          transparent
-          alphaTest={0.1}
-        />
+      <sprite position={[0, 0.72, 0]} scale={[1.6, 1.6, 1]}>
+        <spriteMaterial map={spriteSheet} transparent alphaTest={0.1} />
       </sprite>
     </group>
   );

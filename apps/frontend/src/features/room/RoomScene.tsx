@@ -97,6 +97,268 @@ function PosterWallProps() {
   );
 }
 
+const floorSeams = [-2.25, -1.7, -1.15, -0.6, -0.05, 0.5, 1.05, 1.6, 2.15] as const;
+const deskKeyRows = [-0.5, -0.38, -0.26] as const;
+const deskKeyColumns = [-0.42, -0.28, -0.14, 0, 0.14, 0.28, 0.42] as const;
+const bookRows = [0.28, 0.72, 1.17, 1.62] as const;
+const bookColors = ['#d96c5f', '#e8c36a', '#5d9ca6', '#8f6db6', '#72a66a'] as const;
+const whiteboardNotes = [
+  { color: '#f1d78c', position: [-0.76, 1.88, 0.09] as [number, number, number], rotation: 0.04 },
+  { color: '#f4a261', position: [-0.18, 1.74, 0.09] as [number, number, number], rotation: -0.06 },
+  { color: '#8db8e6', position: [0.52, 1.9, 0.09] as [number, number, number], rotation: 0.08 },
+  { color: '#9bd58a', position: [0.76, 1.44, 0.09] as [number, number, number], rotation: -0.03 },
+] as const;
+
+function FloorDetails() {
+  return (
+    <group>
+      {floorSeams.map((z) => (
+        <mesh key={z} receiveShadow position={[0, 0.06, z]}>
+          <boxGeometry args={[7.12, 0.012, 0.018]} />
+          <meshStandardMaterial color="#6d4932" roughness={1} />
+        </mesh>
+      ))}
+      <mesh receiveShadow position={[0.1, 0.075, 0.5]}>
+        <boxGeometry args={[3.06, 0.025, 1.86]} />
+        <meshStandardMaterial color="#375f58" roughness={0.94} />
+      </mesh>
+      <mesh receiveShadow position={[0.1, 0.09, -0.36]}>
+        <boxGeometry args={[2.76, 0.018, 0.05]} />
+        <meshStandardMaterial color="#d7b478" roughness={0.9} />
+      </mesh>
+      <mesh receiveShadow position={[0.1, 0.09, 1.36]}>
+        <boxGeometry args={[2.76, 0.018, 0.05]} />
+        <meshStandardMaterial color="#d7b478" roughness={0.9} />
+      </mesh>
+      <mesh receiveShadow position={[-1.24, 0.09, 0.5]}>
+        <boxGeometry args={[0.05, 0.018, 1.64]} />
+        <meshStandardMaterial color="#d7b478" roughness={0.9} />
+      </mesh>
+      <mesh receiveShadow position={[1.44, 0.09, 0.5]}>
+        <boxGeometry args={[0.05, 0.018, 1.64]} />
+        <meshStandardMaterial color="#d7b478" roughness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+function BaseboardTrim() {
+  return (
+    <group>
+      <mesh receiveShadow position={[0, 0.28, -2.91]}>
+        <boxGeometry args={[7.36, 0.16, 0.06]} />
+        <meshStandardMaterial color="#7e5b42" roughness={0.9} />
+      </mesh>
+      <mesh receiveShadow position={[-3.64, 0.28, 0]}>
+        <boxGeometry args={[0.06, 0.16, 5.78]} />
+        <meshStandardMaterial color="#806149" roughness={0.9} />
+      </mesh>
+      <mesh receiveShadow position={[3.64, 0.28, 0]}>
+        <boxGeometry args={[0.06, 0.16, 5.78]} />
+        <meshStandardMaterial color="#806149" roughness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+function DeskSetup() {
+  return (
+    <group position={[-2.7, 0, -2.1]}>
+      <mesh castShadow receiveShadow position={[0, 0.48, -0.2]}>
+        <boxGeometry args={[1.95, 0.14, 0.9]} />
+        <meshStandardMaterial color="#5a3f31" roughness={0.82} />
+      </mesh>
+      <mesh castShadow position={[-0.88, 0.25, -0.53]}>
+        <boxGeometry args={[0.12, 0.46, 0.12]} />
+        <meshStandardMaterial color="#4f3529" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[0.88, 0.25, -0.53]}>
+        <boxGeometry args={[0.12, 0.46, 0.12]} />
+        <meshStandardMaterial color="#4f3529" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[-0.88, 0.25, 0.13]}>
+        <boxGeometry args={[0.12, 0.46, 0.12]} />
+        <meshStandardMaterial color="#4f3529" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[0.88, 0.25, 0.13]}>
+        <boxGeometry args={[0.12, 0.46, 0.12]} />
+        <meshStandardMaterial color="#4f3529" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[0, 0.88, -0.52]}>
+        <boxGeometry args={[1.25, 0.82, 0.12]} />
+        <meshStandardMaterial color="#1c232a" emissive="#5db6ff" emissiveIntensity={0.14} />
+      </mesh>
+      <mesh castShadow position={[0, 0.89, -0.45]}>
+        <boxGeometry args={[1.03, 0.62, 0.035]} />
+        <meshStandardMaterial color="#162c38" emissive="#7fcfff" emissiveIntensity={0.28} />
+      </mesh>
+      <mesh castShadow position={[0, 0.52, -0.5]}>
+        <boxGeometry args={[0.2, 0.16, 0.08]} />
+        <meshStandardMaterial color="#2b3038" roughness={0.74} />
+      </mesh>
+      <mesh castShadow position={[0, 0.48, -0.38]}>
+        <boxGeometry args={[0.54, 0.05, 0.16]} />
+        <meshStandardMaterial color="#2b3038" roughness={0.74} />
+      </mesh>
+      <mesh castShadow position={[-0.36, 0.58, -0.26]}>
+        <boxGeometry args={[0.45, 0.24, 0.3]} />
+        <meshStandardMaterial color="#d6d2c4" roughness={0.7} />
+      </mesh>
+      <mesh castShadow position={[0.43, 0.62, -0.34]}>
+        <boxGeometry args={[0.24, 0.34, 0.22]} />
+        <meshStandardMaterial color="#2a2e37" roughness={0.72} />
+      </mesh>
+      <group position={[0, 0.59, -0.08]}>
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[1.04, 0.045, 0.34]} />
+          <meshStandardMaterial color="#242a31" roughness={0.78} />
+        </mesh>
+        {deskKeyRows.map((z, rowIndex) =>
+          deskKeyColumns.map((x, columnIndex) => (
+            <mesh
+              castShadow
+              key={`${rowIndex}-${columnIndex}`}
+              position={[x + rowIndex * 0.035, 0.04, z + 0.34]}
+            >
+              <boxGeometry args={[0.07, 0.018, 0.045]} />
+              <meshStandardMaterial color="#c9d0d6" roughness={0.64} />
+            </mesh>
+          )),
+        )}
+      </group>
+      <mesh castShadow position={[0.64, 0.61, 0.02]}>
+        <boxGeometry args={[0.18, 0.045, 0.28]} />
+        <meshStandardMaterial color="#20252c" roughness={0.68} />
+      </mesh>
+      <group position={[-0.72, 0.63, 0.06]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.08, 0.07, 0.18, 16]} />
+          <meshStandardMaterial color="#f0e4bf" roughness={0.6} />
+        </mesh>
+        <mesh castShadow position={[0.07, 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.05, 0.01, 8, 14]} />
+          <meshStandardMaterial color="#f0e4bf" roughness={0.6} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+function BedProp() {
+  return (
+    <group position={[-2.35, 0, 1.8]}>
+      <mesh castShadow receiveShadow position={[0, 0.26, 0]}>
+        <boxGeometry args={[2.1, 0.42, 1.45]} />
+        <meshStandardMaterial color="#8562a1" roughness={0.82} />
+      </mesh>
+      <mesh castShadow position={[0, 0.52, 0]}>
+        <boxGeometry args={[2.04, 0.08, 1.39]} />
+        <meshStandardMaterial color="#cbc2db" roughness={0.86} />
+      </mesh>
+      <mesh castShadow position={[0.32, 0.61, 0.2]}>
+        <boxGeometry args={[1.36, 0.1, 1.02]} />
+        <meshStandardMaterial color="#7e5f9e" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[-0.75, 0.64, -0.35]}>
+        <boxGeometry args={[0.5, 0.2, 0.48]} />
+        <meshStandardMaterial color="#f0e4bf" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[-1.16, 0.58, 0.86]}>
+        <boxGeometry args={[0.42, 0.46, 0.42]} />
+        <meshStandardMaterial color="#59402f" roughness={0.88} />
+      </mesh>
+      <mesh castShadow position={[-1.16, 0.96, 0.86]}>
+        <cylinderGeometry args={[0.16, 0.22, 0.22, 18]} />
+        <meshStandardMaterial color="#f1c982" emissive="#f2c06e" emissiveIntensity={0.2} />
+      </mesh>
+      <pointLight position={[-1.16, 1.08, 0.86]} color="#ffd59a" intensity={0.22} distance={2.8} />
+    </group>
+  );
+}
+
+function BookshelfProp() {
+  return (
+    <group position={[2.95, 0, 1.2]}>
+      <mesh castShadow receiveShadow position={[0, 0.92, 0]}>
+        <boxGeometry args={[0.78, 1.9, 1.58]} />
+        <meshStandardMaterial color="#5c4c3b" roughness={0.86} />
+      </mesh>
+      {bookRows.map((y) => (
+        <mesh castShadow key={`shelf-${y}`} position={[0, y, 0]}>
+          <boxGeometry args={[0.82, 0.04, 1.48]} />
+          <meshStandardMaterial color="#735d49" roughness={0.84} />
+        </mesh>
+      ))}
+      {bookRows.slice(0, -1).map((y, rowIndex) =>
+        bookColors.map((color, columnIndex) => (
+          <mesh
+            castShadow
+            key={`${rowIndex}-${color}`}
+            position={[0.03, y + 0.18, -0.56 + columnIndex * 0.27 + rowIndex * 0.03]}
+            rotation={[0, 0, (columnIndex % 2 === 0 ? 1 : -1) * 0.04]}
+          >
+            <boxGeometry args={[0.16, 0.34 + (columnIndex % 2) * 0.08, 0.08]} />
+            <meshStandardMaterial color={color} roughness={0.78} />
+          </mesh>
+        )),
+      )}
+      <mesh castShadow position={[0.03, 1.82, 0.48]}>
+        <boxGeometry args={[0.2, 0.16, 0.2]} />
+        <meshStandardMaterial color="#d6bf84" roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+function ProjectBoardProp() {
+  return (
+    <group position={[0, 0, -2.82]}>
+      <mesh castShadow receiveShadow position={[0, 1.62, 0]}>
+        <boxGeometry args={[2.35, 1.48, 0.08]} />
+        <meshStandardMaterial color="#4d684a" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[0, 1.62, 0.05]}>
+        <boxGeometry args={[2.13, 1.26, 0.04]} />
+        <meshStandardMaterial color="#f2ecd4" roughness={0.7} />
+      </mesh>
+      {whiteboardNotes.map((note) => (
+        <mesh
+          castShadow
+          key={`${note.color}-${note.position[0]}`}
+          position={note.position}
+          rotation={[0, 0, note.rotation]}
+        >
+          <boxGeometry args={[0.38, 0.3, 0.025]} />
+          <meshStandardMaterial color={note.color} roughness={0.82} />
+        </mesh>
+      ))}
+      <mesh castShadow position={[0.16, 1.57, 0.09]} rotation={[0, 0, -0.14]}>
+        <boxGeometry args={[1.32, 0.025, 0.02]} />
+        <meshStandardMaterial color="#43515b" roughness={0.8} />
+      </mesh>
+      <mesh castShadow position={[-0.2, 1.36, 0.09]} rotation={[0, 0, 0.08]}>
+        <boxGeometry args={[1.02, 0.025, 0.02]} />
+        <meshStandardMaterial color="#43515b" roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+function OpenCeilingLight() {
+  return (
+    <group position={[0.25, 2.94, 0.2]}>
+      <mesh castShadow position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 0.38, 12]} />
+        <meshStandardMaterial color="#5e5145" roughness={0.72} />
+      </mesh>
+      <mesh castShadow position={[0, -0.12, 0]}>
+        <cylinderGeometry args={[0.28, 0.18, 0.18, 24]} />
+        <meshStandardMaterial color="#e8cf9f" emissive="#f0cb84" emissiveIntensity={0.34} />
+      </mesh>
+    </group>
+  );
+}
+
 function InteractableObject({
   object,
   active,
@@ -189,6 +451,7 @@ function RoomShell() {
         <boxGeometry args={[7.2, 0.02, 5.7]} />
         <meshStandardMaterial color="#91633f" roughness={0.96} metalness={0} />
       </mesh>
+      <FloorDetails />
 
       <mesh receiveShadow position={[0, 1.5, -3]}>
         <boxGeometry args={[7.5, 3, 0.12]} />
@@ -202,104 +465,16 @@ function RoomShell() {
         <boxGeometry args={[0.12, 3, 6]} />
         <meshStandardMaterial color="#5d4b3f" />
       </mesh>
-      <mesh receiveShadow position={[0, 3.04, 0]}>
-        <boxGeometry args={[7.5, 0.1, 6]} />
-        <meshStandardMaterial color="#2f3943" />
-      </mesh>
-
-      <mesh receiveShadow position={[0.1, 0.04, 0.5]}>
-        <boxGeometry args={[2.9, 0.02, 1.7]} />
-        <meshStandardMaterial color="#5f8f82" />
-      </mesh>
-
-      <group position={[-2.7, 0, -2.1]}>
-        <mesh castShadow receiveShadow position={[0, 0.48, -0.2]}>
-          <boxGeometry args={[1.95, 0.14, 0.9]} />
-          <meshStandardMaterial color="#5a3f31" />
-        </mesh>
-        <mesh castShadow position={[-0.88, 0.25, -0.53]}>
-          <boxGeometry args={[0.12, 0.46, 0.12]} />
-          <meshStandardMaterial color="#4f3529" />
-        </mesh>
-        <mesh castShadow position={[0.88, 0.25, -0.53]}>
-          <boxGeometry args={[0.12, 0.46, 0.12]} />
-          <meshStandardMaterial color="#4f3529" />
-        </mesh>
-        <mesh castShadow position={[-0.88, 0.25, 0.13]}>
-          <boxGeometry args={[0.12, 0.46, 0.12]} />
-          <meshStandardMaterial color="#4f3529" />
-        </mesh>
-        <mesh castShadow position={[0.88, 0.25, 0.13]}>
-          <boxGeometry args={[0.12, 0.46, 0.12]} />
-          <meshStandardMaterial color="#4f3529" />
-        </mesh>
-        <mesh castShadow position={[0, 0.88, -0.52]}>
-          <boxGeometry args={[1.25, 0.82, 0.12]} />
-          <meshStandardMaterial color="#1c232a" emissive="#5db6ff" emissiveIntensity={0.12} />
-        </mesh>
-        <mesh castShadow position={[-0.36, 0.58, -0.26]}>
-          <boxGeometry args={[0.45, 0.24, 0.3]} />
-          <meshStandardMaterial color="#d6d2c4" />
-        </mesh>
-        <mesh castShadow position={[0.43, 0.62, -0.34]}>
-          <boxGeometry args={[0.24, 0.34, 0.22]} />
-          <meshStandardMaterial color="#2a2e37" />
-        </mesh>
-      </group>
-
-      <group position={[-2.35, 0, 1.8]}>
-        <mesh castShadow receiveShadow position={[0, 0.26, 0]}>
-          <boxGeometry args={[2.1, 0.42, 1.45]} />
-          <meshStandardMaterial color="#8562a1" />
-        </mesh>
-        <mesh castShadow position={[0, 0.52, 0]}>
-          <boxGeometry args={[2.04, 0.08, 1.39]} />
-          <meshStandardMaterial color="#cbc2db" />
-        </mesh>
-        <mesh castShadow position={[-0.75, 0.62, -0.35]}>
-          <boxGeometry args={[0.45, 0.22, 0.45]} />
-          <meshStandardMaterial color="#f0e4bf" />
-        </mesh>
-      </group>
-
-      <group position={[2.95, 0, 1.2]}>
-        <mesh castShadow receiveShadow position={[0, 0.92, 0]}>
-          <boxGeometry args={[0.78, 1.9, 1.58]} />
-          <meshStandardMaterial color="#5c4c3b" />
-        </mesh>
-        <mesh castShadow position={[0, 1.4, 0]}>
-          <boxGeometry args={[0.82, 0.04, 1.48]} />
-          <meshStandardMaterial color="#735d49" />
-        </mesh>
-        <mesh castShadow position={[0, 0.95, 0]}>
-          <boxGeometry args={[0.82, 0.04, 1.48]} />
-          <meshStandardMaterial color="#735d49" />
-        </mesh>
-        <mesh castShadow position={[0, 0.5, 0]}>
-          <boxGeometry args={[0.82, 0.04, 1.48]} />
-          <meshStandardMaterial color="#735d49" />
-        </mesh>
-      </group>
-
-      <group position={[0, 0, -2.82]}>
-        <mesh castShadow receiveShadow position={[0, 1.62, 0]}>
-          <boxGeometry args={[2.35, 1.48, 0.08]} />
-          <meshStandardMaterial color="#4d684a" />
-        </mesh>
-        <mesh castShadow position={[0, 1.62, 0.05]}>
-          <boxGeometry args={[2.13, 1.26, 0.04]} />
-          <meshStandardMaterial color="#f2ecd4" />
-        </mesh>
-      </group>
+      <BaseboardTrim />
+      <DeskSetup />
+      <BedProp />
+      <BookshelfProp />
+      <ProjectBoardProp />
 
       <PortraitProp />
       <PosterWallProps />
       <MailboxProp />
-
-      <mesh castShadow position={[0, 2.78, 0.2]}>
-        <cylinderGeometry args={[0.22, 0.22, 0.08, 18]} />
-        <meshStandardMaterial color="#e8cf9f" emissive="#f0cb84" emissiveIntensity={0.32} />
-      </mesh>
+      <OpenCeilingLight />
     </group>
   );
 }

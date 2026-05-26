@@ -44,7 +44,12 @@ function OverlayShell({
           <p className="eyebrow">Portfolio Room</p>
           <h2>{title}</h2>
         </div>
-        <button aria-label="Close overlay" className="icon-button" onClick={closeOverlay} type="button">
+        <button
+          aria-label="Close overlay"
+          className="icon-button"
+          onClick={closeOverlay}
+          type="button"
+        >
           <X size={20} />
         </button>
       </header>
@@ -53,7 +58,11 @@ function OverlayShell({
   );
 }
 
-function DataNotice({ loading, error, usingFallback }: Pick<PortfolioOverlayProps, 'loading' | 'error' | 'usingFallback'>) {
+function DataNotice({
+  loading,
+  error,
+  usingFallback,
+}: Pick<PortfolioOverlayProps, 'loading' | 'error' | 'usingFallback'>) {
   if (loading) {
     return <p className="data-notice">Loading live API data...</p>;
   }
@@ -71,6 +80,37 @@ function DataNotice({ loading, error, usingFallback }: Pick<PortfolioOverlayProp
   }
 
   return <p className="data-notice">Live backend data loaded.</p>;
+}
+
+function formatTimelineDate(value: string | null) {
+  if (!value) return 'Present';
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+}
+
+function ProjectPreview({ project, label }: { project: Project; label?: string }) {
+  const mediaUrl = project.gifDemo ?? project.thumbnail ?? project.media[0]?.url;
+  const mediaLabel =
+    label ??
+    (project.gifDemo ? 'GIF demo' : project.featured ? 'Featured project' : 'Project media');
+
+  return (
+    <div
+      className={`project-thumb ${mediaUrl ? 'project-thumb-media' : ''}`}
+      style={
+        mediaUrl
+          ? {
+              backgroundImage: `linear-gradient(rgba(17, 19, 24, 0.08), rgba(17, 19, 24, 0.78)), url("${mediaUrl}")`,
+            }
+          : undefined
+      }
+    >
+      <span>{mediaLabel}</span>
+    </div>
+  );
 }
 
 function TerminalPane({ projects, skills }: { projects: Project[]; skills: Skill[] }) {
@@ -135,25 +175,80 @@ function TerminalPane({ projects, skills }: { projects: Project[]; skills: Skill
   );
 }
 
+function TimelinePane({ experiences }: { experiences: Experience[] }) {
+  return (
+    <div className="timeline-list">
+      {experiences.map((experience) => (
+        <article className="timeline-item" key={experience.id}>
+          <p className="timeline-date">
+            {formatTimelineDate(experience.startDate)} - {formatTimelineDate(experience.endDate)}
+          </p>
+          <div className="detail-card">
+            <h3>{experience.role}</h3>
+            <p className="muted">{experience.company}</p>
+            <p>{experience.description}</p>
+            <p className="tag-row">{experience.technologies.join(' / ')}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function ContactPane() {
+  const setOverlay = usePortfolioStore((state) => state.setOverlay);
+
+  return (
+    <div className="grid-list">
+      <article className="detail-card">
+        <h3>Direct Contact</h3>
+        <p>{aboutProfile.contact}</p>
+        <div className="link-row">
+          <button className="secondary-button" onClick={() => setOverlay('mailbox')} type="button">
+            <Mail size={16} /> Open mailbox
+          </button>
+          <a className="text-link" href="mailto:replace-me@example.com">
+            <Mail size={16} /> Email placeholder
+          </a>
+        </div>
+      </article>
+      <article className="detail-card">
+        <h3>Publishing Checklist</h3>
+        <p>
+          Replace placeholder email, GitHub, live URLs, resume PDF, and project media before
+          deployment.
+        </p>
+        <p className="tag-row">
+          README / public portfolio URL / public repository / Docker verification
+        </p>
+      </article>
+    </div>
+  );
+}
+
 function ComputerOverlay(props: PortfolioOverlayProps) {
-  const [tab, setTab] = useState<'experience' | 'skills' | 'resume' | 'terminal'>('experience');
+  const [tab, setTab] = useState<
+    'experience' | 'timeline' | 'skills' | 'resume' | 'contact' | 'terminal'
+  >('experience');
 
   return (
     <OverlayShell title="Main Computer" wide>
       <DataNotice {...props} />
       <div className="tab-row" role="tablist">
-        {(['experience', 'skills', 'resume', 'terminal'] as const).map((item) => (
-          <button
-            aria-selected={tab === item}
-            className={tab === item ? 'active' : ''}
-            key={item}
-            onClick={() => setTab(item)}
-            role="tab"
-            type="button"
-          >
-            {item}
-          </button>
-        ))}
+        {(['experience', 'timeline', 'skills', 'resume', 'contact', 'terminal'] as const).map(
+          (item) => (
+            <button
+              aria-selected={tab === item}
+              className={tab === item ? 'active' : ''}
+              key={item}
+              onClick={() => setTab(item)}
+              role="tab"
+              type="button"
+            >
+              {item}
+            </button>
+          ),
+        )}
       </div>
       {tab === 'experience' ? (
         <div className="stack-list">
@@ -167,6 +262,7 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
           ))}
         </div>
       ) : null}
+      {tab === 'timeline' ? <TimelinePane experiences={props.experiences} /> : null}
       {tab === 'skills' ? <SkillsGrid skills={props.skills} /> : null}
       {tab === 'resume' ? (
         <div className="detail-card">
@@ -179,6 +275,7 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
           </a>
         </div>
       ) : null}
+      {tab === 'contact' ? <ContactPane /> : null}
       {tab === 'terminal' ? <TerminalPane projects={props.projects} skills={props.skills} /> : null}
     </OverlayShell>
   );
@@ -187,19 +284,23 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
 function SkillsGrid({ skills }: { skills: Skill[] }) {
   return (
     <div className="grid-list">
-      {skills.map((skill) => (
-        <article className="detail-card" key={skill.id}>
-          <div className="card-heading">
-            <h3>{skill.name}</h3>
-            <span>{skill.category}</span>
-          </div>
-          <div aria-label={`${skill.level} out of 5`} className="meter">
-            <span style={{ width: `${skill.level * 20}%` }} />
-          </div>
-          <p>{skill.reasoning}</p>
-          <p className="tag-row">{skill.appliedIn.join(' / ')}</p>
-        </article>
-      ))}
+      {skills.map((skill) => {
+        const level = Math.min(5, Math.max(1, skill.level));
+
+        return (
+          <article className="detail-card" key={skill.id}>
+            <div className="card-heading">
+              <h3>{skill.name}</h3>
+              <span>{skill.category}</span>
+            </div>
+            <div aria-label={`${level} out of 5`} className="meter">
+              <span style={{ width: `${level * 20}%` }} />
+            </div>
+            <p>{skill.reasoning}</p>
+            <p className="tag-row">{skill.appliedIn.join(' / ')}</p>
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -211,9 +312,7 @@ function ProjectsOverlay(props: PortfolioOverlayProps) {
       <div className="project-grid">
         {props.projects.map((project) => (
           <article className="project-card" key={project.id}>
-            <div className="project-thumb">
-              <span>{project.featured ? 'Featured' : 'Project'}</span>
-            </div>
+            <ProjectPreview project={project} />
             <h3>{project.title}</h3>
             <p>{project.description}</p>
             <h4>Architecture</h4>
@@ -334,9 +433,7 @@ function PostersOverlay({ projects }: { projects: Project[] }) {
       <div className="project-grid">
         {featured.map((project) => (
           <article className="project-card poster-card" key={project.id}>
-            <div className="project-thumb">
-              <span>GIF demo placeholder</span>
-            </div>
+            <ProjectPreview label="Featured highlight" project={project} />
             <h3>{project.title}</h3>
             <p>{project.description}</p>
             <p className="tag-row">{project.stack.join(' / ')}</p>
@@ -385,8 +482,8 @@ function RecruiterOverlay(props: PortfolioOverlayProps) {
         <section>
           <h3>Technical Direction</h3>
           <p>
-            The portfolio is built as a real full-stack product: typed contracts, REST API,
-            database persistence, Dockerized services, and a UI that demonstrates async behavior.
+            The portfolio is built as a real full-stack product: typed contracts, REST API, database
+            persistence, Dockerized services, and a UI that demonstrates async behavior.
           </p>
         </section>
       </div>
@@ -402,9 +499,15 @@ function SettingsOverlay() {
     <OverlayShell title="Settings">
       <label className="setting-row">
         <span>Audio muted</span>
-        <input checked={muted} onChange={(event) => setMuted(event.target.checked)} type="checkbox" />
+        <input
+          checked={muted}
+          onChange={(event) => setMuted(event.target.checked)}
+          type="checkbox"
+        />
       </label>
-      <p className="muted">Audio is wired with Howler hooks and starts muted until final assets exist.</p>
+      <p className="muted">
+        Audio is wired with Howler hooks and starts muted until final assets exist.
+      </p>
     </OverlayShell>
   );
 }
