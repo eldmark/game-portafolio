@@ -1,106 +1,97 @@
 # Interactive Portfolio Room
 
-A full-stack developer portfolio presented as an explorable cozy room. Visitors can move through a stylized 3D space, interact with objects, inspect projects, read technical reasoning, and use a recruiter mode when they need a faster traditional portfolio flow.
+A full-stack developer portfolio presented as an explorable cozy room. Visitors can move through a stylized 3D space, interact with objects, inspect projects, read technical reasoning, and use a dedicated Recruiter Mode for a faster, traditional flow.
 
-## Features
-- Interactive React Three Fiber room with movement, camera, and object prompts.
-- Recruiter mode with direct access to About, Projects, Skills, Resume, and Contact.
-- Dynamic projects, skills, and experience loaded from a backend API.
-- Contact mailbox that posts messages to the API.
-- Fake developer terminal inside the computer overlay.
-- Mascot tutorial, accessible modal overlays, loading states, and error states.
-- Dockerized frontend, backend, and PostgreSQL database.
+## 🚀 Experience Features
+- **Explorable 3D Space:** Interactive React Three Fiber room with movement, camera follow, and object prompts.
+- **Pixel Art Character:** Sprite-sheet based character animation with direction-based logic.
+- **Recruiter Mode:** A high-speed, traditional portfolio view optimized for professional evaluation (About, Proof of Work, Skills, Resume, and Contact).
+- **Dynamic Content:** Projects, skills, and experience are loaded from a backend API with a robust frontend fallback system.
+- **Interactive Computer:** A functional developer terminal simulation inside the computer overlay.
+- **Contact System:** Integrated mailbox with real-time validation and error handling.
+- **Mobile Responsive:** Fully optimized for all devices, including mobile-friendly navigation bars and touch controls.
+- **Cozy Aesthetics:** Polished UI with Framer Motion animations, Syne typography, and a warm color palette.
 
-## Stack
-- **Frontend:** Next.js, React, TypeScript, React Three Fiber, Drei, Framer Motion, Zustand, Howler.js.
-- **Backend:** Node.js, Express, Prisma, PostgreSQL, Zod.
+## 🛠️ Technical Stack
+- **Frontend:** Next.js (App Router), React, TypeScript, React Three Fiber, Drei, Framer Motion, Zustand.
+- **Backend:** Node.js, Express, Prisma ORM, PostgreSQL, Zod validation.
 - **DevOps:** Docker, Docker Compose.
+- **Shared:** Monorepo architecture with shared TypeScript contracts.
 
-## Why This Stack
-Next.js provides routing, production builds, and a mature React foundation. React Three Fiber makes the 3D room fit naturally into the React component model. Zustand keeps interaction state small and explicit without boilerplate. Express keeps the API readable for a junior full-stack portfolio while still supporting production-style middleware, validation, and service boundaries. Prisma and PostgreSQL demonstrate relational modeling, migrations, and intentional data access. Docker Compose proves the app can run as a real multi-service system.
+## 🏗️ Architecture
+- `apps/frontend`: Next.js portfolio and 3D room experience.
+- `apps/backend`: REST API, PostgreSQL database management, and email services.
+- `packages/shared`: Centralized types and Zod schemas used by both frontend and backend.
+- `packages/ui`: Shared UI primitives.
+- `docs/`: Comprehensive documentation (Projects, Architecture, Replacements).
 
-## Architecture
-- `apps/frontend`: user-facing Next.js portfolio and room game.
-- `apps/backend`: REST API, validation, Prisma access, and seed data.
-- `packages/shared`: shared TypeScript contracts and Zod schemas.
-- `packages/ui`: small reusable UI primitives.
-- `assets`: future models, textures, audio, screenshots, and GIFs.
+## 📋 Getting Started
 
-The room acts as the navigation layer. Each interactable object opens an overlay backed by typed content or API data. Recruiter mode reuses the same data but presents it in a fast, traditional layout.
+### 1. Prerequisites
+- Node.js >= 20.11.0
+- Docker & Docker Compose (optional for local development)
 
-## Environment Variables
-Copy `.env.example` and adjust values as needed.
+### 2. Environment Setup
+Copy the example environment files and adjust the values:
 
 ```bash
+# Root directory
 cp .env.example .env
+
+# Backend
+cp apps/backend/.env.example apps/backend/.env
+
+# Frontend
+cp apps/frontend/.env.example apps/frontend/.env
 ```
 
-Backend:
-- `DATABASE_URL`
-- `PORT`
-- `CORS_ORIGIN`
-
-Frontend:
-- `NEXT_PUBLIC_API_URL`
-
-## Local Development
-Install dependencies:
-
+### 3. Installation
 ```bash
 npm install
 ```
 
-Run the full app:
-
-```bash
-npm run dev
-```
-
-Run database migration and seed:
+### 4. Database Setup
+Ensure you have a PostgreSQL instance running, then:
 
 ```bash
 npm run db:migrate
 npm run db:seed
 ```
 
-## Docker
-Start the full stack:
-
+### 5. Local Development
 ```bash
-docker compose up --build
+npm run dev
 ```
 
-Frontend: `http://localhost:3001`
+## 🐳 Docker Execution
+The easiest way to run the full stack (Frontend, Backend, Database) is using Docker:
 
-Backend health check: `http://localhost:4000/health`
-
-## Backend API
-- `GET /projects`, `GET /projects/:slug`
-- `GET /skills`
-- `GET /experiences`
-- `GET /analytics/summary`
-- `POST /messages`
-- `POST /visits`, `PATCH /visits/:sessionId`
-- `POST /dialogue-logs`
-
-## Quality Checks
 ```bash
-npm run typecheck
-npm run lint
-npm run build
+npm run docker:up
 ```
 
-## Screenshots And GIFs
-Add final gameplay screenshots, project GIFs, and architecture diagrams before publishing.
+- **Frontend:** `http://localhost:3000`
+- **Backend:** `http://localhost:4000`
 
-## Current Limitations
-- Portfolio data is seeded with placeholders.
-- The recruiter battle minigame is planned as a post-MVP feature.
-- Admin/CMS and analytics dashboard are deferred until the core full-stack experience is stable.
+## 🎨 Manual Personalization
+This portfolio is designed to be easily customized. Before deploying, follow the guide in:
+👉 **[docs/replace.md](./docs/replace.md)**
 
-## Future Improvements
-- Pokemon-style recruiter interview battle.
-- Admin dashboard for editing project content.
-- Analytics dashboard for recruiter behavior.
-- Better authored 3D assets, compressed textures, and production audio.
-- CI pipeline and deployment automation.
+It covers how to:
+- Replace project thumbnails and GIFs.
+- Add your own resume PDF.
+- Update personal contact links and GitHub repositories.
+- Configure email services (Resend).
+
+## ✅ Quality Standards
+```bash
+npm run typecheck # Verify TypeScript types
+npm run lint      # Run ESLint
+npm run format    # Apply Prettier formatting
+```
+
+## 📜 Future Roadmap
+- [ ] Recruiter "Interview Battle" minigame.
+- [ ] Admin dashboard for real-time project management.
+- [ ] Advanced WebGL shaders for the 3D room.
+- [ ] Automated CI/CD pipelines.
