@@ -3,7 +3,7 @@
 import type { FormEvent, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, Github, Mail, X } from 'lucide-react';
+import { ArrowRight, ExternalLink, Github, Mail, X } from 'lucide-react';
 import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
 import { aboutProfile, futureIdeas, knowledgeNotes } from '@/lib/portfolio-fallback';
@@ -34,9 +34,10 @@ function OverlayShell({
       aria-label={title}
       aria-modal="true"
       className={`overlay-panel ${wide ? 'overlay-panel-wide' : ''}`}
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 20, scale: 0.98 }}
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, y: 20 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       role="dialog"
     >
       <header className="overlay-header">
@@ -50,7 +51,7 @@ function OverlayShell({
           onClick={closeOverlay}
           type="button"
         >
-          <X size={20} />
+          <X size={24} />
         </button>
       </header>
       {children}
@@ -76,10 +77,20 @@ function DataNotice({
   }
 
   if (usingFallback) {
-    return <p className="data-notice">Showing local placeholder content.</p>;
+    return <p className="data-notice">Showing local portfolio seed data.</p>;
   }
 
   return <p className="data-notice">Live backend data loaded.</p>;
+}
+
+function ChipList({ items, label }: { items: string[]; label: string }) {
+  return (
+    <div aria-label={label} className="chip-list">
+      {items.map((item) => (
+        <span key={item}>{item}</span>
+      ))}
+    </div>
+  );
 }
 
 function formatTimelineDate(value: string | null) {
@@ -89,6 +100,12 @@ function formatTimelineDate(value: string | null) {
     month: 'short',
     year: 'numeric',
   }).format(new Date(value));
+}
+
+function shortenText(value: string, maxLength: number) {
+  if (value.length <= maxLength) return value;
+
+  return `${value.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
 function ProjectPreview({ project, label }: { project: Project; label?: string }) {
@@ -108,8 +125,39 @@ function ProjectPreview({ project, label }: { project: Project; label?: string }
           : undefined
       }
     >
-      <span>{mediaLabel}</span>
+      <span className="project-thumb-label">{mediaLabel}</span>
     </div>
+  );
+}
+
+function SkillCard({ skill }: { skill: Skill }) {
+  const [expanded, setExpanded] = useState(false);
+  const level = Math.min(5, Math.max(1, skill.level));
+  const previewReasoning = shortenText(skill.reasoning, 120);
+
+  return (
+    <article className={`detail-card skill-card ${expanded ? 'is-expanded' : ''}`}>
+      <div className="card-heading">
+        <h3>{skill.name}</h3>
+        <span>{skill.category}</span>
+      </div>
+      <div aria-label={`${level} out of 5`} className="meter">
+        <span style={{ width: `${level * 20}%` }} />
+      </div>
+      <p>{expanded ? skill.reasoning : previewReasoning}</p>
+      {!expanded ? (
+        <p className="card-more-hint">Click to know more about where this shows up.</p>
+      ) : null}
+      {expanded ? <ChipList items={skill.appliedIn} label={`${skill.name} applied in`} /> : null}
+      <button
+        aria-expanded={expanded}
+        className="card-toggle"
+        onClick={() => setExpanded((current) => !current)}
+        type="button"
+      >
+        {expanded ? 'Show less' : 'Know more'}
+      </button>
+    </article>
   );
 }
 
@@ -144,9 +192,9 @@ function TerminalPane({ projects, skills }: { projects: Project[]; skills: Skill
     } else if (normalized === 'contact') {
       nextLines.push(aboutProfile.contact);
     } else if (normalized === 'resume') {
-      nextLines.push('Resume link placeholder: replace with /resume.pdf before publishing.');
+      nextLines.push('Resume path: /resume.pdf');
     } else if (normalized === 'github') {
-      nextLines.push('GitHub placeholder: https://github.com/your-user');
+      nextLines.push('GitHub: https://github.com/eldmark');
     } else {
       nextLines.push(`Unknown command: ${normalized}`);
     }
@@ -187,7 +235,7 @@ function TimelinePane({ experiences }: { experiences: Experience[] }) {
             <h3>{experience.role}</h3>
             <p className="muted">{experience.company}</p>
             <p>{experience.description}</p>
-            <p className="tag-row">{experience.technologies.join(' / ')}</p>
+            <ChipList items={experience.technologies} label={`${experience.role} technologies`} />
           </div>
         </article>
       ))}
@@ -207,19 +255,21 @@ function ContactPane() {
           <button className="secondary-button" onClick={() => setOverlay('mailbox')} type="button">
             <Mail size={16} /> Open mailbox
           </button>
-          <a className="text-link" href="mailto:replace-me@example.com">
-            <Mail size={16} /> Email placeholder
+          <a
+            className="text-link"
+            href="https://github.com/eldmark"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Github size={16} /> GitHub profile
           </a>
         </div>
       </article>
       <article className="detail-card">
-        <h3>Publishing Checklist</h3>
+        <h3>Availability</h3>
         <p>
-          Replace placeholder email, GitHub, live URLs, resume PDF, and project media before
-          deployment.
-        </p>
-        <p className="tag-row">
-          README / public portfolio URL / public repository / Docker verification
+          I am currently open to new opportunities and collaborations. Feel free to reach out via
+          the mailbox or GitHub.
         </p>
       </article>
     </div>
@@ -257,7 +307,7 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
               <h3>{experience.role}</h3>
               <p className="muted">{experience.company}</p>
               <p>{experience.description}</p>
-              <p className="tag-row">{experience.technologies.join(' / ')}</p>
+              <ChipList items={experience.technologies} label={`${experience.role} technologies`} />
             </article>
           ))}
         </div>
@@ -268,10 +318,11 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
         <div className="detail-card">
           <h3>Resume</h3>
           <p>
-            Add a final PDF at <code>public/resume.pdf</code> and link it here before publishing.
+            Download my latest resume to see a detailed breakdown of my experience, education, and
+            technical skills.
           </p>
-          <a className="text-link" href="/resume.pdf">
-            Open resume placeholder
+          <a className="text-link" href="/resume.pdf" target="_blank" rel="noreferrer">
+            Open resume file <ArrowRight size={16} />
           </a>
         </div>
       ) : null}
@@ -284,24 +335,79 @@ function ComputerOverlay(props: PortfolioOverlayProps) {
 function SkillsGrid({ skills }: { skills: Skill[] }) {
   return (
     <div className="grid-list">
-      {skills.map((skill) => {
-        const level = Math.min(5, Math.max(1, skill.level));
-
-        return (
-          <article className="detail-card" key={skill.id}>
-            <div className="card-heading">
-              <h3>{skill.name}</h3>
-              <span>{skill.category}</span>
-            </div>
-            <div aria-label={`${level} out of 5`} className="meter">
-              <span style={{ width: `${level * 20}%` }} />
-            </div>
-            <p>{skill.reasoning}</p>
-            <p className="tag-row">{skill.appliedIn.join(' / ')}</p>
-          </article>
-        );
-      })}
+      {skills.map((skill) => (
+        <SkillCard key={skill.id} skill={skill} />
+      ))}
     </div>
+  );
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+  const visibleStack = expanded ? project.stack : project.stack.slice(0, 4);
+  const hiddenStackCount = project.stack.length - visibleStack.length;
+  const contentId = `project-card-${project.id}`;
+
+  return (
+    <article className={`project-card poster-card ${expanded ? 'is-expanded' : ''}`}>
+      <ProjectPreview label="Featured highlight" project={project} />
+      <div className="project-card-body" id={contentId}>
+        <div className="card-heading">
+          <div>
+            <p className="card-kicker">Featured Case</p>
+            <h3>{project.title}</h3>
+          </div>
+          <span>{project.stack[0] ?? 'Full stack'}</span>
+        </div>
+        <p className="project-card-summary">{shortenText(project.description, 140)}</p>
+        {!expanded ? (
+          <p className="card-more-hint">Click to know more about the architecture and stack.</p>
+        ) : null}
+        {expanded ? (
+          <>
+            <section className="project-card-section">
+              <h4>Architecture</h4>
+              <p>{project.architecture}</p>
+            </section>
+            <section className="project-card-section">
+              <h4>Technical Challenges</h4>
+              <ChipList items={project.challenges} label={`${project.title} challenges`} />
+            </section>
+            <section className="project-card-section">
+              <h4>Stack Reasoning</h4>
+              <p>{project.stackReasoning}</p>
+            </section>
+          </>
+        ) : null}
+        <ChipList items={visibleStack} label={`${project.title} stack`} />
+        {!expanded && hiddenStackCount > 0 ? (
+          <p className="card-more-hint">+{hiddenStackCount} more technologies available.</p>
+        ) : null}
+        <button
+          aria-controls={contentId}
+          aria-expanded={expanded}
+          className="card-toggle"
+          onClick={() => setExpanded((current) => !current)}
+          type="button"
+        >
+          {expanded ? 'Show less' : 'Know more'}
+        </button>
+        {expanded ? (
+          <div className="link-row project-card-actions">
+            {project.githubUrl ? (
+              <a href={project.githubUrl} rel="noreferrer" target="_blank">
+                <Github size={16} /> Code
+              </a>
+            ) : null}
+            {project.liveUrl ? (
+              <a href={project.liveUrl} rel="noreferrer" target="_blank">
+                <ExternalLink size={16} /> Live
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </article>
   );
 }
 
@@ -313,30 +419,40 @@ function ProjectsOverlay(props: PortfolioOverlayProps) {
         {props.projects.map((project) => (
           <article className="project-card" key={project.id}>
             <ProjectPreview project={project} />
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-            <h4>Architecture</h4>
-            <p>{project.architecture}</p>
-            <h4>Technical Challenges</h4>
-            <ul>
-              {project.challenges.map((challenge) => (
-                <li key={challenge}>{challenge}</li>
-              ))}
-            </ul>
-            <h4>Stack Reasoning</h4>
-            <p>{project.stackReasoning}</p>
-            <p className="tag-row">{project.stack.join(' / ')}</p>
-            <div className="link-row">
-              {project.githubUrl ? (
-                <a href={project.githubUrl} rel="noreferrer" target="_blank">
-                  <Github size={16} /> Code
-                </a>
-              ) : null}
-              {project.liveUrl ? (
-                <a href={project.liveUrl} rel="noreferrer" target="_blank">
-                  <ExternalLink size={16} /> Live
-                </a>
-              ) : null}
+            <div className="project-card-body">
+              <div className="card-heading">
+                <div>
+                  <p className="card-kicker">{project.featured ? 'Featured Case' : 'Project'}</p>
+                  <h3>{project.title}</h3>
+                </div>
+                <span>{project.stack[0] ?? 'Full stack'}</span>
+              </div>
+              <p className="project-card-summary">{project.description}</p>
+              <section className="project-card-section">
+                <h4>Architecture</h4>
+                <p>{project.architecture}</p>
+              </section>
+              <section className="project-card-section">
+                <h4>Technical Challenges</h4>
+                <ChipList items={project.challenges} label={`${project.title} challenges`} />
+              </section>
+              <section className="project-card-section">
+                <h4>Stack Reasoning</h4>
+                <p>{project.stackReasoning}</p>
+              </section>
+              <ChipList items={project.stack} label={`${project.title} stack`} />
+              <div className="link-row project-card-actions">
+                {project.githubUrl ? (
+                  <a href={project.githubUrl} rel="noreferrer" target="_blank">
+                    <Github size={16} /> Code
+                  </a>
+                ) : null}
+                {project.liveUrl ? (
+                  <a href={project.liveUrl} rel="noreferrer" target="_blank">
+                    <ExternalLink size={16} /> Live
+                  </a>
+                ) : null}
+              </div>
             </div>
           </article>
         ))}
@@ -363,7 +479,7 @@ function MailboxOverlay() {
         message: String(formData.get('message') ?? ''),
       });
       setStatus('success');
-      setMessage('Message sent. Replace backend delivery integration with email/webhook next.');
+      setMessage('Message sent successfully. I will get back to you soon!');
       event.currentTarget.reset();
     } catch (error) {
       setStatus('error');
@@ -432,12 +548,7 @@ function PostersOverlay({ projects }: { projects: Project[] }) {
     <OverlayShell title="Posters" wide>
       <div className="project-grid">
         {featured.map((project) => (
-          <article className="project-card poster-card" key={project.id}>
-            <ProjectPreview label="Featured highlight" project={project} />
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-            <p className="tag-row">{project.stack.join(' / ')}</p>
-          </article>
+          <ProjectCard key={project.id} project={project} />
         ))}
       </div>
     </OverlayShell>
@@ -474,7 +585,7 @@ function RecruiterOverlay(props: PortfolioOverlayProps) {
               <article className="detail-card" key={project.id}>
                 <h4>{project.title}</h4>
                 <p>{project.description}</p>
-                <p className="tag-row">{project.stack.join(' / ')}</p>
+                <ChipList items={project.stack} label={`${project.title} stack`} />
               </article>
             ))}
           </div>

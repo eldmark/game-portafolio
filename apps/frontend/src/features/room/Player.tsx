@@ -14,64 +14,66 @@ const pressedKeys = new Set<string>();
 
 const SPRITE_SHEET_URL = '/assets/models/man-character-spritesheet.png';
 
-const COLUMNS = 10;
-const ROWS = 6;
+/*
+  NEW SPRITESHEET
 
-const WALK_FPS = 10;
+  Image size:
+  200 x 250
+
+  Grid:
+  4 columns
+  5 rows
+
+  Frame size:
+  50 x 50
+*/
+
+const COLUMNS = 4;
+const ROWS = 5;
+
+const FRAME_WIDTH = 50;
+const FRAME_HEIGHT = 50;
+
+const WALK_FPS = 8;
 
 /* -------------------------------------------------------------------------- */
 /*                             ANIMATION MAPPING                              */
 /* -------------------------------------------------------------------------- */
 
+/*
+  ROWS
+
+  0 = idle down
+  1 = walk right
+  2 = walk left
+  3 = idle front alt
+  4 = back / up
+*/
+
 const ANIMATIONS = {
   idleDown: {
     row: 0,
-    frames: [0, 1, 2],
+    frames: [0, 1],
   },
 
   walkRight: {
-    row: 0,
-    frames: [3, 4, 5, 6, 7, 8, 9],
-  },
-
-  idleUp: {
     row: 1,
-    frames: [0, 1, 2],
+    frames: [0, 1, 2, 3],
   },
 
   walkLeft: {
-    row: 1,
-    frames: [3, 4, 5, 6, 7, 8, 9],
-  },
-
-  idleLeft: {
     row: 2,
-    frames: [0, 1, 2],
+    frames: [0, 1, 2, 3],
   },
 
-  walkLeftAlt: {
-    row: 2,
-    frames: [3, 4, 5, 6, 7, 8, 9],
-  },
-
-  idleRight: {
+  idleAlt: {
     row: 3,
-    frames: [0, 1, 2],
+    frames: [0, 1],
   },
 
-  walkRightAlt: {
-    row: 3,
-    frames: [3, 4, 5, 6, 7, 8, 9],
-  },
-
-  idleDownAlt: {
-    row: 5,
-    frames: [0, 1, 2],
-  },
-
-  walkDown: {
-    row: 5,
-    frames: [3, 4, 5, 6, 7, 8, 9],
+  walkUp: {
+    row: 4,
+    frames: [0, 1, 2, 3],
   },
 } as const;
 
@@ -104,9 +106,6 @@ const ROOM_COLLIDERS: Collider[] = [
   { minX: -3.35, maxX: -1.25, minZ: 1.02, maxZ: 2.58 },
   { minX: 2.42, maxX: 3.35, minZ: 0.28, maxZ: 2.08 },
   { minX: 2.74, maxX: 3.32, minZ: -1.54, maxZ: -0.88 },
-  { minX: 1.52, maxX: 2.94, minZ: -3.1, maxZ: -2.66 },
-  { minX: -1.08, maxX: 1.08, minZ: -3.1, maxZ: -2.58 },
-  { minX: -3.35, maxX: -2.9, minZ: -0.08, maxZ: 0.98 },
 ];
 
 function collidesAt(x: number, z: number) {
@@ -149,6 +148,7 @@ function useKeyboardControls() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+
       pressedKeys.clear();
     };
   }, []);
@@ -281,48 +281,31 @@ export function Player() {
     if (moving) {
       switch (facingDirectionRef.current) {
         case 'left':
-          animationKey = 'walkLeftAlt';
-          break;
-
-        case 'right':
-          animationKey = 'walkRightAlt';
-          break;
-
-        case 'up':
           animationKey = 'walkLeft';
           break;
 
-        case 'down':
-          animationKey = 'walkDown';
-          break;
-      }
-    } else {
-      switch (facingDirectionRef.current) {
-        case 'left':
-          animationKey = 'idleLeft';
-          break;
-
         case 'right':
-          animationKey = 'idleRight';
+          animationKey = 'walkRight';
           break;
 
         case 'up':
-          animationKey = 'idleUp';
+          animationKey = 'walkUp';
           break;
 
         case 'down':
-          animationKey = 'idleDown';
+          animationKey = 'walkRight';
           break;
       }
+    } else {
+      animationKey = 'idleDown';
     }
 
     const animation = ANIMATIONS[animationKey];
 
-    const frame =
-      animation.frames[currentFrameRef.current % animation.frames.length] ?? animation.frames[0];
+    const frame = animation.frames[currentFrameRef.current % animation.frames.length] ?? 0;
 
     /* ---------------------------------------------------------------------- */
-    /*                            SPRITE OFFSETS                              */
+    /*                             SPRITE OFFSET                              */
     /* ---------------------------------------------------------------------- */
 
     const offsetX = frame / COLUMNS;
@@ -354,7 +337,7 @@ export function Player() {
 
       {/* SPRITE */}
 
-      <sprite position={[0, 0.72, 0]} scale={[1.6, 1.6, 1]}>
+      <sprite position={[0, 0.62, 0]} scale={[0.95, 0.95, 1]}>
         <spriteMaterial map={spriteSheet} transparent alphaTest={0.1} />
       </sprite>
     </group>

@@ -110,13 +110,13 @@ const whiteboardNotes = [
 ] as const;
 
 function FloorDetails() {
+  const seamGeo = useMemo(() => new THREE.BoxGeometry(7.12, 0.012, 0.018), []);
+  const seamMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6d4932', roughness: 1 }), []);
+  
   return (
     <group>
       {floorSeams.map((z) => (
-        <mesh key={z} receiveShadow position={[0, 0.06, z]}>
-          <boxGeometry args={[7.12, 0.012, 0.018]} />
-          <meshStandardMaterial color="#6d4932" roughness={1} />
-        </mesh>
+        <mesh key={z} receiveShadow position={[0, 0.06, z]} geometry={seamGeo} material={seamMat} />
       ))}
       <mesh receiveShadow position={[0.1, 0.075, 0.5]}>
         <boxGeometry args={[3.06, 0.025, 1.86]} />
@@ -143,25 +143,24 @@ function FloorDetails() {
 }
 
 function BaseboardTrim() {
+  const horizontalGeo = useMemo(() => new THREE.BoxGeometry(7.36, 0.16, 0.06), []);
+  const verticalGeo = useMemo(() => new THREE.BoxGeometry(0.06, 0.16, 5.78), []);
+  const mat1 = useMemo(() => new THREE.MeshStandardMaterial({ color: '#7e5b42', roughness: 0.9 }), []);
+  const mat2 = useMemo(() => new THREE.MeshStandardMaterial({ color: '#806149', roughness: 0.9 }), []);
+
   return (
     <group>
-      <mesh receiveShadow position={[0, 0.28, -2.91]}>
-        <boxGeometry args={[7.36, 0.16, 0.06]} />
-        <meshStandardMaterial color="#7e5b42" roughness={0.9} />
-      </mesh>
-      <mesh receiveShadow position={[-3.64, 0.28, 0]}>
-        <boxGeometry args={[0.06, 0.16, 5.78]} />
-        <meshStandardMaterial color="#806149" roughness={0.9} />
-      </mesh>
-      <mesh receiveShadow position={[3.64, 0.28, 0]}>
-        <boxGeometry args={[0.06, 0.16, 5.78]} />
-        <meshStandardMaterial color="#806149" roughness={0.9} />
-      </mesh>
+      <mesh receiveShadow position={[0, 0.28, -2.91]} geometry={horizontalGeo} material={mat1} />
+      <mesh receiveShadow position={[-3.64, 0.28, 0]} geometry={verticalGeo} material={mat2} />
+      <mesh receiveShadow position={[3.64, 0.28, 0]} geometry={verticalGeo} material={mat2} />
     </group>
   );
 }
 
 function DeskSetup() {
+  const keyGeo = useMemo(() => new THREE.BoxGeometry(0.07, 0.018, 0.045), []);
+  const keyMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#c9d0d6', roughness: 0.64 }), []);
+
   return (
     <group position={[-2.7, 0, -2.1]}>
       <mesh castShadow receiveShadow position={[0, 0.48, -0.2]}>
@@ -219,10 +218,9 @@ function DeskSetup() {
               castShadow
               key={`${rowIndex}-${columnIndex}`}
               position={[x + rowIndex * 0.035, 0.04, z + 0.34]}
-            >
-              <boxGeometry args={[0.07, 0.018, 0.045]} />
-              <meshStandardMaterial color="#c9d0d6" roughness={0.64} />
-            </mesh>
+              geometry={keyGeo}
+              material={keyMat}
+            />
           )),
         )}
       </group>
@@ -277,6 +275,12 @@ function BedProp() {
 }
 
 function BookshelfProp() {
+  const shelfGeo = useMemo(() => new THREE.BoxGeometry(0.82, 0.04, 1.48), []);
+  const shelfMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#735d49', roughness: 0.84 }), []);
+  const bookGeo1 = useMemo(() => new THREE.BoxGeometry(0.16, 0.34, 0.08), []);
+  const bookGeo2 = useMemo(() => new THREE.BoxGeometry(0.16, 0.42, 0.08), []);
+  const bookMaterials = useMemo(() => bookColors.map(color => new THREE.MeshStandardMaterial({ color, roughness: 0.78 })), []);
+
   return (
     <group position={[2.95, 0, 1.2]}>
       <mesh castShadow receiveShadow position={[0, 0.92, 0]}>
@@ -284,10 +288,7 @@ function BookshelfProp() {
         <meshStandardMaterial color="#5c4c3b" roughness={0.86} />
       </mesh>
       {bookRows.map((y) => (
-        <mesh castShadow key={`shelf-${y}`} position={[0, y, 0]}>
-          <boxGeometry args={[0.82, 0.04, 1.48]} />
-          <meshStandardMaterial color="#735d49" roughness={0.84} />
-        </mesh>
+        <mesh castShadow key={`shelf-${y}`} position={[0, y, 0]} geometry={shelfGeo} material={shelfMat} />
       ))}
       {bookRows.slice(0, -1).map((y, rowIndex) =>
         bookColors.map((color, columnIndex) => (
@@ -296,10 +297,9 @@ function BookshelfProp() {
             key={`${rowIndex}-${color}`}
             position={[0.03, y + 0.18, -0.56 + columnIndex * 0.27 + rowIndex * 0.03]}
             rotation={[0, 0, (columnIndex % 2 === 0 ? 1 : -1) * 0.04]}
-          >
-            <boxGeometry args={[0.16, 0.34 + (columnIndex % 2) * 0.08, 0.08]} />
-            <meshStandardMaterial color={color} roughness={0.78} />
-          </mesh>
+            geometry={columnIndex % 2 === 0 ? bookGeo1 : bookGeo2}
+            material={bookMaterials[columnIndex]}
+          />
         )),
       )}
       <mesh castShadow position={[0.03, 1.82, 0.48]}>

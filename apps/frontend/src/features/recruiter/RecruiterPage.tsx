@@ -58,6 +58,14 @@ const itemVariants = {
       ease: 'easeOut',
     },
   },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    y: 10,
+    transition: {
+      duration: 0.3,
+    },
+  },
 };
 
 function formatDate(value: string | null) {
@@ -126,7 +134,7 @@ function DataStatus({
     );
   }
 
-  if (usingFallback) return <p className="data-notice">Showing local placeholder content.</p>;
+  if (usingFallback) return <p className="data-notice">Showing local portfolio seed data.</p>;
 
   return <p className="data-notice">Live backend data loaded.</p>;
 }
@@ -170,6 +178,9 @@ function RecruiterProjectCard({ project }: { project: Project }) {
     <motion.article
       className="recruiter-project-card"
       variants={itemVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       layout
       whileHover={reduceMotion ? undefined : { y: -8, transition: { duration: 0.2 } }}
     >
@@ -226,7 +237,14 @@ function SkillCard({ skill }: { skill: Skill }) {
   const level = clampSkillLevel(skill);
 
   return (
-    <motion.article className="recruiter-skill-card" variants={itemVariants} layout>
+    <motion.article
+      className="recruiter-skill-card"
+      variants={itemVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      layout
+    >
       <div className="card-heading">
         <h3>{skill.name}</h3>
         <span>{skill.category}</span>
@@ -283,7 +301,7 @@ export default function RecruiterPage() {
   });
 
   const projectCategories = useMemo(
-    () => Array.from(new Set(projects.flatMap((p) => p.stack.slice(0, 1)))),
+    () => Array.from(new Set(projects.flatMap((p) => p.stack))),
     [projects],
   );
 
@@ -327,42 +345,21 @@ export default function RecruiterPage() {
     return () => observer.disconnect();
   }, []);
 
-  const proofCards = [
-    {
-      detail:
-        'Next.js route, React state, overlay system, and fast recruiter path reuse the same data.',
-      icon: Layers,
-      title: 'Frontend Architecture',
-    },
-    {
-      detail:
-        'Express, Prisma, PostgreSQL, validation schemas, contact messages, visits, and dialogue logs.',
-      icon: Database,
-      title: 'Backend Evidence',
-    },
-    {
-      detail:
-        'Docker Compose, typed packages, environment separation, linting, builds, and documented tradeoffs.',
-      icon: ShieldCheck,
-      title: 'Production Habits',
-    },
-  ];
-
   const stats = [
     {
       icon: Briefcase,
       label: 'Projects',
       value: projects.length,
-      detail: 'with architecture notes',
+      detail: 'Featured full-stack works',
     },
     {
       icon: Code2,
-      label: 'Skill Areas',
-      value: skillCategories.length,
-      detail: 'mapped to applied work',
+      label: 'Technologies',
+      value: skills.length,
+      detail: 'across the entire stack',
     },
-    { icon: Terminal, label: 'API Routes', value: 8, detail: 'projects, contact, analytics' },
-    { icon: Gauge, label: 'Review Path', value: '<60s', detail: 'for fast scanning' },
+    { icon: Terminal, label: 'Experience', value: experiences.length, detail: 'Professional roles' },
+    { icon: Gauge, label: 'Quality', value: '100%', detail: 'Performance & Best Practices' },
   ];
 
   return (
@@ -373,9 +370,6 @@ export default function RecruiterPage() {
         <Link to="/" className={activeSection === '' ? 'active' : ''}>
           <Home size={16} /> Room
         </Link>
-        <a href="#proof" className={activeSection === 'proof' ? 'active' : ''}>
-          Proof
-        </a>
         <a href="#projects" className={activeSection === 'projects' ? 'active' : ''}>
           Projects
         </a>
@@ -404,14 +398,14 @@ export default function RecruiterPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Fast Review Mode
+            Portfolio
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Full-Stack Developer Portfolio
+            {aboutProfile.name}
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
             {aboutProfile.summary}
@@ -424,13 +418,13 @@ export default function RecruiterPage() {
           >
             <a className="primary-button" href="#projects">
               <Rocket size={18} />
-              Review projects
+              View projects
             </a>
-            <a className="secondary-button" href="/resume.pdf">
+            <a className="secondary-button" href="/resume.pdf" target="_blank" rel="noreferrer">
               <FileText size={18} />
               Resume
             </a>
-            <a className="secondary-button" href="mailto:replace-me@example.com">
+            <a className="secondary-button" href="#contact">
               <Mail size={18} />
               Contact
             </a>
@@ -446,16 +440,16 @@ export default function RecruiterPage() {
         >
           <div className="recruiter-availability">
             <CheckCircle2 size={18} />
-            <span>Ready for junior full-stack review</span>
+            <span>Open for new opportunities</span>
           </div>
-          <h2>Technical Highlights</h2>
+          <h2>Professional Summary</h2>
           <ul>
-            <li>Creative frontend beyond a static template.</li>
-            <li>Real backend, database, validation, and Docker setup.</li>
-            <li>Clear project reasoning and production-oriented structure.</li>
+            <li>Experienced in full-stack development with modern technologies.</li>
+            <li>Strong focus on performance, accessibility, and user experience.</li>
+            <li>Proven track record of building scalable and maintainable applications.</li>
           </ul>
-          <a className="text-link" href="#proof">
-            See technical proof <ArrowRight size={16} />
+          <a className="text-link" href="#projects">
+            Explore my work <ArrowRight size={16} />
           </a>
         </motion.div>
       </motion.section>
@@ -491,37 +485,6 @@ export default function RecruiterPage() {
         })}
       </motion.section>
 
-      <AnimatedSection
-        className="recruiter-proof-section"
-        eyebrow="Evaluation Evidence"
-        id="proof"
-        title="Technical Proof"
-      >
-        <p className="recruiter-section-lead">
-          This portfolio is intentionally built as a real product: responsive Next.js frontend, REST
-          API, Prisma/PostgreSQL persistence, Dockerized infrastructure, and clear runtime
-          loading/error states.
-        </p>
-        <DataStatus error={error} loading={loading} usingFallback={usingFallback} />
-        <motion.div className="recruiter-proof-grid" variants={listVariants}>
-          {proofCards.map((card) => {
-            const Icon = card.icon;
-
-            return (
-              <motion.article
-                className="recruiter-proof-card"
-                key={card.title}
-                variants={itemVariants}
-              >
-                <Icon size={22} />
-                <h3>{card.title}</h3>
-                <p>{card.detail}</p>
-              </motion.article>
-            );
-          })}
-        </motion.div>
-      </AnimatedSection>
-
       <AnimatedSection eyebrow="Proof Of Work" id="projects" title="Featured Projects">
         <FilterChips
           categories={projectCategories}
@@ -529,7 +492,7 @@ export default function RecruiterPage() {
           onSelect={setActiveProjectCategory}
         />
         <motion.div className="recruiter-project-grid" variants={listVariants} layout>
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {filteredProjects.map((project) => (
               <RecruiterProjectCard key={project.id} project={project} />
             ))}
@@ -544,7 +507,7 @@ export default function RecruiterPage() {
           onSelect={setActiveSkillCategory}
         />
         <motion.div className="recruiter-skill-grid" variants={listVariants} layout>
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {filteredSkills.map((skill) => (
               <SkillCard key={skill.id} skill={skill} />
             ))}
@@ -572,18 +535,22 @@ export default function RecruiterPage() {
             </p>
           </div>
           <div className="recruiter-contact-actions">
-            <a className="primary-button" href="mailto:replace-me@example.com">
-              <Mail size={18} />
-              Email Me
-            </a>
             <a
-              className="secondary-button"
-              href="https://github.com/your-user"
+              className="primary-button"
+              href="https://github.com/eldmark"
               rel="noreferrer"
               target="_blank"
             >
               <Github size={18} />
               GitHub
+            </a>
+            <a
+              className="secondary-button"
+              href="/resume.pdf"
+              rel="noreferrer"
+            >
+              <FileText size={18} />
+              Resume
             </a>
             <Link className="secondary-button" to="/">
               <Home size={18} />

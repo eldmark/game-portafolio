@@ -3,11 +3,26 @@
 import { Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Info, Laptop, Mail, Map, Settings, Volume2, VolumeX } from 'lucide-react';
+import {
+  BookOpen,
+  Briefcase,
+  FileText,
+  FolderKanban,
+  Info,
+  Laptop,
+  Mail,
+  Map,
+  Settings,
+  UserRound,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import { logDialogue, trackVisit, endVisit } from '@/lib/api';
+import { aboutProfile } from '@/lib/portfolio-fallback';
 import { usePortfolioData } from '@/lib/usePortfolioData';
 import { usePortfolioStore } from '@/lib/store';
 import { PortfolioOverlay } from '@/features/overlays/PortfolioOverlay';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { AudioManager } from './AudioManager';
 import { RoomScene } from './RoomScene';
 import { getNearestObject } from './room-objects';
@@ -29,10 +44,10 @@ function EntryScreen() {
     <section className="entry-screen" aria-label="Portfolio entry menu">
       <div className="entry-copy">
         <p className="eyebrow">Interactive Full-Stack Portfolio</p>
-        <h1>Developer Room</h1>
+        <h1>{aboutProfile.name}&apos;s Developer Room</h1>
         <p>
-          Walk through a cozy digital workspace where each object reveals technical evidence,
-          project architecture, and contact paths.
+          Explore a cozy digital workspace where each object reveals project architecture, backend
+          reasoning, frontend craft, and contact paths.
         </p>
       </div>
       <div className="entry-actions">
@@ -78,22 +93,25 @@ function RecruiterNav() {
 
   return (
     <nav className="recruiter-nav" aria-label="Recruiter shortcuts">
+      <span className="recruiter-nav-brand">Recruiter Mode</span>
       <button onClick={() => setOverlay('about')} type="button">
-        About
+        <UserRound size={15} /> About
       </button>
       <button onClick={() => setOverlay('projects')} type="button">
-        Projects
+        <FolderKanban size={15} /> Projects
       </button>
       <button onClick={() => setOverlay('bookshelf')} type="button">
-        Skills
+        <BookOpen size={15} /> Skills
       </button>
       <button onClick={() => setOverlay('computer')} type="button">
-        Resume
+        <FileText size={15} /> Resume
       </button>
       <button onClick={() => setOverlay('mailbox')} type="button">
-        Contact
+        <Mail size={15} /> Contact
       </button>
-      <Link to="/recruiter">Full recruiter page</Link>
+      <Link to="/recruiter">
+        <Briefcase size={15} /> Full page
+      </Link>
       <button aria-label="Toggle audio" onClick={() => setMuted(!muted)} type="button">
         {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       </button>
@@ -239,11 +257,22 @@ export default function RoomExperience() {
         <>
           <RecruiterNav />
           <section className="room-stage" aria-label="Interactive portfolio room">
-            <Canvas camera={{ position: [0, 4.2, 6.5], fov: 45 }} shadows>
-              <Suspense fallback={null}>
-                <RoomScene activeObjectId={nearestObject?.id ?? null} />
-              </Suspense>
-            </Canvas>
+            <ErrorBoundary>
+              <Canvas 
+                camera={{ position: [0, 4.2, 6.5], fov: 45 }} 
+                shadows 
+                gl={{ 
+                  antialias: true,
+                  powerPreference: "high-performance",
+                  preserveDrawingBuffer: true,
+                  failIfMajorPerformanceCaveat: false
+                }}
+              >
+                <Suspense fallback={null}>
+                  <RoomScene activeObjectId={nearestObject?.id ?? null} />
+                </Suspense>
+              </Canvas>
+            </ErrorBoundary>
             <div className="hud">
               <p>{nearestObject ? `Press E: ${nearestObject.hint}` : 'Move near an object'}</p>
             </div>

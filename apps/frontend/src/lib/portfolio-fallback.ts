@@ -2,135 +2,310 @@ import type { Experience, Project, Skill } from '@portfolio/shared';
 
 export const fallbackProjects: Project[] = [
   {
-    id: 'fallback-room',
-    title: 'Interactive Portfolio Room',
-    slug: 'interactive-portfolio-room',
+    id: 'scholarship-hours-platform',
+    title: 'Scholarship Hours Platform',
+    slug: 'scholarship-hours-platform',
     description:
-      'A cozy explorable portfolio where visitors discover projects, skills, and contact options through room interactions.',
+      'A full-stack platform designed to manage scholarship working hours through a modular client-server architecture.',
     architecture:
-      'The app separates the 3D scene, interaction registry, overlay UI, API client, and backend data model so creative features do not collapse into one large component.',
+      'Frontend built with React Native Expo, backend implemented using Spring Boot REST APIs, MariaDB relational database, and Dockerized infrastructure separated into independent services.',
     challenges: [
-      'Keeping the 3D scene lightweight enough for mobile.',
-      'Providing a traditional recruiter path without losing the playful concept.',
-      'Showing technical reasoning inside the product instead of only in documentation.',
+      'Managing distributed services',
+      'Frontend-backend synchronization',
+      'Docker orchestration',
+      'Authentication flows',
     ],
-    stack: ['Next.js', 'React Three Fiber', 'TypeScript', 'Express', 'Prisma', 'PostgreSQL'],
+    stack: ['React Native', 'Spring Boot', 'MariaDB', 'Docker', 'Docker Compose'],
     stackReasoning:
-      'This stack demonstrates frontend architecture, 3D rendering, REST API usage, relational persistence, and containerized deployment in one cohesive project.',
-    githubUrl: 'https://github.com/your-user/interactive-portfolio-room',
-    liveUrl: 'https://your-portfolio.example.com',
-    thumbnail: '/assets/gifs/project-room-placeholder.gif',
-    gifDemo: '/assets/gifs/project-room-placeholder.gif',
+      'Spring Boot was selected for structured backend architecture and React Native for cross-platform mobile support.',
+    githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
+    liveUrl: null,
+    thumbnail: '/projects/scholarship-hours/thumbnail.png',
+    gifDemo: '/projects/scholarship-hours/demo.gif',
     featured: true,
     media: [],
   },
   {
-    id: 'fallback-recruiter',
-    title: 'Recruiter Mode Dashboard',
-    slug: 'recruiter-mode-dashboard',
+    id: 'lisp-interpreter',
+    title: 'Lisp Interpreter',
+    slug: 'lisp-interpreter',
     description:
-      'A fast, scannable route for reviewers who need evidence, links, resume access, and contact details immediately.',
+      'A custom Lisp interpreter implemented in Java supporting parsing, recursion, evaluation, and symbolic computation.',
     architecture:
-      'Recruiter mode reuses the same typed API data as the room but renders it as a direct professional summary.',
+      'Modular interpreter architecture including lexer, parser, evaluator, execution context, and recursive evaluation engine.',
     challenges: [
-      'Avoiding duplicated content between the room and the recruiter route.',
-      'Preserving fast navigation while keeping the interface cohesive.',
+      'Recursive evaluation',
+      'AST parsing',
+      'Execution context handling',
+      'Language design',
     ],
-    stack: ['Next.js App Router', 'TypeScript', 'Zustand', 'Framer Motion'],
+    stack: ['Java', 'Recursion', 'Tree Structures', 'Interpreter Design'],
     stackReasoning:
-      'Routing proves traditional app structure, while shared state and motion keep the transition between playful and professional modes smooth.',
-    githubUrl: 'https://github.com/your-user/interactive-portfolio-room',
-    liveUrl: 'https://your-portfolio.example.com/recruiter',
-    thumbnail: '/assets/gifs/recruiter-mode-placeholder.gif',
-    gifDemo: '/assets/gifs/recruiter-mode-placeholder.gif',
+      'Java was selected for its object-oriented structure and strong handling of modular parser/interpreter design.',
+    githubUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter.git',
+    liveUrl: null,
+    thumbnail: '/projects/lisp-interpreter/thumbnail.png',
+    gifDemo: '/projects/lisp-interpreter/demo.gif',
     featured: true,
+    media: [],
+  },
+  {
+    id: 'movie-blog-spa',
+    title: 'Movie Blog SPA',
+    slug: 'movie-blog-spa',
+    description:
+      'A modern movie platform built with React and Vite featuring routing, persistence, favorites, search history, and dark mode.',
+    architecture:
+      'Frontend SPA using React Router and Context API connected to a lightweight backend with SQLite persistence and Dockerized services.',
+    challenges: [
+      'Global state management',
+      'Persistence synchronization',
+      'Routing structure',
+      'Docker integration',
+    ],
+    stack: ['React', 'Vite', 'React Router', 'SQLite', 'Docker Compose'],
+    stackReasoning:
+      'React Router and Context API were used to demonstrate SPA architecture and client-side state management.',
+    githubUrl: 'https://github.com/eldmark/react-router.git',
+    liveUrl: null,
+    thumbnail: '/projects/movie-blog/thumbnail.png',
+    gifDemo: '/projects/movie-blog/demo.gif',
+    featured: true,
+    media: [],
+  },
+  {
+    id: 'equa-notepad',
+    title: 'Equa Notepad',
+    slug: 'equa-notepad',
+    description:
+      'Android application for organizing mathematical formulas and notes with cloud synchronization and AI-assisted exercises.',
+    architecture:
+      'Modern Android architecture using Jetpack Compose, ViewModels, Room, Supabase backend services, and Google Authentication.',
+    challenges: [
+      'Offline synchronization',
+      'Realtime updates',
+      'Authentication integration',
+      'AI API integration',
+    ],
+    stack: ['Kotlin', 'Jetpack Compose', 'Supabase', 'Room', 'Google Identity'],
+    stackReasoning:
+      'Compose and Supabase were selected for modern mobile architecture and simplified cloud integration.',
+    githubUrl: 'https://github.com/angcoder-c/equa-notepad-plats',
+    liveUrl: null,
+    thumbnail: '/projects/equa-notepad/thumbnail.png',
+    gifDemo: '/projects/equa-notepad/demo.gif',
+    featured: true,
+    media: [],
+  },
+  {
+    id: 'http-server-go',
+    title: 'HTTP Server in Go',
+    slug: 'http-server-go',
+    description:
+      'A lightweight HTTP server implemented in Go without frameworks to understand request flow and backend fundamentals.',
+    architecture:
+      'Minimal backend architecture focused on routing, request processing, and low-level HTTP handling.',
+    challenges: ['Manual routing', 'HTTP handling', 'Low-level backend concepts'],
+    stack: ['Go', 'HTTP', 'Backend Systems'],
+    stackReasoning:
+      'Go was selected to better understand concurrency, networking, and low-level backend behavior.',
+    githubUrl: 'https://github.com/eldmark/go-http',
+    liveUrl: null,
+    thumbnail: '/projects/go-http/thumbnail.png',
+    gifDemo: '/projects/go-http/demo.gif',
+    featured: false,
     media: [],
   },
 ];
 
 export const fallbackSkills: Skill[] = [
   {
-    id: 'skill-next',
-    name: 'React + Next.js',
-    category: 'Frontend',
-    icon: 'Layout',
+    id: 'skill-typescript',
+    name: 'TypeScript',
+    category: 'Programming Language',
+    icon: 'Code',
+    level: 5,
+    reasoning:
+      'Selected for large-scale frontend and backend projects due to type safety, maintainability, and scalability.',
+    appliedIn: ['Backend APIs', 'Interactive Portfolio', 'React Applications'],
+  },
+  {
+    id: 'skill-javascript',
+    name: 'JavaScript',
+    category: 'Programming Language',
+    icon: 'Code',
+    level: 5,
+    reasoning:
+      'Core language for frontend and full-stack development with strong ecosystem support.',
+    appliedIn: ['Movie Blog', 'Zoo Management System', 'Frontend Development'],
+  },
+  {
+    id: 'skill-node',
+    name: 'Node.js',
+    category: 'Backend',
+    icon: 'Server',
     level: 4,
     reasoning:
-      'Selected for component modularity, routing, SSR/build support, and compatibility with React Three Fiber.',
-    appliedIn: ['Room overlays', 'Recruiter route', 'Project views'],
+      'Used to build scalable backend services and REST APIs with asynchronous architecture.',
+    appliedIn: ['Authentication Systems', 'REST APIs', 'Portfolio Backend'],
+  },
+  {
+    id: 'skill-react',
+    name: 'React',
+    category: 'Frontend',
+    icon: 'Layout',
+    level: 5,
+    reasoning:
+      'Chosen for component-based architecture, ecosystem maturity, and SPA capabilities.',
+    appliedIn: ['Interactive Portfolio', 'Movie Blog', 'Scholarship Hours Platform'],
   },
   {
     id: 'skill-r3f',
     name: 'React Three Fiber',
-    category: '3D',
+    category: '3D Frontend',
     icon: 'Box',
-    level: 3,
+    level: 4,
     reasoning:
-      'Used so the 3D room can share React state, Suspense boundaries, and component composition with the rest of the app.',
-    appliedIn: ['Room scene', 'Object prompts', 'Camera framing'],
+      'Selected to build interactive 3D experiences integrated with React architecture.',
+    appliedIn: ['Interactive Portfolio Room', '3D UI Experiments'],
+  },
+  {
+    id: 'skill-postgresql',
+    name: 'PostgreSQL',
+    category: 'Database',
+    icon: 'Database',
+    level: 4,
+    reasoning: 'Reliable relational database with strong consistency and scalability.',
+    appliedIn: ['Backend APIs', 'Authentication Systems', 'Portfolio Analytics'],
   },
   {
     id: 'skill-prisma',
-    name: 'Prisma + PostgreSQL',
-    category: 'Backend',
+    name: 'Prisma ORM',
+    category: 'Database Tooling',
     icon: 'Database',
-    level: 3,
-    reasoning:
-      'Chosen to demonstrate relational design, migrations, typed data access, and meaningful persistence.',
-    appliedIn: ['Projects API', 'Contact messages', 'Visit analytics'],
+    level: 4,
+    reasoning: 'Improves schema management, query safety, and developer productivity.',
+    appliedIn: ['PostgreSQL APIs', 'Authentication Systems', 'Portfolio Backend'],
   },
   {
     id: 'skill-docker',
-    name: 'Docker Compose',
+    name: 'Docker',
     category: 'DevOps',
     icon: 'Container',
-    level: 3,
+    level: 4,
     reasoning:
-      'Containerizes frontend, backend, and database so reviewers can run the full stack consistently.',
-    appliedIn: ['Local infrastructure', 'Backend deployment', 'Database setup'],
+      'Used to create reproducible environments and containerized full-stack systems.',
+    appliedIn: ['Scholarship Hours Platform', 'Movie Blog', 'Portfolio Infrastructure'],
+  },
+  {
+    id: 'skill-spring',
+    name: 'Spring Boot',
+    category: 'Backend Framework',
+    icon: 'Server',
+    level: 4,
+    reasoning: 'Used for structured enterprise-style backend systems and REST APIs.',
+    appliedIn: ['Scholarship Hours Platform', 'REST API Systems'],
+  },
+  {
+    id: 'skill-go',
+    name: 'Go',
+    category: 'Programming Language',
+    icon: 'Code',
+    level: 3,
+    reasoning: 'Explored for lightweight backend services and low-level HTTP understanding.',
+    appliedIn: ['HTTP Server in Go', 'Concurrency Experiments'],
+  },
+  {
+    id: 'skill-java',
+    name: 'Java',
+    category: 'Programming Language',
+    icon: 'Code',
+    level: 4,
+    reasoning:
+      'Used for backend systems, interpreters, and academic software engineering projects.',
+    appliedIn: ['Lisp Interpreter', 'Scholarship Hours Platform'],
+  },
+  {
+    id: 'skill-rest',
+    name: 'REST APIs',
+    category: 'Architecture',
+    icon: 'Network',
+    level: 5,
+    reasoning: 'Main communication architecture used across backend and full-stack projects.',
+    appliedIn: ['Movie Blog', 'Scholarship Hours Platform', 'Authentication Systems'],
   },
 ];
 
 export const fallbackExperiences: Experience[] = [
   {
-    id: 'experience-portfolio',
-    company: 'Portfolio Lab',
-    role: 'Full-Stack Developer',
+    id: 'experience-freelance-jr',
+    company: 'Freelance / Contract',
+    role: 'Software Developer Jr',
     description:
-      'Designed a portfolio as a real product: interactive frontend, REST API, relational schema, Docker setup, and architecture documentation.',
+      'Developed backend services using Node.js and TypeScript, implemented REST APIs, integrated PostgreSQL with Prisma ORM, and deployed applications using Docker.',
+    startDate: '2024-12-01T00:00:00.000Z',
+    endDate: '2025-05-01T00:00:00.000Z',
+    technologies: ['Node.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Docker', 'React'],
+  },
+  {
+    id: 'experience-freelance-backend',
+    company: 'Freelance / Contract',
+    role: 'Backend Developer',
+    description:
+      'Built secure backend systems using JWT, OAuth2, RBAC authorization, refresh tokens, and modular architecture practices.',
     startDate: '2026-01-01T00:00:00.000Z',
     endDate: null,
-    technologies: ['TypeScript', 'Next.js', 'Node.js', 'PostgreSQL', 'Docker'],
+    technologies: ['Node.js', 'JWT', 'OAuth2', 'RBAC', 'REST APIs'],
+  },
+  {
+    id: 'experience-uvg-algorithms',
+    company: 'Universidad del Valle de Guatemala',
+    role: 'Teaching Assistant - Algorithms & Data Structures',
+    description:
+      'Guided students in algorithms, data structures, computational thinking, and scalable software design principles.',
+    startDate: '2026-01-01T00:00:00.000Z',
+    endDate: null,
+    technologies: ['Java', 'Python', 'Algorithms', 'Data Structures'],
+  },
+  {
+    id: 'experience-uvg-microprocessors',
+    company: 'Universidad del Valle de Guatemala',
+    role: 'Teaching Assistant - Microprocessor Programming',
+    description:
+      'Assisted students with hardware/software automation systems, concurrency concepts, and parallel processing foundations.',
+    startDate: '2026-01-01T00:00:00.000Z',
+    endDate: null,
+    technologies: ['C', 'Parallelism', 'Concurrency', 'Embedded Systems'],
   },
 ];
 
 export const aboutProfile = {
-  name: 'Developer Portfolio',
+  name: 'Eldmark',
   summary:
-    'A junior full-stack developer focused on practical architecture, thoughtful UI, and production-oriented habits.',
+    'A junior full-stack developer focused on backend systems, practical frontend architecture, Dockerized delivery, and production-oriented habits.',
   direction:
-    'The goal is to join a team where frontend craft, backend reliability, and clear technical reasoning matter.',
-  contact: 'Replace this with your email, LinkedIn, GitHub, Discord, and Calendly before publishing.',
+    'The goal is to join a team where full-stack execution, backend reliability, UI polish, and clear technical reasoning matter.',
+  contact: 'Contact me via GitHub or LinkedIn to discuss projects or opportunities.',
 };
 
 export const knowledgeNotes = [
   {
-    title: 'State Architecture',
-    body: 'Small global state is used for room position, overlays, settings, and recruiter mode. API data remains local to screens so loading and error states stay visible.',
+    title: 'Full-Stack Development',
+    body: 'I enjoy building end-to-end applications, from designing relational schemas and REST APIs to creating responsive and interactive user interfaces.',
   },
   {
-    title: 'REST API Usage',
-    body: 'Projects, skills, experience, contact messages, visits, and dialogue logs are modeled as REST resources to demonstrate async handling and validation.',
+    title: 'Clean Code & Architecture',
+    body: 'I prioritize maintainability and scalability by following SOLID principles, using typed contracts, and implementing modular software designs.',
   },
   {
-    title: 'Performance Thinking',
-    body: 'The room uses simple geometry, lazy UI, controlled shadows, and explicit loading screens so the creative concept does not overpower usability.',
+    title: 'Continuous Learning',
+    body: 'I am always exploring new technologies and methodologies to stay current with industry trends and improve my software engineering skills.',
   },
 ];
 
 export const futureIdeas = [
-  'Pokemon-style recruiter battle with technical questions.',
-  'Admin dashboard for editing projects and screenshots.',
-  'Analytics dashboard for recruiter behavior.',
-  'Compressed custom 3D assets, audio loops, and polished animations.',
+  'Exploring Microservices with Go and Kubernetes.',
+  'Diving deeper into WebGL and advanced 3D shaders.',
+  'Implementing CI/CD pipelines for automated deployments.',
+  'Contributing to open-source projects in the Node.js ecosystem.',
 ];
