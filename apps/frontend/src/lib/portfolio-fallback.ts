@@ -2,74 +2,72 @@ import type { Experience, Project, Skill } from '@portfolio/shared';
 
 export const fallbackProjects: Project[] = [
   {
-    id: 'scholarship-hours-platform',
-    title: 'Scholarship Hours Platform',
-    slug: 'scholarship-hours-platform',
+    id: 'bodegas-ecommerce-platform',
+    title: 'Bodegas E-Commerce Platform',
+    slug: 'bodegas-ecommerce-platform',
     description:
-      'A full-stack platform designed to manage scholarship working hours through a modular client-server architecture.',
+      'Full-stack enterprise e-commerce platform with inventory management, order processing, and promotions engine.',
     architecture:
-      'Frontend built with React Native Expo, backend implemented using Spring Boot REST APIs, MariaDB relational database, and Dockerized infrastructure separated into independent services.',
+      'Vue SPA + Express REST API + PostgreSQL + Prisma + Cloudflare R2 image storage.',
     challenges: [
-      'Managing distributed services',
-      'Frontend-backend synchronization',
-      'Docker orchestration',
-      'Authentication flows',
+      'Enterprise inventory management',
+      'Background jobs for reservation expiration',
+      'Inventory consistency',
+      'CI/CD workflows with GitHub Actions',
     ],
-    stack: ['React Native', 'Spring Boot', 'MariaDB', 'Docker', 'Docker Compose'],
+    stack: ['Vue 3', 'TypeScript', 'Express', 'PostgreSQL', 'Prisma', 'Clerk', 'Cloudflare R2', 'Docker'],
     stackReasoning:
-      'Spring Boot was selected for structured backend architecture and React Native for cross-platform mobile support.',
-    githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
+      'Chosen for enterprise scalability: Clerk for auth, Cloudflare R2 for media, and Prisma for relational consistency.',
+    githubUrl: null,
     liveUrl: null,
-    thumbnail: '/projects/scholarship-hours/thumbnail.png',
-    gifDemo: '/projects/scholarship-hours/demo.gif',
+    thumbnail: '/projects/bodegas/thumbnail.png',
+    gifDemo: '/projects/bodegas/demo.gif',
     featured: true,
     media: [],
   },
   {
-    id: 'lisp-interpreter',
-    title: 'Lisp Interpreter',
-    slug: 'lisp-interpreter',
+    id: 'barber-shop-management-system',
+    title: 'Barber Shop Management System',
+    slug: 'barber-shop-management-system',
     description:
-      'A custom Lisp interpreter implemented in Java supporting parsing, recursion, evaluation, and symbolic computation.',
-    architecture:
-      'Modular interpreter architecture including lexer, parser, evaluator, execution context, and recursive evaluation engine.',
+      'Advanced full-stack management system for barber shops, featuring reservations, billing, and analytics.',
+    architecture: 'React SPA + Bun ElysiaJS API + PostgreSQL + Prisma.',
     challenges: [
-      'Recursive evaluation',
-      'AST parsing',
-      'Execution context handling',
-      'Language design',
+      'Reservation workflow optimization',
+      'Advanced SQL reporting with CTEs',
+      'Database triggers and stored procedures',
+      'Analytics dashboard implementation',
     ],
-    stack: ['Java', 'Recursion', 'Tree Structures', 'Interpreter Design'],
+    stack: ['React', 'TypeScript', 'Bun', 'ElysiaJS', 'PostgreSQL', 'Prisma', 'Docker'],
     stackReasoning:
-      'Java was selected for its object-oriented structure and strong handling of modular parser/interpreter design.',
-    githubUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter.git',
+      'Leverages Bun and ElysiaJS for high-performance API, and PostgreSQL features for complex business logic.',
+    githubUrl: null,
     liveUrl: null,
-    thumbnail: '/projects/lisp-interpreter/thumbnail.png',
-    gifDemo: '/projects/lisp-interpreter/demo.gif',
+    thumbnail: '/projects/barber-shop/thumbnail.png',
+    gifDemo: '/projects/barber-shop/demo.gif',
     featured: true,
     media: [],
   },
   {
-    id: 'movie-blog-spa',
-    title: 'Movie Blog SPA',
-    slug: 'movie-blog-spa',
+    id: 'enterprise-backend-nda',
+    title: 'Enterprise Backend (Private NDA Project)',
+    slug: 'enterprise-backend-nda',
     description:
-      'A modern movie platform built with React and Vite featuring routing, persistence, favorites, search history, and dark mode.',
-    architecture:
-      'Frontend SPA using React Router and Context API connected to a lightweight backend with SQLite persistence and Dockerized services.',
+      'Secure enterprise-grade backend service focused on authentication and authorization.',
+    architecture: 'Node.js + TypeScript + PostgreSQL with multi-layer middleware architecture.',
     challenges: [
-      'Global state management',
-      'Persistence synchronization',
-      'Routing structure',
-      'Docker integration',
+      'OAuth2 and JWT integration',
+      'Refresh token implementation',
+      'RBAC authorization middleware',
+      'Secure API design patterns',
     ],
-    stack: ['React', 'Vite', 'React Router', 'SQLite', 'Docker Compose'],
+    stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'JWT', 'OAuth2'],
     stackReasoning:
-      'React Router and Context API were used to demonstrate SPA architecture and client-side state management.',
-    githubUrl: 'https://github.com/eldmark/react-router.git',
+      'Focused on industry-standard security protocols and production-ready backend patterns.',
+    githubUrl: null,
     liveUrl: null,
-    thumbnail: '/projects/movie-blog/thumbnail.png',
-    gifDemo: '/projects/movie-blog/demo.gif',
+    thumbnail: '/projects/nda-backend/thumbnail.png',
+    gifDemo: '/projects/nda-backend/demo.gif',
     featured: true,
     media: [],
   },
@@ -95,6 +93,121 @@ export const fallbackProjects: Project[] = [
     thumbnail: '/projects/equa-notepad/thumbnail.png',
     gifDemo: '/projects/equa-notepad/demo.gif',
     featured: true,
+    media: [],
+  },
+  {
+    id: 'food-recommendation-platform',
+    title: 'Food Recommendation Platform',
+    slug: 'food-recommendation-platform',
+    description: 'Graph-based recommendation system for food and recipes.',
+    architecture: 'Next.js + TypeScript + Neo4j + Cypher.',
+    challenges: [
+      'Collaborative filtering implementation',
+      'Recommendation engine optimization',
+      'Graph database modeling',
+    ],
+    stack: ['Next.js', 'TypeScript', 'Neo4j', 'Cypher'],
+    stackReasoning:
+      'Neo4j is ideal for modeling complex relationships in recommendation systems.',
+    githubUrl: null,
+    liveUrl: null,
+    thumbnail: '/projects/food-rec/thumbnail.png',
+    gifDemo: '/projects/food-rec/demo.gif',
+    featured: false,
+    media: [],
+  },
+  {
+    id: 'trash-detection-api',
+    title: 'Trash Detection API',
+    slug: 'trash-detection-api',
+    description: 'AI-powered waste analysis and heatmap generation platform.',
+    architecture: 'Express + TypeScript + Prisma + Turso + Claude Sonnet + Cloudinary.',
+    challenges: [
+      'Image analysis with Claude Sonnet',
+      'Heatmap generation',
+      'GeoJSON support',
+      'Route optimization',
+    ],
+    stack: ['Express', 'TypeScript', 'Prisma', 'Turso', 'Claude Sonnet', 'Cloudinary'],
+    stackReasoning:
+      'Combines edge database (Turso) with AI analysis (Claude) for efficient waste management.',
+    githubUrl: null,
+    liveUrl: null,
+    thumbnail: '/projects/trash-detection/thumbnail.png',
+    gifDemo: '/projects/trash-detection/demo.gif',
+    featured: false,
+    media: [],
+  },
+  {
+    id: 'scholarship-hours-platform',
+    title: 'Scholarship Hours Platform',
+    slug: 'scholarship-hours-platform',
+    description:
+      'A full-stack platform designed to manage scholarship working hours through a modular client-server architecture.',
+    architecture:
+      'Frontend built with React Native Expo, backend implemented using Spring Boot REST APIs, MariaDB relational database, and Dockerized infrastructure separated into independent services.',
+    challenges: [
+      'Managing distributed services',
+      'Frontend-backend synchronization',
+      'Docker orchestration',
+      'Authentication flows',
+    ],
+    stack: ['React Native', 'Spring Boot', 'MariaDB', 'Docker', 'Docker Compose'],
+    stackReasoning:
+      'Spring Boot was selected for structured backend architecture and React Native for cross-platform mobile support.',
+    githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
+    liveUrl: null,
+    thumbnail: '/projects/scholarship-hours/thumbnail.png',
+    gifDemo: '/projects/scholarship-hours/demo.gif',
+    featured: false,
+    media: [],
+  },
+  {
+    id: 'lisp-interpreter',
+    title: 'Lisp Interpreter',
+    slug: 'lisp-interpreter',
+    description:
+      'A custom Lisp interpreter implemented in Java supporting parsing, recursion, evaluation, and symbolic computation.',
+    architecture:
+      'Modular interpreter architecture including lexer, parser, evaluator, execution context, and recursive evaluation engine.',
+    challenges: [
+      'Recursive evaluation',
+      'AST parsing',
+      'Execution context handling',
+      'Language design',
+    ],
+    stack: ['Java', 'Recursion', 'Tree Structures', 'Interpreter Design'],
+    stackReasoning:
+      'Java was selected for its object-oriented structure and strong handling of modular parser/interpreter design.',
+    githubUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter.git',
+    liveUrl: null,
+    thumbnail: '/projects/lisp-interpreter/thumbnail.png',
+    gifDemo: '/projects/lisp-interpreter/demo.gif',
+    featured: false,
+    media: [],
+  },
+  {
+    id: 'movie-blog-spa',
+    title: 'Movie Blog SPA',
+    slug: 'movie-blog-spa',
+    description:
+      'A modern movie platform built with React and Vite featuring routing, persistence, favorites, search history, and dark mode.',
+    architecture:
+      'Frontend SPA using React Router and Context API connected to a lightweight backend with SQLite persistence and Dockerized services.',
+    challenges: [
+      'Global state management',
+      'Persistence synchronization',
+      'Routing structure',
+      'Docker integration',
+    ],
+    stack: ['React', 'Vite', 'React Router', 'SQLite', 'Docker Compose'],
+    stackReasoning:
+      'React Router and Context API were used to demonstrate SPA architecture and client-side state management.',
+    githubUrl: 'https://github.com/eldmark/react-router.git',
+    liveUrl: null,
+    thumbnail: '/projects/movie-blog/thumbnail.png',
+    gifDemo: '/projects/movie-blog/demo.gif',
+    featured: false,
     media: [],
   },
   {
@@ -155,8 +268,7 @@ export const fallbackSkills: Skill[] = [
     category: 'Frontend',
     icon: 'Layout',
     level: 5,
-    reasoning:
-      'Chosen for component-based architecture, ecosystem maturity, and SPA capabilities.',
+    reasoning: 'Chosen for component-based architecture, ecosystem maturity, and SPA capabilities.',
     appliedIn: ['Interactive Portfolio', 'Movie Blog', 'Scholarship Hours Platform'],
   },
   {
@@ -165,8 +277,7 @@ export const fallbackSkills: Skill[] = [
     category: '3D Frontend',
     icon: 'Box',
     level: 4,
-    reasoning:
-      'Selected to build interactive 3D experiences integrated with React architecture.',
+    reasoning: 'Selected to build interactive 3D experiences integrated with React architecture.',
     appliedIn: ['Interactive Portfolio Room', '3D UI Experiments'],
   },
   {
@@ -193,8 +304,7 @@ export const fallbackSkills: Skill[] = [
     category: 'DevOps',
     icon: 'Container',
     level: 4,
-    reasoning:
-      'Used to create reproducible environments and containerized full-stack systems.',
+    reasoning: 'Used to create reproducible environments and containerized full-stack systems.',
     appliedIn: ['Scholarship Hours Platform', 'Movie Blog', 'Portfolio Infrastructure'],
   },
   {
@@ -280,7 +390,7 @@ export const fallbackExperiences: Experience[] = [
 ];
 
 export const aboutProfile = {
-  name: 'Eldmark',
+  name: 'Marco Alejandro Díaz Castañeda',
   summary:
     'A junior full-stack developer focused on backend systems, practical frontend architecture, Dockerized delivery, and production-oriented habits.',
   direction:

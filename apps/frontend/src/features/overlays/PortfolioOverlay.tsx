@@ -466,11 +466,12 @@ function MailboxOverlay() {
   const [message, setMessage] = useState<string | null>(null);
 
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
+    const form = event.currentTarget;
     event.preventDefault();
     setStatus('loading');
     setMessage(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
 
     try {
       await sendMessage({
@@ -480,7 +481,7 @@ function MailboxOverlay() {
       });
       setStatus('success');
       setMessage('Message sent successfully. I will get back to you soon!');
-      event.currentTarget.reset();
+      form.reset();
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Message failed');

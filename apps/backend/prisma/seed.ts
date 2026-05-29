@@ -24,8 +24,18 @@ async function main() {
         category: 'Languages',
         level: 5,
         reasoning:
-          'CV lists Python, JavaScript, TypeScript, Java, Go, Kotlin, Scala, C, and C++ for full-stack, mobile, systems, and academic work.',
-        appliedIn: ['Python', 'JavaScript', 'TypeScript', 'Java', 'Go', 'Kotlin', 'Scala', 'C', 'C++'],
+          'Python, JavaScript, TypeScript, Java, Go, Kotlin, Scala, C, and C++ for full-stack, mobile, systems, and academic work.',
+        appliedIn: [
+          'Python',
+          'JavaScript',
+          'TypeScript',
+          'Java',
+          'Go',
+          'Kotlin',
+          'Scala',
+          'C',
+          'C++',
+        ],
       },
       {
         name: 'Backend Development',
@@ -33,7 +43,15 @@ async function main() {
         level: 4,
         reasoning:
           'Experience includes REST APIs, secure enterprise backends, token middleware, RBAC, and relational data access.',
-        appliedIn: ['Node.js', 'Spring Boot', 'Elysia', 'Express', 'FastAPI', 'REST APIs', 'Prisma ORM'],
+        appliedIn: [
+          'Node.js',
+          'Spring Boot',
+          'Elysia',
+          'Express',
+          'FastAPI',
+          'REST APIs',
+          'Prisma ORM',
+        ],
       },
       {
         name: 'Frontend Development',
@@ -48,7 +66,7 @@ async function main() {
         category: 'Data',
         level: 4,
         reasoning:
-          'CV covers relational and non-relational databases used for backend services, mobile sync, and data modeling.',
+          'Relational and non-relational databases used for backend services, mobile sync, and data modeling.',
         appliedIn: ['PostgreSQL', 'MariaDB', 'MySQL', 'Neo4J', 'Redis', 'Room', 'Supabase'],
       },
       {
@@ -81,7 +99,15 @@ async function main() {
         level: 4,
         reasoning:
           'CV highlights client-server architecture, microservices, MVC, MVVC, multi-layer design, scalable patterns, and Agile/Scrum practices.',
-        appliedIn: ['Client-server', 'Microservices', 'MVC', 'MVVC', 'Multi-layer', 'Design Patterns', 'Scrum'],
+        appliedIn: [
+          'Client-server',
+          'Microservices',
+          'MVC',
+          'MVVC',
+          'Multi-layer',
+          'Design Patterns',
+          'Scrum',
+        ],
       },
     ],
   });
@@ -117,7 +143,15 @@ async function main() {
           'Developed secure and scalable enterprise backend services with JWT, OAuth2, token validation middleware, RBAC authorization, access tokens, and refresh tokens.',
         startDate: new Date('2026-01-01'),
         endDate: null,
-        technologies: ['Node.js', 'REST APIs', 'JWT', 'OAuth2', 'RBAC', 'Access Tokens', 'Refresh Tokens'],
+        technologies: [
+          'Node.js',
+          'REST APIs',
+          'JWT',
+          'OAuth2',
+          'RBAC',
+          'Access Tokens',
+          'Refresh Tokens',
+        ],
       },
       {
         company: 'Freelance / Contract',
@@ -138,73 +172,193 @@ async function main() {
   await prisma.project.createMany({
     data: [
       {
-        title: 'Scholarship Hours Control Platform',
-        slug: 'scholarship-hours-control-platform',
+        title: 'Bodegas E-Commerce Platform',
+        slug: 'bodegas-ecommerce-platform',
         description:
-          'Full-stack client-server platform for managing scholarship hours and university users.',
+          'Full-stack enterprise e-commerce platform with inventory management, order processing, and promotions engine.',
         architecture:
-          'Designed around administrator and student workflows, with services adapted to user needs and UI/UX decisions informed by Gestalt principles.',
+          'Vue SPA + Express REST API + PostgreSQL + Prisma + Cloudflare R2 image storage.',
         challenges: [
-          'Scholarship hour tracking',
-          'Administrator and student flows',
-          'Client-server coordination',
-          'UI/UX structure',
+          'Enterprise inventory management',
+          'Background jobs for reservation expiration',
+          'Inventory consistency',
+          'CI/CD workflows with GitHub Actions',
         ],
-        stack: ['Full Stack', 'Client-server Architecture', 'UI/UX', 'Gestalt'],
+        stack: ['Vue 3', 'TypeScript', 'Express', 'PostgreSQL', 'Prisma', 'Clerk', 'Cloudflare R2', 'Docker'],
         stackReasoning:
-          'The CV frames this project as a full-stack system focused on client-server design, user management, and practical UI/UX decisions.',
-        githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
+          'Chosen for enterprise scalability: Clerk for auth, Cloudflare R2 for media, and Prisma for relational consistency.',
+        githubUrl: null,
         featured: true,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Barber Shop Management System',
+        slug: 'barber-shop-management-system',
+        description:
+          'Advanced full-stack management system for barber shops, featuring reservations, billing, and analytics.',
+        architecture: 'React SPA + Bun ElysiaJS API + PostgreSQL + Prisma.',
+        challenges: [
+          'Reservation workflow optimization',
+          'Advanced SQL reporting with CTEs',
+          'Database triggers and stored procedures',
+          'Analytics dashboard implementation',
+        ],
+        stack: ['React', 'TypeScript', 'Bun', 'ElysiaJS', 'PostgreSQL', 'Prisma', 'Docker'],
+        stackReasoning:
+          'Leverages Bun and ElysiaJS for high-performance API, and PostgreSQL features for complex business logic.',
+        githubUrl: null,
+        featured: true,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Enterprise Backend (Private NDA Project)',
+        slug: 'enterprise-backend-nda',
+        description:
+          'Secure enterprise-grade backend service focused on authentication and authorization.',
+        architecture: 'Node.js + TypeScript + PostgreSQL with multi-layer middleware architecture.',
+        challenges: [
+          'OAuth2 and JWT integration',
+          'Refresh token implementation',
+          'RBAC authorization middleware',
+          'Secure API design patterns',
+        ],
+        stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'JWT', 'OAuth2'],
+        stackReasoning:
+          'Focused on industry-standard security protocols and production-ready backend patterns.',
+        githubUrl: null,
+        featured: true,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Equa Notepad',
+        slug: 'equa-notepad',
+        description:
+          'Android application for mathematical note organization with AI-generated exercises and cloud sync.',
+        architecture:
+          'Kotlin + Jetpack Compose + Room + DataStore + Supabase + Google Identity + OpenRouter.',
+        challenges: [
+          'Local and remote data synchronization',
+          'Offline-first architecture',
+          'AI-generated exercise integration',
+          'Google Identity authentication',
+        ],
+        stack: ['Kotlin', 'Jetpack Compose', 'Room', 'DataStore', 'Supabase', 'Google Identity', 'OpenRouter'],
+        stackReasoning:
+          'Modern Android stack combined with Supabase for cloud features and AI integration via OpenRouter.',
+        githubUrl: 'https://github.com/angcoder-c/equa-notepad-plats',
+        featured: false,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Food Recommendation Platform',
+        slug: 'food-recommendation-platform',
+        description: 'Graph-based recommendation system for food and recipes.',
+        architecture: 'Next.js + TypeScript + Neo4j + Cypher.',
+        challenges: [
+          'Collaborative filtering implementation',
+          'Recommendation engine optimization',
+          'Graph database modeling',
+        ],
+        stack: ['Next.js', 'TypeScript', 'Neo4j', 'Cypher'],
+        stackReasoning:
+          'Neo4j is ideal for modeling complex relationships in recommendation systems.',
+        githubUrl: null,
+        featured: false,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Trash Detection API',
+        slug: 'trash-detection-api',
+        description: 'AI-powered waste analysis and heatmap generation platform.',
+        architecture: 'Express + TypeScript + Prisma + Turso + Claude Sonnet + Cloudinary.',
+        challenges: [
+          'Image analysis with Claude Sonnet',
+          'Heatmap generation',
+          'GeoJSON support',
+          'Route optimization',
+        ],
+        stack: ['Express', 'TypeScript', 'Prisma', 'Turso', 'Claude Sonnet', 'Cloudinary'],
+        stackReasoning:
+          'Combines edge database (Turso) with AI analysis (Claude) for efficient waste management.',
+        githubUrl: null,
+        featured: false,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Scholarship Hours Platform',
+        slug: 'scholarship-hours-platform',
+        description: 'Full stack management system for tracking scholarship hours.',
+        architecture: 'Spring Boot + MariaDB + React Native + Docker.',
+        challenges: [
+          'Hour tracking logic',
+          'Cross-platform mobile client',
+          'Authentication and authorization',
+        ],
+        stack: ['Spring Boot', 'MariaDB', 'React Native', 'Docker'],
+        stackReasoning:
+          'Robust backend with Spring Boot and flexible mobile client with React Native.',
+        githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
+        featured: false,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Lisp Interpreter',
+        slug: 'lisp-interpreter',
+        description: 'Custom Lisp interpreter built from scratch in Java.',
+        architecture: 'Lexer + Parser + AST evaluation + Execution context.',
+        challenges: [
+          'Recursive evaluation logic',
+          'Lexical scoping and execution context',
+          'Custom AST construction',
+        ],
+        stack: ['Java'],
+        stackReasoning:
+          'Built to demonstrate deep understanding of programming language fundamentals.',
+        githubUrl: null,
+        featured: false,
+        thumbnail: null,
+        gifDemo: null,
+      },
+      {
+        title: 'Movie Blog',
+        slug: 'movie-blog',
+        description: 'Movie management platform with persistent favorites and global state.',
+        architecture: 'React + React Router + SQLite + Docker.',
+        challenges: [
+          'Global state management',
+          'Persistent search history',
+          'SQLite integration in Docker',
+        ],
+        stack: ['React', 'React Router', 'SQLite', 'Docker'],
+        stackReasoning:
+          'Lightweight state-driven application with local persistence.',
+        githubUrl: null,
+        featured: false,
         thumbnail: null,
         gifDemo: null,
       },
       {
         title: 'HTTP Server in Go',
         slug: 'http-server-go',
-        description:
-          'HTTP server implemented from scratch in Go, including route handling, requests, and responses without frameworks.',
-        architecture:
-          'Minimal no-framework backend architecture focused on direct HTTP handling and production deployment on a Google Cloud VPS.',
+        description: 'Lightweight HTTP server implementation from scratch.',
+        architecture: 'Custom routing and request handling without frameworks.',
         challenges: [
-          'Manual routing',
-          'Request and response handling',
-          'No-framework implementation',
-          'VPS deployment',
+          'Internal HTTP protocol implementation',
+          'Concurrent request handling',
+          'Minimalist routing logic',
         ],
-        stack: ['Go', 'HTTP', 'Google Cloud VPS', 'No-framework Backend'],
+        stack: ['Go'],
         stackReasoning:
-          'Go was used to demonstrate low-level backend fundamentals, explicit request handling, and deployable server behavior.',
+          'Demonstrates proficiency in low-level web protocols and Go concurrency.',
         githubUrl: 'https://github.com/eldmark/go-http',
-        featured: true,
-        thumbnail: null,
-        gifDemo: null,
-      },
-      {
-        title: 'Mathematical Notes App',
-        slug: 'mathematical-notes-app',
-        description:
-          'Android and cloud application for managing mathematical notes, formulas, synchronization, authentication, and AI-generated exercises.',
-        architecture:
-          'Modern Android architecture with Jetpack Compose, ViewModel, Room, Supabase auth/database/realtime services, Google Identity, local storage, and remote synchronization.',
-        challenges: [
-          'Local and remote data synchronization',
-          'Google authentication',
-          'Realtime cloud integration',
-          'Generative AI exercise creation',
-        ],
-        stack: [
-          'Kotlin',
-          'Jetpack Compose',
-          'ViewModel',
-          'Room',
-          'Supabase',
-          'Google Identity',
-          'Generative AI',
-        ],
-        stackReasoning:
-          'The stack matches the CV project: modern Android UI/state patterns, local persistence, Supabase cloud services, Google Identity, and generative AI features.',
-        githubUrl: 'https://github.com/angcoder-c/equa-notepad-plats',
-        featured: true,
+        featured: false,
         thumbnail: null,
         gifDemo: null,
       },
