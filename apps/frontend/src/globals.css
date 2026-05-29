@@ -223,7 +223,7 @@ code {
   top: 16px;
   left: 50%;
   display: flex;
-  max-width: calc(100vw - 24px);
+  max-width: calc(100vw - 32px);
   transform: translateX(-50%);
   gap: 8px;
   align-items: center;
@@ -234,6 +234,17 @@ code {
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(14px);
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.recruiter-nav::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .recruiter-nav-brand {
+    display: none;
+  }
 }
 
 .recruiter-nav-brand {
@@ -379,14 +390,26 @@ code {
 .overlay-panel {
   width: min(1000px, 100%);
   max-height: calc(100vh - 112px);
-  overflow: auto;
-  padding: clamp(28px, 4.5vw, 44px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(20px, 4.5vw, 44px);
   border: 2px solid var(--text);
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(200, 90, 60, 0.08), transparent 34%),
     var(--bg);
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.overlay-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overlay-panel::-webkit-scrollbar-thumb {
+  background-color: var(--line-strong);
+  border-radius: 10px;
 }
 
 .overlay-panel-wide {
@@ -406,24 +429,18 @@ code {
   margin-bottom: 24px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
 }
 
-.overlay-header h2,
-.recruiter-section h2,
-.project-card h3,
-.detail-card h3,
-.recruiter-project-card h3,
-.recruiter-skill-card h3,
-.recruiter-proof-card h3 {
-  margin: 0;
+.overlay-header > div {
+  min-width: 0;
+  flex: 1;
 }
 
-.overlay-header h2,
-.recruiter-section h2,
-.recruiter-hero-panel h2 {
-  font-family: var(--font-display);
-  font-size: clamp(32px, 5vw, 48px);
-  line-height: 1.05;
+.overlay-header h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .icon-button {
@@ -432,6 +449,7 @@ code {
   justify-content: center;
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
 }
 
 .data-notice {
@@ -442,6 +460,7 @@ code {
   color: var(--muted);
   background: rgba(255, 255, 255, 0.58);
   font-size: 13px;
+  word-break: break-word;
 }
 
 .data-notice-error,
@@ -691,6 +710,7 @@ code {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
+  max-width: 100%;
 }
 
 .chip-list span,
@@ -707,6 +727,7 @@ code {
   font-size: 10px;
   font-weight: 600;
   line-height: 1.2;
+  word-break: break-all;
 }
 
 .link-row a,
@@ -767,17 +788,21 @@ code {
   background: var(--terminal);
   color: var(--terminal-text);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .terminal-lines {
   min-height: 220px;
   max-height: 320px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .terminal-lines pre {
   margin: 0 0 8px;
   white-space: pre-wrap;
+  word-break: break-all;
   font-family: var(--font-mono);
   font-size: 13px;
 }
@@ -859,7 +884,7 @@ code {
   z-index: 10;
   top: 16px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin: 0 auto 32px;
   max-width: 1120px;
@@ -869,6 +894,24 @@ code {
   background: rgba(245, 245, 240, 0.92);
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  justify-content: center;
+}
+
+.recruiter-page-nav::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .recruiter-page-nav {
+    justify-content: flex-start;
+    margin-left: -12px;
+    margin-right: -12px;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
 }
 
 .recruiter-page-nav a.active,
