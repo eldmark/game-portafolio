@@ -398,12 +398,13 @@ export const fallbackExperiences: Experience[] = [
 
 export const aboutProfile = {
   name: 'Marco Alejandro Díaz Castañeda',
+  email: 'marcoalejandro.diazcastaneda@gmail.com',
   summary:
     'A junior full-stack developer focused on backend systems, practical frontend architecture, Dockerized delivery, and production-oriented habits.',
   direction:
     'The goal is to join a team where full-stack execution, backend reliability, UI polish, and clear technical reasoning matter.',
   contact:
-    'Github: https://github.com/eldmark | LinkedIn: https://www.linkedin.com/in/marco-diaz21/ | Email: marcoalejandro.diazcastaneda@gmail.com',
+    'GitHub: https://github.com/eldmark | LinkedIn: https://www.linkedin.com/in/marco-diaz21/ | Email: marcoalejandro.diazcastaneda@gmail.com',
 };
 
 export const knowledgeNotes = [

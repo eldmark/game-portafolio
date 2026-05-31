@@ -82,7 +82,7 @@ function DataNotice({
     return <p className="data-notice">Showing local portfolio seed data.</p>;
   }
 
-  return <p className="data-notice">Live backend data loaded.</p>;
+  return <p className="data-notice">Live API data ready.</p>;
 }
 
 function ChipList({ items, label }: { items: string[]; label: string }) {
@@ -122,14 +122,7 @@ function ProjectPreview({ project, label }: { project: Project; label?: string }
     <div className={`project-thumb ${mediaUrl ? 'project-thumb-media' : ''}`}>
       {mediaUrl ? (
         isVideo ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="project-thumb-video"
-            src={mediaUrl}
-          />
+          <video autoPlay loop muted playsInline className="project-thumb-video" src={mediaUrl} />
         ) : (
           <div
             className="project-thumb-bg"
@@ -363,7 +356,9 @@ function ProjectCard({ project }: { project: Project }) {
   const contentId = `project-card-${project.id}`;
 
   return (
-    <article className={`project-card poster-card ${expanded ? 'is-expanded' : ''}`}>
+    <article
+      className={`project-card poster-card ${project.featured ? 'is-featured' : ''} ${expanded ? 'is-expanded' : ''}`}
+    >
       <ProjectPreview label="Featured highlight" project={project} />
       <div className="project-card-body" id={contentId}>
         <div className="card-heading">
@@ -397,27 +392,32 @@ function ProjectCard({ project }: { project: Project }) {
         {!expanded && hiddenStackCount > 0 ? (
           <p className="card-more-hint">+{hiddenStackCount} more technologies available.</p>
         ) : null}
-        <button
-          aria-controls={contentId}
-          aria-expanded={expanded}
-          className="card-toggle"
-          onClick={() => setExpanded((current) => !current)}
-          type="button"
-        >
-          {expanded ? 'Show less' : 'Know more'}
-        </button>
-        {expanded ? (
+        <div className="project-card-cta-row">
+          <button
+            aria-controls={contentId}
+            aria-expanded={expanded}
+            className="card-toggle"
+            onClick={() => setExpanded((current) => !current)}
+            type="button"
+          >
+            {expanded ? 'Show less' : 'Know more'}
+          </button>
+          {project.githubUrl ? (
+            <a
+              className="card-toggle card-toggle-link"
+              href={project.githubUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Github size={16} /> GitHub
+            </a>
+          ) : null}
+        </div>
+        {expanded && project.liveUrl ? (
           <div className="link-row project-card-actions">
-            {project.githubUrl ? (
-              <a href={project.githubUrl} rel="noreferrer" target="_blank">
-                <Github size={16} /> Code
-              </a>
-            ) : null}
-            {project.liveUrl ? (
-              <a href={project.liveUrl} rel="noreferrer" target="_blank">
-                <ExternalLink size={16} /> Live
-              </a>
-            ) : null}
+            <a href={project.liveUrl} rel="noreferrer" target="_blank">
+              <ExternalLink size={16} /> Live
+            </a>
           </div>
         ) : null}
       </div>
@@ -430,7 +430,9 @@ function ProjectBoardCard({ project }: { project: Project }) {
   const contentId = `project-board-card-${project.id}`;
 
   return (
-    <article className={`project-card board-project-card ${expanded ? 'is-expanded' : ''}`}>
+    <article
+      className={`project-card board-project-card ${project.featured ? 'is-featured' : ''} ${expanded ? 'is-expanded' : ''}`}
+    >
       {expanded ? <ProjectPreview project={project} /> : null}
       <div className="project-card-body" id={contentId}>
         <div className="card-heading">
@@ -456,29 +458,36 @@ function ProjectBoardCard({ project }: { project: Project }) {
               <p>{project.stackReasoning}</p>
             </section>
             <ChipList items={project.stack} label={`${project.title} stack`} />
-            <div className="link-row project-card-actions">
-              {project.githubUrl ? (
-                <a href={project.githubUrl} rel="noreferrer" target="_blank">
-                  <Github size={16} /> Code
-                </a>
-              ) : null}
-              {project.liveUrl ? (
+            {project.liveUrl ? (
+              <div className="link-row project-card-actions">
                 <a href={project.liveUrl} rel="noreferrer" target="_blank">
                   <ExternalLink size={16} /> Live
                 </a>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </>
         ) : null}
-        <button
-          aria-controls={contentId}
-          aria-expanded={expanded}
-          className="card-toggle"
-          onClick={() => setExpanded((current) => !current)}
-          type="button"
-        >
-          {expanded ? 'Mostrar menos' : 'Mostrar mas'}
-        </button>
+        <div className="project-card-cta-row">
+          <button
+            aria-controls={contentId}
+            aria-expanded={expanded}
+            className="card-toggle"
+            onClick={() => setExpanded((current) => !current)}
+            type="button"
+          >
+            {expanded ? 'Mostrar menos' : 'Mostrar mas'}
+          </button>
+          {project.githubUrl ? (
+            <a
+              className="card-toggle card-toggle-link"
+              href={project.githubUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Github size={16} /> GitHub
+            </a>
+          ) : null}
+        </div>
       </div>
     </article>
   );
@@ -500,6 +509,7 @@ function ProjectsOverlay(props: PortfolioOverlayProps) {
 function MailboxOverlay() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
+  const [fallbackEmail, setFallbackEmail] = useState(aboutProfile.email);
 
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
     const form = event.currentTarget;
@@ -510,17 +520,30 @@ function MailboxOverlay() {
     const formData = new FormData(form);
 
     try {
-      await sendMessage({
+      const result = await sendMessage({
         name: String(formData.get('name') ?? ''),
         email: String(formData.get('email') ?? ''),
         message: String(formData.get('message') ?? ''),
       });
-      setStatus('success');
-      setMessage('Message sent successfully. I will get back to you soon!');
+      setFallbackEmail(result.contactEmail || aboutProfile.email);
+
+      if (result.emailDelivery === 'fallback') {
+        setStatus('error');
+        setMessage(
+          `Resend is not available right now. You can email me directly at ${result.contactEmail}.`,
+        );
+      } else {
+        setStatus('success');
+        setMessage('Message sent successfully. I will get back to you soon!');
+      }
       form.reset();
     } catch (error) {
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Message failed');
+      setMessage(
+        error instanceof Error
+          ? `${error.message} You can email me directly at ${fallbackEmail}.`
+          : `Message failed. You can email me directly at ${fallbackEmail}.`,
+      );
     }
   }
 
@@ -544,6 +567,11 @@ function MailboxOverlay() {
           {status === 'loading' ? 'Sending...' : 'Send message'}
         </button>
         {message ? <p className={`form-status form-status-${status}`}>{message}</p> : null}
+        {status === 'error' ? (
+          <a className="text-link" href={`mailto:${fallbackEmail}`}>
+            Write me directly at {fallbackEmail}
+          </a>
+        ) : null}
       </form>
     </OverlayShell>
   );
