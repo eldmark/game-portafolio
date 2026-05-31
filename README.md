@@ -136,6 +136,63 @@ npm run lint      # Run ESLint
 npm run format    # Apply Prettier formatting
 ```
 
+## API Documentation
+
+This project exposes a small REST API used by the frontend. All JSON responses follow the envelope shape: `{ "data": ... }` on success, and `{ "error": "message", "details": ... }` on failure.
+
+Base URL (development): `http://localhost:4000`
+
+Authentication: Admin routes require a JWT in the `Authorization: Bearer <token>` header.
+
+Public endpoints
+
+- `GET /projects` — list projects (returns `[{...project}]`)
+- `GET /projects/:slug` — get a single project by slug
+- `GET /skills` — list skills
+- `GET /experiences` — list experiences
+- `POST /messages` — submit contact message (body: `{ name, email, message }`)
+
+Usage tracking & analytics
+
+- `POST /visits` — record or upsert a visit (body: `{ sessionId, recruiterMode, device, country }`)
+- `PATCH /visits/:sessionId` — update duration and flags (body: `{ duration, recruiterMode }`)
+- `POST /dialogue-logs` — record a dialogue interaction (body: `{ sessionId, dialogueKey }`)
+- `GET /analytics/summary` — admin-visible analytics summary (total visits, average duration, dialogue counts)
+
+Auth
+
+- `POST /auth/login` — login (body: `{ email, password }`) returns `{ token, user }` on success.
+
+Admin endpoints (require `Authorization` header)
+
+- `GET /admin/users` — list admin users
+- `POST /admin/users` — create admin user (body `{ email, password, name? }`)
+- `DELETE /admin/users/:id` — delete admin user
+- `POST /admin/projects`, `PATCH /admin/projects/:id`, `DELETE /admin/projects/:id` — manage projects
+- `POST /admin/skills`, `PATCH /admin/skills/:id`, `DELETE /admin/skills/:id` — manage skills
+- `POST /admin/experiences`, `PATCH /admin/experiences/:id`, `DELETE /admin/experiences/:id` — manage experiences
+
+Quick curl examples
+
+Fetch public projects:
+
+```bash
+curl -s http://localhost:4000/projects | jq
+```
+
+Create an admin user (replace `<TOKEN>` with an admin JWT):
+
+```bash
+curl -X POST http://localhost:4000/admin/users \
+	-H "Content-Type: application/json" \
+	-H "Authorization: Bearer <TOKEN>" \
+	-d '{"email":"you@example.com","password":"securepass","name":"You"}' | jq
+```
+
+Environment variables the server expects (see `apps/backend/.env.example`):
+
+- `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, `CONTACT_EMAIL`, `CORS_ORIGIN`, `PORT`
+
 ## Screenshots and Media
 
 Add production screenshots or GIFs of:
@@ -151,10 +208,3 @@ Add production screenshots or GIFs of:
 - Balancing creative visuals with recruiter-friendly navigation.
 - Keeping backend data, analytics, and admin flows consistent across frontend and server.
 - Making deployment friendly for both local Docker usage and server-based hosting.
-
-## 📜 Future Roadmap
-
-- [ ] Recruiter "Interview Battle" minigame.
-- [ ] Admin dashboard for real-time project management.
-- [ ] Advanced WebGL shaders for the 3D room.
-- [ ] Automated CI/CD pipelines.
