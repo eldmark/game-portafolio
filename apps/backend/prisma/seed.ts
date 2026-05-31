@@ -212,7 +212,7 @@ async function main() {
         githubUrl: null,
         featured: true,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/bodegasdelicores.webm',
       },
       {
         title: 'Barber Shop Management System',
@@ -229,10 +229,10 @@ async function main() {
         stack: ['React', 'TypeScript', 'Bun', 'ElysiaJS', 'PostgreSQL', 'Prisma', 'Docker'],
         stackReasoning:
           'Leverages Bun and ElysiaJS for high-performance API, and PostgreSQL features for complex business logic.',
-        githubUrl: null,
+        githubUrl: 'https://github.com/eldmark/db_barbershop.git',
         featured: true,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/barbershop.webm',
       },
       {
         title: 'Enterprise Backend (Private NDA Project)',
@@ -281,7 +281,7 @@ async function main() {
         githubUrl: 'https://github.com/angcoder-c/equa-notepad-plats',
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/equa-notepad-plats.mp4',
       },
       {
         title: 'Food Recommendation Platform',
@@ -296,10 +296,10 @@ async function main() {
         stack: ['Next.js', 'TypeScript', 'Neo4j', 'Cypher'],
         stackReasoning:
           'Neo4j is ideal for modeling complex relationships in recommendation systems.',
-        githubUrl: null,
+        githubUrl: 'https://github.com/angcoder-c/food-recommendations-p2.git',
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/food-recomendation.webm',
       },
       {
         title: 'Trash Detection API',
@@ -315,10 +315,10 @@ async function main() {
         stack: ['Express', 'TypeScript', 'Prisma', 'Turso', 'Claude Sonnet', 'Cloudinary'],
         stackReasoning:
           'Combines edge database (Turso) with AI analysis (Claude) for efficient waste management.',
-        githubUrl: null,
+        githubUrl: 'https://github.com/eldmark/backend-ecoscan.git',
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/trashclient.webm',
       },
       {
         title: 'Scholarship Hours Platform',
@@ -336,7 +336,7 @@ async function main() {
         githubUrl: 'https://github.com/eldmark/Scholarship-Hours.git',
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/scholarshiphours.webm',
       },
       {
         title: 'Lisp Interpreter',
@@ -348,13 +348,13 @@ async function main() {
           'Lexical scoping and execution context',
           'Custom AST construction',
         ],
-        stack: ['Java'],
+        stack: ['Java', 'Maven', 'JUnit'],
         stackReasoning:
           'Built to demonstrate deep understanding of programming language fundamentals.',
-        githubUrl: null,
+        githubUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter.git',
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/lisp-interpeter.webm',
       },
       {
         title: 'Movie Blog',
@@ -371,7 +371,7 @@ async function main() {
         githubUrl: null,
         featured: false,
         thumbnail: null,
-        gifDemo: null,
+        gifDemo: '/assets/demos/movies-catalog.webm',
       },
       {
         title: 'HTTP Server in Go',
