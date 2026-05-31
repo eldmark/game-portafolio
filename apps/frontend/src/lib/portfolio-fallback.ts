@@ -100,7 +100,7 @@ export const fallbackProjects: Project[] = [
     liveUrl: null,
     thumbnail: null,
     gifDemo: '/assets/demos/equa-notepad-plats.mp4',
-    featured: true,
+    featured: false,
     media: [],
   },
   {

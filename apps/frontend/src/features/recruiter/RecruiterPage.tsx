@@ -8,18 +8,14 @@ import {
   Briefcase,
   CheckCircle2,
   Code2,
-  Database,
   ExternalLink,
   FileText,
   Gauge,
   Github,
   Home,
-  Layers,
   Mail,
   Rocket,
-  ShieldCheck,
   Terminal,
-  ChevronDown,
 } from 'lucide-react';
 import type { Experience, Project, Skill } from '@portfolio/shared';
 import { aboutProfile } from '@/lib/portfolio-fallback';
@@ -440,6 +436,7 @@ export default function RecruiterPage() {
               Contact
             </a>
           </motion.div>
+          <DataStatus error={error} loading={loading} usingFallback={usingFallback} />
         </div>
 
         <motion.div

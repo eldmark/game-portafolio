@@ -31,9 +31,6 @@ const SPRITE_SHEET_URL = '/assets/models/man-character-spritesheet.png';
 const COLUMNS = 4;
 const ROWS = 5;
 
-const FRAME_WIDTH = 50;
-const FRAME_HEIGHT = 50;
-
 const WALK_FPS = 8;
 
 /* -------------------------------------------------------------------------- */

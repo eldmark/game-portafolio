@@ -1152,52 +1152,65 @@ code {
 
 .recruiter-page {
   min-height: 100vh;
-  padding: 24px;
-  background:
-    linear-gradient(135deg, rgba(200, 90, 60, 0.07), transparent 28%),
-    linear-gradient(180deg, var(--bg) 0%, #ecebe2 100%);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  background-image: 
+    radial-gradient(circle at 20% 120%, rgba(123, 63, 30, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% -20%, rgba(232, 148, 58, 0.05) 0%, transparent 40%);
 }
 
 .recruiter-page-nav {
   position: sticky;
-  z-index: 10;
-  top: 16px;
+  z-index: 100;
+  top: 0;
+  height: 56px;
   display: flex;
-  flex-wrap: nowrap;
-  gap: 8px;
-  margin: 0 auto 32px;
-  max-width: 1120px;
-  padding: 8px;
-  border: 2px solid var(--text);
-  border-radius: 8px;
-  background: rgba(245, 245, 240, 0.92);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  overflow-x: auto;
-  scrollbar-width: none;
+  align-items: center;
   justify-content: center;
+  gap: var(--space);
+  padding: 0 var(--space-2);
+  background: rgba(28, 23, 20, 0.80);
+  backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-2);
 }
 
-.recruiter-page-nav::-webkit-scrollbar {
-  display: none;
+.recruiter-page-nav a {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
 }
 
-@media (max-width: 760px) {
-  .recruiter-page-nav {
-    justify-content: flex-start;
-    margin-left: -12px;
-    margin-right: -12px;
-    border-radius: 0;
-    border-left: 0;
-    border-right: 0;
-  }
+.recruiter-page-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-accent-glow);
+  border-radius: 1px;
+  transition: width var(--duration-normal) var(--ease-out),
+              left   var(--duration-normal) var(--ease-out);
 }
 
-.recruiter-page-nav a.active,
-.recruiter-page-nav a:hover {
-  background: var(--text);
-  color: var(--cream);
-  border-color: var(--text);
+.recruiter-page-nav a:hover,
+.recruiter-page-nav a.active {
+  color: var(--color-text-primary);
+}
+
+.recruiter-page-nav a:hover::after,
+.recruiter-page-nav a.active::after {
+  width: 100%;
+  left: 0;
 }
 
 .recruiter-hero,
@@ -1292,14 +1305,36 @@ code {
 }
 
 .recruiter-section {
-  padding: 34px 0;
-  border-top: 1px solid var(--line);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border-subtle);
+  max-width: 1120px;
+  margin: 0 auto;
 }
 
 .recruiter-section-header {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 18px;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space);
+  margin-bottom: var(--space-2);
+}
+
+.recruiter-section-header h2,
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.recruiter-section-header .eyebrow,
+.section-label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0;
 }
 
 .recruiter-section-lead {
