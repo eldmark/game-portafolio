@@ -173,6 +173,7 @@ function AnimatedSection({
 function RecruiterProjectCard({ project }: { project: Project }) {
   const mediaUrl = getProjectMedia(project);
   const reduceMotion = useReducedMotion();
+  const isVideo = mediaUrl?.match(/\.(mp4|webm|ogg)$/i);
 
   return (
     <motion.article
@@ -184,16 +185,26 @@ function RecruiterProjectCard({ project }: { project: Project }) {
       layout
       whileHover={reduceMotion ? undefined : { y: -8, transition: { duration: 0.2 } }}
     >
-      <div
-        className={`recruiter-project-media ${mediaUrl ? 'has-media' : ''}`}
-        style={
-          mediaUrl
-            ? {
+      <div className={`recruiter-project-media ${mediaUrl ? 'has-media' : ''}`}>
+        {mediaUrl ? (
+          isVideo ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="recruiter-project-video"
+              src={mediaUrl}
+            />
+          ) : (
+            <div
+              className="recruiter-project-bg"
+              style={{
                 backgroundImage: `linear-gradient(rgba(17, 19, 24, 0.1), rgba(17, 19, 24, 0.8)), url("${mediaUrl}")`,
-              }
-            : undefined
-        }
-      >
+              }}
+            />
+          )
+        ) : null}
         <span>{project.featured ? 'Featured' : 'Project'}</span>
       </div>
 

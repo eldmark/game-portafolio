@@ -116,17 +116,29 @@ function ProjectPreview({ project, label }: { project: Project; label?: string }
     label ??
     (project.gifDemo ? 'GIF demo' : project.featured ? 'Featured project' : 'Project media');
 
+  const isVideo = mediaUrl?.match(/\.(mp4|webm|ogg)$/i);
+
   return (
-    <div
-      className={`project-thumb ${mediaUrl ? 'project-thumb-media' : ''}`}
-      style={
-        mediaUrl
-          ? {
+    <div className={`project-thumb ${mediaUrl ? 'project-thumb-media' : ''}`}>
+      {mediaUrl ? (
+        isVideo ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="project-thumb-video"
+            src={mediaUrl}
+          />
+        ) : (
+          <div
+            className="project-thumb-bg"
+            style={{
               backgroundImage: `linear-gradient(rgba(17, 19, 24, 0.08), rgba(17, 19, 24, 0.78)), url("${mediaUrl}")`,
-            }
-          : undefined
-      }
-    >
+            }}
+          />
+        )
+      ) : null}
       <span className="project-thumb-label">{mediaLabel}</span>
     </div>
   );

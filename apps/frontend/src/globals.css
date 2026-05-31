@@ -1,33 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --bg: #f5f5f0;
-  --panel: #ebebe3;
-  --panel-strong: #e2e1d7;
-  --panel-low: #fafbf9;
-  --text: #1a1a1a;
-  --muted: #52525b;
-  --muted-strong: #71717a;
-  --line: rgba(26, 26, 26, 0.2);
-  --line-strong: rgba(26, 26, 26, 0.58);
-  --accent: #c85a3c;
-  --accent-2: #e07a5f;
-  --accent-warm: #f4a261;
-  --cream: #fafbf9;
-  --danger: #b54d40;
-  --success: #28784b;
+  /* Colors - Sunset Calm */
+  --color-bg-base:        #1C1714;   /* deep warm charcoal */
+  --color-bg-surface:     #26211D;   /* card base */
+  --color-bg-elevated:    #312A24;   /* hover / active surface */
+  --color-bg-overlay:     #3D342C;   /* modal / tooltip backdrop */
+
+  --color-horizon-deep:   #7B3F1E;   /* burnt sienna */
+  --color-horizon-mid:    #C4622D;   /* terracotta */
+  --color-horizon-warm:   #E8943A;   /* amber */
+  --color-horizon-glow:   #F5C97A;   /* golden hour peak */
+  --color-horizon-sky:    #F7DFA5;   /* pale straw light */
+
+  --color-text-primary:   #F2E8D5;   /* warm off-white */
+  --color-text-secondary: #B09880;   /* muted sand */
+  --color-text-muted:     #6E5C4E;   /* dim label */
+  --color-text-inverse:   #1C1714;   /* text on light surfaces */
+
+  --color-accent-primary: #E8943A;   /* amber — CTAs, active states */
+  --color-accent-soft:    #C4622D;   /* terracotta — secondary accent */
+  --color-accent-glow:    #F5C97A;   /* golden — highlights, badges */
+
+  --color-border-subtle:  rgba(245, 201, 122, 0.08);
+  --color-border-default: rgba(245, 201, 122, 0.16);
+  --color-border-strong:  rgba(245, 201, 122, 0.32);
+
+  --color-success:        #6DAF7A;
+  --color-error:          #D96B5B;
+  --color-tag-bg:         rgba(232, 148, 58, 0.12);
+  --color-tag-border:     rgba(232, 148, 58, 0.28);
+
+  /* Legacy Aliases (to prevent immediate breakage) */
+  --bg: var(--color-bg-base);
+  --panel: var(--color-bg-surface);
+  --panel-strong: var(--color-bg-elevated);
+  --panel-low: var(--color-bg-overlay);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-secondary);
+  --muted-strong: var(--color-text-muted);
+  --line: var(--color-border-default);
+  --line-strong: var(--color-border-strong);
+  --accent: var(--color-accent-primary);
+  --accent-2: var(--color-accent-soft);
+  --accent-warm: var(--color-horizon-warm);
+  --cream: var(--color-text-primary);
+  --danger: var(--color-error);
+  --success: var(--color-success);
   --terminal: #101112;
   --terminal-text: #9ee6a8;
-  --font-display: "Syne", "Inter", sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", monospace;
-  --shadow-card: 0 14px 34px rgba(26, 26, 26, 0.1);
-  --shadow-raised: 0 20px 50px rgba(26, 26, 26, 0.16);
-  --gradient-sunset: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 55%, #f0a35f 100%);
+
+  /* Typography */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Spacing */
+  --space-half:   0.5rem;    /* 8px */
+  --space:        1rem;      /* 16px */
+  --space-2:      2rem;      /* 32px */
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card:    0 2px 8px rgba(0,0,0,0.32), 0 0 0 1px var(--color-border-subtle);
+  --shadow-raised:  0 4px 16px rgba(0,0,0,0.40), 0 0 0 1px var(--color-border-default);
+  --shadow-glow:    0 0 20px rgba(232, 148, 58, 0.18);
+  --shadow-glow-sm: 0 0 8px  rgba(232, 148, 58, 0.14);
+
+  /* Gradients */
+  --gradient-sunset: linear-gradient(
+    135deg,
+    var(--color-horizon-deep) 0%,
+    var(--color-horizon-mid) 40%,
+    var(--color-horizon-warm) 70%,
+    var(--color-horizon-glow) 100%
+  );
+  --gradient-card-shine: linear-gradient(
+    135deg,
+    rgba(245, 201, 122, 0.06) 0%,
+    transparent 60%
+  );
 }
 
 * {
@@ -879,6 +942,17 @@ code {
     var(--panel-strong);
   background-position: center;
   background-size: cover;
+  overflow: hidden;
+}
+
+.project-thumb-video,
+.project-thumb-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .project-thumb-media {
@@ -887,6 +961,8 @@ code {
 }
 
 .project-thumb-label {
+  position: relative;
+  z-index: 1;
   max-width: 100%;
   padding: 6px 9px;
   border-radius: 6px;
@@ -1251,6 +1327,7 @@ code {
 }
 
 .recruiter-project-media {
+  position: relative;
   display: grid;
   min-height: 190px;
   aspect-ratio: 16 / 10;
@@ -1263,9 +1340,22 @@ code {
     var(--panel-strong);
   background-position: center;
   background-size: cover;
+  overflow: hidden;
+}
+
+.recruiter-project-video,
+.recruiter-project-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .recruiter-project-media span {
+  position: relative;
+  z-index: 1;
   padding: 6px 9px;
   border-radius: 6px;
   background: rgba(16, 17, 18, 0.8);

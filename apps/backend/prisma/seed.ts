@@ -225,6 +225,9 @@ async function main() {
           'Advanced SQL reporting with CTEs',
           'Database triggers and stored procedures',
           'Analytics dashboard implementation',
+          'OAuth2 and JWT integration',
+          'RBAC authorization middleware',
+          'Secure API design patterns',
         ],
         stack: ['React', 'TypeScript', 'Bun', 'ElysiaJS', 'PostgreSQL', 'Prisma', 'Docker'],
         stackReasoning:
@@ -233,26 +236,6 @@ async function main() {
         featured: true,
         thumbnail: null,
         gifDemo: '/assets/demos/barbershop.webm',
-      },
-      {
-        title: 'Enterprise Backend (Private NDA Project)',
-        slug: 'enterprise-backend-nda',
-        description:
-          'Secure enterprise-grade backend service focused on authentication and authorization.',
-        architecture: 'Node.js + TypeScript + PostgreSQL with multi-layer middleware architecture.',
-        challenges: [
-          'OAuth2 and JWT integration',
-          'Refresh token implementation',
-          'RBAC authorization middleware',
-          'Secure API design patterns',
-        ],
-        stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'JWT', 'OAuth2'],
-        stackReasoning:
-          'Focused on industry-standard security protocols and production-ready backend patterns.',
-        githubUrl: null,
-        featured: true,
-        thumbnail: null,
-        gifDemo: null,
       },
       {
         title: 'Equa Notepad',
