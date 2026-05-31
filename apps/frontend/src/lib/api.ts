@@ -61,8 +61,29 @@ export async function getAnalyticsSummary() {
   );
 }
 
+export type AdminUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminUserCreate = {
+  email: string;
+  password: string;
+  name?: string | null;
+};
+
 export async function sendMessage(input: ContactMessageInput) {
-  return request<ApiItemResponse<{ id: string; createdAt: string }>>('/messages', {
+  return request<
+    ApiItemResponse<{
+      id: string;
+      createdAt: string;
+      emailDelivery: 'sent' | 'fallback';
+      contactEmail: string;
+    }>
+  >('/messages', {
     method: 'POST',
     body: JSON.stringify(input),
   }).then((response) => response.data);
@@ -163,4 +184,19 @@ export async function updateExperience(id: string, data: ExperienceUpdate) {
 
 export async function deleteExperience(id: string) {
   return request<void>(`/admin/experiences/${id}`, { method: 'DELETE' });
+}
+
+export async function getUsers() {
+  return request<ApiListResponse<AdminUser>>('/admin/users').then((response) => response.data);
+}
+
+export async function deleteUser(id: string) {
+  return request<void>(`/admin/users/${id}`, { method: 'DELETE' });
+}
+
+export async function createUser(data: AdminUserCreate) {
+  return request<ApiItemResponse<AdminUser>>('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then((response) => response.data);
 }

@@ -132,7 +132,7 @@ function DataStatus({
 
   if (usingFallback) return <p className="data-notice">Showing local portfolio seed data.</p>;
 
-  return <p className="data-notice">Live backend data loaded.</p>;
+  return <p className="data-notice">Live API data ready.</p>;
 }
 
 function AnimatedSection({
@@ -173,7 +173,7 @@ function RecruiterProjectCard({ project }: { project: Project }) {
 
   return (
     <motion.article
-      className="recruiter-project-card"
+      className={`recruiter-project-card ${project.featured ? 'is-featured' : ''}`}
       variants={itemVariants}
       initial="hidden"
       animate="visible"
@@ -365,7 +365,12 @@ export default function RecruiterPage() {
       value: skills.length,
       detail: 'across the entire stack',
     },
-    { icon: Terminal, label: 'Experience', value: experiences.length, detail: 'Professional roles' },
+    {
+      icon: Terminal,
+      label: 'Experience',
+      value: experiences.length,
+      detail: 'Professional roles',
+    },
     { icon: Gauge, label: 'Quality', value: '100%', detail: 'Performance & Best Practices' },
   ];
 
@@ -543,8 +548,12 @@ export default function RecruiterPage() {
             </p>
           </div>
           <div className="recruiter-contact-actions">
+            <a className="primary-button" href={`mailto:${aboutProfile.email}`}>
+              <Mail size={18} />
+              Email Me
+            </a>
             <a
-              className="primary-button"
+              className="secondary-button"
               href="https://github.com/eldmark"
               rel="noreferrer"
               target="_blank"
@@ -552,11 +561,7 @@ export default function RecruiterPage() {
               <Github size={18} />
               GitHub
             </a>
-            <a
-              className="secondary-button"
-              href="/resume.pdf"
-              rel="noreferrer"
-            >
+            <a className="secondary-button" href="/resume.pdf" rel="noreferrer">
               <FileText size={18} />
               Resume
             </a>

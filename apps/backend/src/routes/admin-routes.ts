@@ -7,10 +7,98 @@ import {
   skillCreateSchema,
   skillUpdateSchema,
 } from '@portfolio/shared';
-import { asyncHandler, notFound } from '../lib/errors.js';
+import bcrypt from 'bcryptjs';
+import { z } from 'zod';
+import { asyncHandler, badRequest, forbidden, notFound } from '../lib/errors.js';
 import { prisma } from '../lib/prisma.js';
+import type { AuthRequest } from '../middleware/auth-middleware.js';
 
 export const adminRouter = Router();
+
+const createAdminUserSchema = z.object({
+  email: z.string().trim().email(),
+  password: z.string().min(6),
+  name: z.string().trim().min(1).optional().nullable(),
+});
+
+function getAdminUserId(req: unknown) {
+  return (req as AuthRequest).user?.userId;
+}
+
+adminRouter.get(
+  '/users',
+  asyncHandler(async (_req, res) => {
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.json({ data: users });
+  }),
+);
+
+adminRouter.post(
+  '/users',
+  asyncHandler(async (req, res) => {
+    const input = createAdminUserSchema.parse(req.body);
+
+    const existing = await prisma.user.findUnique({ where: { email: input.email } });
+
+    if (existing) {
+      throw badRequest('A user with that email already exists');
+    }
+
+    const password = await bcrypt.hash(input.password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email: input.email,
+        password,
+        name: input.name?.trim() || null,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.status(201).json({ data: user });
+  }),
+);
+
+adminRouter.delete(
+  '/users/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const currentUserId = getAdminUserId(req);
+
+    if (!id) {
+      throw notFound('User not found');
+    }
+
+    if (currentUserId && currentUserId === id) {
+      throw forbidden('You cannot delete the account you are currently using');
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id } });
+
+    if (!existing) {
+      throw notFound('User not found');
+    }
+
+    await prisma.user.delete({ where: { id } });
+    res.status(204).end();
+  }),
+);
 
 /* -------------------------------------------------------------------------- */
 /*                                  PROJECTS                                  */
@@ -148,7 +236,11 @@ adminRouter.patch(
       data: {
         ...input,
         startDate: input.startDate ? new Date(input.startDate) : undefined,
-        endDate: input.endDate ? new Date(input.endDate) : input.endDate === null ? null : undefined,
+        endDate: input.endDate
+          ? new Date(input.endDate)
+          : input.endDate === null
+            ? null
+            : undefined,
       },
     });
     res.json({ data: experience });

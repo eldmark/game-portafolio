@@ -67,7 +67,10 @@ const ANIMATIONS = {
     row: 3,
     frames: [0, 1],
   },
-
+  walkDown: {
+    row: 3,
+    frames: [0, 1],
+  },
   walkUp: {
     row: 4,
     frames: [0, 1, 2, 3],
@@ -290,7 +293,7 @@ export function Player() {
           break;
 
         case 'down':
-          animationKey = 'walkRight';
+          animationKey = 'walkDown';
           break;
       }
     } else {

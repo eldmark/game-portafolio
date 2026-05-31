@@ -20,17 +20,24 @@ import {
   getProjects,
   getSkills,
   getExperiences,
+  getAnalyticsSummary,
+  getUsers,
+  createUser,
   deleteProject,
   deleteSkill,
   deleteExperience,
+  deleteUser,
   createProject,
   updateProject,
   createSkill,
   updateSkill,
   createExperience,
   updateExperience,
+  type AdminUser,
+  type AdminUserCreate,
 } from '@/lib/api';
 import type {
+  AnalyticsSummary,
   Project,
   Skill,
   Experience,
@@ -98,6 +105,13 @@ export default function AdminDashboard() {
             <Briefcase size={18} />
             Experience
           </NavLink>
+          <NavLink
+            to="/admin/dashboard/users"
+            className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+          >
+            <User size={18} />
+            Users
+          </NavLink>
         </nav>
 
         <footer className="sidebar-footer">
@@ -114,6 +128,7 @@ export default function AdminDashboard() {
           <Route path="/projects" element={<ProjectManager />} />
           <Route path="/skills" element={<SkillManager />} />
           <Route path="/experience" element={<ExperienceManager />} />
+          <Route path="/users" element={<UserManager />} />
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </main>
@@ -126,6 +141,40 @@ export default function AdminDashboard() {
 /* -------------------------------------------------------------------------- */
 
 function Overview() {
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, []);
+
+  async function loadAnalytics() {
+    try {
+      const data = await getAnalyticsSummary();
+      setAnalytics(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function formatDuration(value: number | null | undefined) {
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+
+    if (value < 60) {
+      return `${value}s`;
+    }
+
+    const minutes = Math.floor(value / 60);
+    const seconds = value % 60;
+    return `${minutes}m ${seconds}s`;
+  }
+
+  const averageDuration = formatDuration(analytics?.averageDuration);
+
   return (
     <div className="overview-page">
       <header className="admin-header">
@@ -134,9 +183,238 @@ function Overview() {
       <div className="recruiter-stat-grid">
         <article className="recruiter-stat-card">
           <LayoutDashboard size={20} />
-          <strong>Welcome back!</strong>
-          <p>You can manage all your portfolio content from this panel.</p>
+          <strong>Complete control</strong>
+          <p>Manage projects, skills, experience, and user accounts from one panel.</p>
         </article>
+        <article className="recruiter-stat-card">
+          <User size={20} />
+          <strong>Seeded admin</strong>
+          <p>You can delete the initial admin account after you create your own login.</p>
+        </article>
+        <article className="recruiter-stat-card">
+          <LayoutDashboard size={20} />
+          <strong>Usage analytics</strong>
+          <p>
+            {loading
+              ? 'Loading usage summary...'
+              : `${analytics?.totalVisits ?? 0} visits, ${analytics?.recruiterVisits ?? 0} recruiter sessions, ${analytics?.totalDialogueLogs ?? 0} dialogue events.`}
+          </p>
+        </article>
+        <article className="recruiter-stat-card">
+          <User size={20} />
+          <strong>Average session</strong>
+          <p>
+            {loading
+              ? 'Loading session duration...'
+              : `${averageDuration} average engagement time.`}
+          </p>
+        </article>
+      </div>
+
+      <section className="admin-disclaimer-card">
+        <h2>Terms &amp; Conditions</h2>
+        <p>
+          By using this portfolio, I may gather usage data such as visits, recruiter-mode usage,
+          dialogue interactions, and session duration to understand how the portfolio is used and
+          improve the experience.
+        </p>
+      </section>
+
+      {!loading && analytics?.popularDialogues?.length ? (
+        <section className="admin-analytics-panel">
+          <header className="admin-analytics-panel-header">
+            <h2>Top interactions</h2>
+            <p>Most used dialogue keys from portfolio visits.</p>
+          </header>
+          <div className="admin-analytics-list">
+            {analytics.popularDialogues.map((dialogue) => (
+              <div key={dialogue.dialogueKey} className="admin-analytics-row">
+                <span>{dialogue.dialogueKey}</span>
+                <strong>{dialogue.count}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 USER MANAGER                               */
+/* -------------------------------------------------------------------------- */
+
+function UserManager() {
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  async function loadUsers() {
+    try {
+      const data = await getUsers();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string, email: string) {
+    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+
+    try {
+      await deleteUser(id);
+      setUsers(users.filter((user) => user.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete user');
+    }
+  }
+
+  function openCreate() {
+    setModalOpen(true);
+  }
+
+  return (
+    <div className="manager-page">
+      <header className="admin-header">
+        <h1>Users</h1>
+        <button className="primary-button" onClick={openCreate}>
+          <Plus size={18} />
+          Add Admin
+        </button>
+      </header>
+
+      {loading ? (
+        <p>Loading users...</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
+                  <strong>{user.email}</strong>
+                </td>
+                <td>{user.name || 'Unnamed user'}</td>
+                <td>{new Date(user.createdAt).toLocaleString()}</td>
+                <td>
+                  <div className="admin-actions">
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(user.id, user.email)}
+                      title="Delete user"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {modalOpen && (
+        <UserModal
+          onClose={() => setModalOpen(false)}
+          onSave={() => {
+            setModalOpen(false);
+            loadUsers();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function UserModal({ onClose, onSave }: { onClose: () => void; onSave: () => void }) {
+  const [formData, setFormData] = useState<AdminUserCreate>({
+    email: '',
+    password: '',
+    name: '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await createUser({
+        email: formData.email.trim(),
+        password: formData.password,
+        name: formData.name?.trim() || null,
+      });
+      onSave();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to create admin user');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="admin-modal-overlay">
+      <div className="admin-modal">
+        <header className="overlay-header">
+          <h2>Add Admin</h2>
+          <button className="icon-button" onClick={onClose}>
+            <X size={24} />
+          </button>
+        </header>
+
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-form-grid">
+            <div className="input-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Name</label>
+              <input
+                value={formData.name || ''}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Admin name"
+              />
+            </div>
+            <div className="input-group admin-form-full">
+              <label>Password</label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button className="secondary-button" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="primary-button" type="submit" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Admin'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
