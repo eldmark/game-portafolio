@@ -2,6 +2,14 @@
 
 A full-stack developer portfolio presented as an explorable cozy room. Visitors can move through a stylized 3D space, interact with objects, inspect projects, read technical reasoning, and use a dedicated Recruiter Mode for a faster, traditional flow.
 
+## What this project demonstrates
+
+- Interactive SPA architecture with routed views and modal overlays.
+- Backend-driven projects, skills, experiences, analytics, and admin workflows.
+- Dockerized frontend, backend, and PostgreSQL stack.
+- Nginx-ready production deployment with support for multiple apps on the same server.
+- Clear engineering reasoning through project descriptions and dashboard analytics.
+
 ## 🚀 Experience Features
 
 - **Explorable 3D Space:** Interactive React Three Fiber room with movement, camera follow, and object prompts.
@@ -20,6 +28,14 @@ A full-stack developer portfolio presented as an explorable cozy room. Visitors 
 - **DevOps:** Docker, Docker Compose.
 - **Shared:** Monorepo architecture with shared TypeScript contracts.
 
+## Why this stack
+
+- **React + Vite:** fast iteration for a UI-heavy portfolio with modular components and smooth client-side routing.
+- **React Three Fiber:** lets the room behave like a real interactive scene while staying in the React ecosystem.
+- **Express + Prisma + PostgreSQL:** a practical backend stack for CRUD, analytics, and admin flows with a real relational database.
+- **Docker:** makes local development and production rollout predictable across machines and servers.
+- **Zustand + Framer Motion:** simple client state and lightweight motion without unnecessary framework overhead.
+
 ## 🏗️ Architecture
 
 - `apps/frontend`: Vite-powered portfolio and 3D room experience.
@@ -27,6 +43,14 @@ A full-stack developer portfolio presented as an explorable cozy room. Visitors 
 - `packages/shared`: Centralized types and Zod schemas used by both frontend and backend.
 - `packages/ui`: Shared UI primitives.
 - `docs/`: Comprehensive documentation (Projects, Architecture, Replacements).
+
+## Key Features
+
+- Room-based portfolio exploration with object interactions and dialogue prompts.
+- Recruiter Mode for quick access to proof of work, skills, experience, resume, and contact.
+- Dynamic projects, experience, skills, and analytics fetched from the backend.
+- Admin dashboard for managing projects, skills, experience, and users.
+- Contact system with email fallback behavior and clear user feedback.
 
 ## 📋 Getting Started
 
@@ -88,6 +112,10 @@ npm run docker:up
 - **Frontend:** `http://localhost:3000`
 - **Backend:** `http://localhost:4000`
 
+## 🚀 Production Deployment with Nginx
+
+The full production guide lives in [docs/produciton.md](./docs/produciton.md).
+
 ## 🎨 Manual Personalization
 
 This portfolio is designed to be easily customized. Before deploying, follow the guide in:
@@ -107,6 +135,22 @@ npm run typecheck # Verify TypeScript types
 npm run lint      # Run ESLint
 npm run format    # Apply Prettier formatting
 ```
+
+## Screenshots and Media
+
+Add production screenshots or GIFs of:
+
+- The room experience.
+- Recruiter Mode.
+- Admin dashboard.
+- The contact fallback flow.
+
+## Challenges Encountered
+
+- Keeping the 3D room stable while still feeling lightweight.
+- Balancing creative visuals with recruiter-friendly navigation.
+- Keeping backend data, analytics, and admin flows consistent across frontend and server.
+- Making deployment friendly for both local Docker usage and server-based hosting.
 
 ## 📜 Future Roadmap
 
