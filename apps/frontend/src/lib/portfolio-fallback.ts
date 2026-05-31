@@ -7,15 +7,23 @@ export const fallbackProjects: Project[] = [
     slug: 'bodegas-ecommerce-platform',
     description:
       'Full-stack enterprise e-commerce platform with inventory management, order processing, and promotions engine.',
-    architecture:
-      'Vue SPA + Express REST API + PostgreSQL + Prisma + Cloudflare R2 image storage.',
+    architecture: 'Vue SPA + Express REST API + PostgreSQL + Prisma + Cloudflare R2 image storage.',
     challenges: [
       'Enterprise inventory management',
       'Background jobs for reservation expiration',
       'Inventory consistency',
       'CI/CD workflows with GitHub Actions',
     ],
-    stack: ['Vue 3', 'TypeScript', 'Express', 'PostgreSQL', 'Prisma', 'Clerk', 'Cloudflare R2', 'Docker'],
+    stack: [
+      'Vue 3',
+      'TypeScript',
+      'Express',
+      'PostgreSQL',
+      'Prisma',
+      'Clerk',
+      'Cloudflare R2',
+      'Docker',
+    ],
     stackReasoning:
       'Chosen for enterprise scalability: Clerk for auth, Cloudflare R2 for media, and Prisma for relational consistency.',
     githubUrl: null,
@@ -107,8 +115,7 @@ export const fallbackProjects: Project[] = [
       'Graph database modeling',
     ],
     stack: ['Next.js', 'TypeScript', 'Neo4j', 'Cypher'],
-    stackReasoning:
-      'Neo4j is ideal for modeling complex relationships in recommendation systems.',
+    stackReasoning: 'Neo4j is ideal for modeling complex relationships in recommendation systems.',
     githubUrl: null,
     liveUrl: null,
     thumbnail: '/projects/food-rec/thumbnail.png',
@@ -395,7 +402,8 @@ export const aboutProfile = {
     'A junior full-stack developer focused on backend systems, practical frontend architecture, Dockerized delivery, and production-oriented habits.',
   direction:
     'The goal is to join a team where full-stack execution, backend reliability, UI polish, and clear technical reasoning matter.',
-  contact: 'Contact me via GitHub or LinkedIn to discuss projects or opportunities.',
+  contact:
+    'Github: https://github.com/eldmark | LinkedIn: https://www.linkedin.com/in/marco-diaz21/ | Email: marcoalejandro.diazcastaneda@gmail.com',
 };
 
 export const knowledgeNotes = [

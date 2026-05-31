@@ -1,5 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
+declare const process: {
+  exit(code?: number): never;
+};
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -119,12 +123,21 @@ async function main() {
   await prisma.experience.createMany({
     data: [
       {
+        company: 'Softlogic S.A.',
+        role: 'Jr Full Stack Developer',
+        description:
+          'Devloped endpoint and maintaine secure and  scalable proyects using Php, Laravel, MySQL, JavaScript, and Vue.js. Focusing on stripe integration.',
+        startDate: new Date('2026-06-01'),
+        endDate: null,
+        technologies: ['PHP', 'Laravel', 'MySQL', 'JavaScript', 'Vue.js', 'Stripe'],
+      },
+      {
         company: 'Universidad del Valle de Guatemala',
         role: 'Teaching Assistant - Algorithms & Data Structures',
         description:
           'Answered questions on known algorithms, data structures, Java, Python, programming fundamentals, logical thinking, scalable software design, and design patterns.',
         startDate: new Date('2026-01-01'),
-        endDate: null,
+        endDate: new Date('2026-06-01'),
         technologies: ['Java', 'Python', 'Algorithms', 'Data Structures', 'Design Patterns'],
       },
       {
@@ -132,7 +145,7 @@ async function main() {
         role: 'Teaching Assistant - Microprocessor Programming',
         description:
           'Supported students with hardware/software automation systems, parallel processing planning, concurrency methods, wiring support, and electronic system diagramming.',
-        startDate: new Date('2026-01-01'),
+        startDate: new Date('2026-06-01'),
         endDate: null,
         technologies: ['C', 'Concurrency', 'Parallel Processing', 'Automation', 'Embedded Systems'],
       },
@@ -184,7 +197,16 @@ async function main() {
           'Inventory consistency',
           'CI/CD workflows with GitHub Actions',
         ],
-        stack: ['Vue 3', 'TypeScript', 'Express', 'PostgreSQL', 'Prisma', 'Clerk', 'Cloudflare R2', 'Docker'],
+        stack: [
+          'Vue 3',
+          'TypeScript',
+          'Express',
+          'PostgreSQL',
+          'Prisma',
+          'Clerk',
+          'Cloudflare R2',
+          'Docker',
+        ],
         stackReasoning:
           'Chosen for enterprise scalability: Clerk for auth, Cloudflare R2 for media, and Prisma for relational consistency.',
         githubUrl: null,
@@ -245,7 +267,15 @@ async function main() {
           'AI-generated exercise integration',
           'Google Identity authentication',
         ],
-        stack: ['Kotlin', 'Jetpack Compose', 'Room', 'DataStore', 'Supabase', 'Google Identity', 'OpenRouter'],
+        stack: [
+          'Kotlin',
+          'Jetpack Compose',
+          'Room',
+          'DataStore',
+          'Supabase',
+          'Google Identity',
+          'OpenRouter',
+        ],
         stackReasoning:
           'Modern Android stack combined with Supabase for cloud features and AI integration via OpenRouter.',
         githubUrl: 'https://github.com/angcoder-c/equa-notepad-plats',
@@ -337,8 +367,7 @@ async function main() {
           'SQLite integration in Docker',
         ],
         stack: ['React', 'React Router', 'SQLite', 'Docker'],
-        stackReasoning:
-          'Lightweight state-driven application with local persistence.',
+        stackReasoning: 'Lightweight state-driven application with local persistence.',
         githubUrl: null,
         featured: false,
         thumbnail: null,
@@ -355,8 +384,7 @@ async function main() {
           'Minimalist routing logic',
         ],
         stack: ['Go'],
-        stackReasoning:
-          'Demonstrates proficiency in low-level web protocols and Go concurrency.',
+        stackReasoning: 'Demonstrates proficiency in low-level web protocols and Go concurrency.',
         githubUrl: 'https://github.com/eldmark/go-http',
         featured: false,
         thumbnail: null,
@@ -367,7 +395,6 @@ async function main() {
 
   console.log(' Portfolio seed completed successfully');
 }
-
 main()
   .catch((error) => {
     console.error(error);

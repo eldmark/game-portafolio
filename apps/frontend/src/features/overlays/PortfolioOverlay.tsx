@@ -22,10 +22,12 @@ function OverlayShell({
   title,
   children,
   wide = false,
+  className = '',
 }: {
   title: string;
   children: ReactNode;
   wide?: boolean;
+  className?: string;
 }) {
   const closeOverlay = usePortfolioStore((state) => state.closeOverlay);
 
@@ -33,7 +35,7 @@ function OverlayShell({
     <motion.section
       aria-label={title}
       aria-modal="true"
-      className={`overlay-panel ${wide ? 'overlay-panel-wide' : ''}`}
+      className={`overlay-panel ${wide ? 'overlay-panel-wide' : ''} ${className}`.trim()}
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -411,50 +413,72 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
+function ProjectBoardCard({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentId = `project-board-card-${project.id}`;
+
+  return (
+    <article className={`project-card board-project-card ${expanded ? 'is-expanded' : ''}`}>
+      {expanded ? <ProjectPreview project={project} /> : null}
+      <div className="project-card-body" id={contentId}>
+        <div className="card-heading">
+          <div>
+            <p className="card-kicker">{project.featured ? 'Featured Case' : 'Project'}</p>
+            <h3>{project.title}</h3>
+          </div>
+          {expanded ? <span>{project.stack[0] ?? 'Full stack'}</span> : null}
+        </div>
+        <p className="project-card-summary">{project.description}</p>
+        {expanded ? (
+          <>
+            <section className="project-card-section">
+              <h4>Architecture</h4>
+              <p>{project.architecture}</p>
+            </section>
+            <section className="project-card-section">
+              <h4>Features</h4>
+              <ChipList items={project.challenges} label={`${project.title} features`} />
+            </section>
+            <section className="project-card-section">
+              <h4>Stack Reasoning</h4>
+              <p>{project.stackReasoning}</p>
+            </section>
+            <ChipList items={project.stack} label={`${project.title} stack`} />
+            <div className="link-row project-card-actions">
+              {project.githubUrl ? (
+                <a href={project.githubUrl} rel="noreferrer" target="_blank">
+                  <Github size={16} /> Code
+                </a>
+              ) : null}
+              {project.liveUrl ? (
+                <a href={project.liveUrl} rel="noreferrer" target="_blank">
+                  <ExternalLink size={16} /> Live
+                </a>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+        <button
+          aria-controls={contentId}
+          aria-expanded={expanded}
+          className="card-toggle"
+          onClick={() => setExpanded((current) => !current)}
+          type="button"
+        >
+          {expanded ? 'Mostrar menos' : 'Mostrar mas'}
+        </button>
+      </div>
+    </article>
+  );
+}
+
 function ProjectsOverlay(props: PortfolioOverlayProps) {
   return (
-    <OverlayShell title="Project Board" wide>
+    <OverlayShell className="project-board-panel" title="Project Board" wide>
       <DataNotice {...props} />
-      <div className="project-grid">
+      <div className="project-grid project-board-grid">
         {props.projects.map((project) => (
-          <article className="project-card" key={project.id}>
-            <ProjectPreview project={project} />
-            <div className="project-card-body">
-              <div className="card-heading">
-                <div>
-                  <p className="card-kicker">{project.featured ? 'Featured Case' : 'Project'}</p>
-                  <h3>{project.title}</h3>
-                </div>
-                <span>{project.stack[0] ?? 'Full stack'}</span>
-              </div>
-              <p className="project-card-summary">{project.description}</p>
-              <section className="project-card-section">
-                <h4>Architecture</h4>
-                <p>{project.architecture}</p>
-              </section>
-              <section className="project-card-section">
-                <h4>Technical Challenges</h4>
-                <ChipList items={project.challenges} label={`${project.title} challenges`} />
-              </section>
-              <section className="project-card-section">
-                <h4>Stack Reasoning</h4>
-                <p>{project.stackReasoning}</p>
-              </section>
-              <ChipList items={project.stack} label={`${project.title} stack`} />
-              <div className="link-row project-card-actions">
-                {project.githubUrl ? (
-                  <a href={project.githubUrl} rel="noreferrer" target="_blank">
-                    <Github size={16} /> Code
-                  </a>
-                ) : null}
-                {project.liveUrl ? (
-                  <a href={project.liveUrl} rel="noreferrer" target="_blank">
-                    <ExternalLink size={16} /> Live
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          </article>
+          <ProjectBoardCard key={project.id} project={project} />
         ))}
       </div>
     </OverlayShell>
@@ -618,7 +642,7 @@ function SettingsOverlay() {
         />
       </label>
       <p className="muted">
-        Audio is wired with Howler hooks and starts muted until final assets exist.
+        Playlist loaded from local audio assets: Glownes, The Flow, and The Waves.
       </p>
     </OverlayShell>
   );

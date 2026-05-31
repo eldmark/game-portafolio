@@ -13,6 +13,8 @@ import {
   Mail,
   Map,
   Settings,
+  SkipBack,
+  SkipForward,
   UserRound,
   Volume2,
   VolumeX,
@@ -27,6 +29,7 @@ import { AudioManager } from './AudioManager';
 import { RoomScene } from './RoomScene';
 import { getNearestObject } from './room-objects';
 import { setVirtualKey } from './Player';
+import { getMusicTrack, musicTracks, normalizeTrackIndex } from './music-tracks';
 
 function createSessionId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -36,51 +39,112 @@ function createSessionId() {
   return `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function VinylMusicPlayer({ variant = 'floating' }: { variant?: 'entry' | 'floating' }) {
+  const muted = usePortfolioStore((state) => state.muted);
+  const setMuted = usePortfolioStore((state) => state.setMuted);
+  const currentTrackIndex = usePortfolioStore((state) => state.currentTrackIndex);
+  const setCurrentTrackIndex = usePortfolioStore((state) => state.setCurrentTrackIndex);
+  const trackIndex = normalizeTrackIndex(currentTrackIndex);
+  const track = getMusicTrack(trackIndex);
+
+  function changeTrack(direction: 1 | -1) {
+    setCurrentTrackIndex((trackIndex + direction + musicTracks.length) % musicTracks.length);
+    if (muted) {
+      setMuted(false);
+    }
+  }
+
+  return (
+    <aside className={`vinyl-player vinyl-player-${variant}`} aria-label="Music player">
+      <button
+        aria-label={muted ? 'Play music' : 'Mute music'}
+        className="vinyl-record"
+        onClick={() => setMuted(!muted)}
+        type="button"
+      >
+        <span />
+      </button>
+      <div className="vinyl-track">
+        <p className="eyebrow">Now Playing</p>
+        <h2>{track.title}</h2>
+        <p>{track.artist}</p>
+      </div>
+      <div className="vinyl-controls" aria-label="Music controls">
+        <button aria-label="Previous song" onClick={() => changeTrack(-1)} type="button">
+          <SkipBack size={17} />
+        </button>
+        <button aria-label={muted ? 'Play music' : 'Mute music'} onClick={() => setMuted(!muted)} type="button">
+          {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+        </button>
+        <button aria-label="Next song" onClick={() => changeTrack(1)} type="button">
+          <SkipForward size={17} />
+        </button>
+      </div>
+    </aside>
+  );
+}
+
 function EntryScreen() {
   const enterRoom = usePortfolioStore((state) => state.enterRoom);
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
+  const audioStarted = usePortfolioStore((state) => state.audioStarted);
+  const startAudio = usePortfolioStore((state) => state.startAudio);
+
+  function enterPortfolio(recruiterMode = false) {
+    if (!audioStarted) {
+      startAudio();
+    }
+
+    enterRoom(recruiterMode);
+  }
 
   return (
     <section className="entry-screen" aria-label="Portfolio entry menu">
-      <div className="entry-copy">
-        <p className="eyebrow">Interactive Full-Stack Portfolio</p>
-        <h1>{aboutProfile.name}&apos;s Developer Room</h1>
-        <p>
-          Explore a cozy digital workspace where each object reveals project architecture, backend
-          reasoning, frontend craft, and contact paths.
-        </p>
-      </div>
-      <div className="entry-actions">
-        <button className="primary-button" onClick={() => enterRoom(false)} type="button">
-          <Map size={18} />
-          Enter Room
-        </button>
-        <button className="secondary-button" onClick={() => enterRoom(true)} type="button">
-          <Laptop size={18} />
-          Recruiter Mode
-        </button>
-        <button
-          className="secondary-button"
-          onClick={() => {
-            enterRoom(false);
-            setOverlay('about');
-          }}
-          type="button"
-        >
-          <Info size={18} />
-          About
-        </button>
-        <button
-          className="secondary-button"
-          onClick={() => {
-            enterRoom(false);
-            setOverlay('settings');
-          }}
-          type="button"
-        >
-          <Settings size={18} />
-          Settings
-        </button>
+      <div className="entry-hero">
+        <div className="entry-copy">
+          <p className="eyebrow">Interactive Full-Stack Portfolio</p>
+          <h1>{aboutProfile.name}&apos;s Developer Room</h1>
+          <p>
+            Explore a cozy digital workspace where each object reveals project architecture, backend
+            reasoning, frontend craft, and contact paths.
+          </p>
+          <div className="entry-actions">
+            <button className="primary-button" onClick={() => enterPortfolio(false)} type="button">
+              <Map size={18} />
+              Enter Room
+            </button>
+            <button className="secondary-button" onClick={() => enterPortfolio(true)} type="button">
+              <Laptop size={18} />
+              Recruiter Mode
+            </button>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                enterPortfolio(false);
+                setOverlay('about');
+              }}
+              type="button"
+            >
+              <Info size={18} />
+              About
+            </button>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                enterPortfolio(false);
+                setOverlay('settings');
+              }}
+              type="button"
+            >
+              <Settings size={18} />
+              Settings
+            </button>
+          </div>
+          <VinylMusicPlayer variant="entry" />
+        </div>
+        <figure className="entry-portrait" aria-label={`${aboutProfile.name} portrait`}>
+          <img alt={`${aboutProfile.name} portrait`} src="/assets/Me/yo.jpg" />
+        </figure>
       </div>
     </section>
   );
@@ -256,6 +320,7 @@ export default function RoomExperience() {
       {enteredRoom ? (
         <>
           <RecruiterNav />
+          <VinylMusicPlayer />
           <section className="room-stage" aria-label="Interactive portfolio room">
             <ErrorBoundary>
               <Canvas 

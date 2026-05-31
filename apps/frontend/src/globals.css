@@ -88,8 +88,6 @@ code {
 .entry-screen {
   min-height: 100vh;
   display: grid;
-  align-content: center;
-  gap: 32px;
   padding: clamp(24px, 7vw, 88px);
   color: var(--cream);
   background:
@@ -100,7 +98,26 @@ code {
   background-size: cover;
 }
 
+.loading-screen {
+  place-items: center;
+}
+
+.entry-screen {
+  align-items: center;
+}
+
+.entry-hero {
+  display: grid;
+  width: min(1180px, 100%);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: clamp(28px, 6vw, 72px);
+  align-items: center;
+  justify-self: center;
+}
+
 .entry-copy {
+  display: grid;
+  gap: 22px;
   max-width: 800px;
 }
 
@@ -124,6 +141,35 @@ code {
 
 .entry-copy p {
   color: rgba(250, 251, 249, 0.78);
+}
+
+.entry-portrait {
+  position: relative;
+  justify-self: end;
+  width: min(380px, 100%);
+  margin: 0;
+}
+
+.entry-portrait::before {
+  position: absolute;
+  inset: 18px -18px -18px 18px;
+  z-index: 0;
+  border: 2px solid rgba(244, 162, 97, 0.54);
+  border-radius: 8px;
+  content: "";
+}
+
+.entry-portrait img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 2px solid rgba(250, 251, 249, 0.68);
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
 }
 
 .eyebrow,
@@ -158,7 +204,8 @@ code {
 .mobile-controls button,
 .dialogue-actions button,
 .tab-row button,
-.filter-chip {
+.filter-chip,
+.vinyl-controls button {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel-low);
@@ -190,7 +237,8 @@ code {
 .recruiter-nav a:hover,
 .recruiter-page-nav a:hover,
 .tab-row button:hover,
-.filter-chip:hover {
+.filter-chip:hover,
+.vinyl-controls button:hover {
   border-color: var(--line-strong);
   background: var(--panel-strong);
 }
@@ -200,6 +248,137 @@ code {
   background: rgba(250, 251, 249, 0.12);
   color: var(--cream);
   backdrop-filter: blur(12px);
+}
+
+.vinyl-player {
+  display: grid;
+  width: min(560px, 100%);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(250, 251, 249, 0.26);
+  border-radius: 8px;
+  background: rgba(16, 17, 18, 0.76);
+  color: var(--cream);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  animation: vinyl-player-in 0.64s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.vinyl-player-floating {
+  position: fixed;
+  z-index: 17;
+  top: 84px;
+  left: 16px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.vinyl-record {
+  position: relative;
+  display: grid;
+  width: 78px;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #f0e6c8 0 8%, #c85a3c 8% 15%, transparent 15%),
+    repeating-radial-gradient(circle at center, #0b0c0d 0 5px, #17191c 5px 7px, #060707 7px 10px);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.06),
+    inset 0 0 24px rgba(255, 255, 255, 0.08),
+    0 12px 26px rgba(0, 0, 0, 0.36);
+  animation: vinyl-spin 4.8s linear infinite;
+}
+
+.vinyl-record::after {
+  position: absolute;
+  inset: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  content: "";
+}
+
+.vinyl-record span {
+  width: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #111318;
+}
+
+.vinyl-player:has(.vinyl-controls button[aria-label="Play music"]) .vinyl-record {
+  animation-play-state: paused;
+}
+
+.vinyl-track {
+  min-width: 0;
+}
+
+.vinyl-track .eyebrow {
+  margin-bottom: 5px;
+  color: var(--accent-warm);
+}
+
+.vinyl-track h2 {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vinyl-track p:last-child {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: rgba(250, 251, 249, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vinyl-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.vinyl-controls button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(250, 251, 249, 0.2);
+  background: rgba(250, 251, 249, 0.1);
+  color: var(--cream);
+}
+
+.vinyl-controls button:hover {
+  border-color: rgba(250, 251, 249, 0.46);
+  background: rgba(250, 251, 249, 0.18);
+}
+
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vinyl-player-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .room-app {
@@ -416,6 +595,11 @@ code {
   width: min(1280px, 100%);
 }
 
+.project-board-panel {
+  width: min(1520px, calc(100vw - 32px));
+  padding: clamp(18px, 2.4vw, 36px);
+}
+
 .overlay-header,
 .card-heading,
 .setting-row {
@@ -510,6 +694,11 @@ code {
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
 }
 
+.project-board-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
 .project-grid.compact {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
@@ -580,6 +769,10 @@ code {
   padding: 0;
 }
 
+.board-project-card:not(.is-expanded) {
+  min-height: 220px;
+}
+
 .project-card::before {
   z-index: 1;
 }
@@ -588,6 +781,16 @@ code {
   display: grid;
   gap: 14px;
   padding: 24px;
+}
+
+.board-project-card .project-card-body {
+  min-height: 100%;
+  align-content: start;
+  padding: clamp(18px, 2vw, 24px);
+}
+
+.board-project-card:not(.is-expanded) .project-card-body {
+  grid-template-rows: auto 1fr auto;
 }
 
 .poster-card .project-card-body,
@@ -1130,6 +1333,15 @@ code {
 }
 
 @media (max-width: 900px) {
+  .entry-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-portrait {
+    justify-self: start;
+    width: min(320px, 84vw);
+  }
+
   .recruiter-hero-redesign,
   .recruiter-contact-panel {
     grid-template-columns: 1fr;
@@ -1192,6 +1404,25 @@ code {
   .project-grid,
   .recruiter-project-grid {
     grid-template-columns: 1fr;
+  }
+
+  .vinyl-player {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .vinyl-player-floating {
+    top: 86px;
+  }
+
+  .vinyl-controls {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 1180px) and (min-width: 761px) {
+  .project-board-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
