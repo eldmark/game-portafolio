@@ -1,48 +1,62 @@
 import { z } from 'zod';
 
 export const projectMediaSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   type: z.enum(['image', 'gif', 'video']),
-  url: z.string(),
+  url: z.string().url(),
   alt: z.string(),
-  orderIndex: z.number(),
+  orderIndex: z.number().int().default(0),
 });
 
 export const projectSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  slug: z.string(),
-  description: z.string(),
+  title: z.string().min(2),
+  slug: z.string().min(2),
+  description: z.string().min(10),
   architecture: z.string(),
   challenges: z.array(z.string()),
   stack: z.array(z.string()),
   stackReasoning: z.string(),
-  githubUrl: z.string().nullable(),
-  liveUrl: z.string().nullable(),
-  thumbnail: z.string().nullable(),
-  gifDemo: z.string().nullable(),
-  featured: z.boolean(),
+  githubUrl: z.string().url().nullable().optional(),
+  liveUrl: z.string().url().nullable().optional(),
+  thumbnail: z.string().nullable().optional(),
+  gifDemo: z.string().nullable().optional(),
+  featured: z.boolean().default(false),
   media: z.array(projectMediaSchema).default([]),
 });
 
+export const projectCreateSchema = projectSchema.omit({ id: true });
+export const projectUpdateSchema = projectCreateSchema.partial();
+
 export const skillSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().min(1),
   category: z.string(),
-  icon: z.string().nullable(),
+  icon: z.string().nullable().optional(),
   level: z.number().min(1).max(5),
   reasoning: z.string(),
   appliedIn: z.array(z.string()),
 });
 
+export const skillCreateSchema = skillSchema.omit({ id: true });
+export const skillUpdateSchema = skillCreateSchema.partial();
+
 export const experienceSchema = z.object({
   id: z.string(),
-  company: z.string(),
-  role: z.string(),
-  description: z.string(),
+  company: z.string().min(1),
+  role: z.string().min(1),
+  description: z.string().min(10),
   startDate: z.string(),
   endDate: z.string().nullable(),
   technologies: z.array(z.string()),
+});
+
+export const experienceCreateSchema = experienceSchema.omit({ id: true });
+export const experienceUpdateSchema = experienceCreateSchema.partial();
+
+export const loginInputSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
 });
 
 export const contactMessageInputSchema = z.object({
@@ -85,8 +99,19 @@ export const analyticsSummarySchema = z.object({
 
 export type ProjectMedia = z.infer<typeof projectMediaSchema>;
 export type Project = z.infer<typeof projectSchema>;
+export type ProjectCreate = z.infer<typeof projectCreateSchema>;
+export type ProjectUpdate = z.infer<typeof projectUpdateSchema>;
+
 export type Skill = z.infer<typeof skillSchema>;
+export type SkillCreate = z.infer<typeof skillCreateSchema>;
+export type SkillUpdate = z.infer<typeof skillUpdateSchema>;
+
 export type Experience = z.infer<typeof experienceSchema>;
+export type ExperienceCreate = z.infer<typeof experienceCreateSchema>;
+export type ExperienceUpdate = z.infer<typeof experienceUpdateSchema>;
+
+export type LoginInput = z.infer<typeof loginInputSchema>;
+
 export type ContactMessageInput = z.infer<typeof contactMessageInputSchema>;
 export type VisitInput = z.infer<typeof visitInputSchema>;
 export type VisitPatch = z.infer<typeof visitPatchSchema>;

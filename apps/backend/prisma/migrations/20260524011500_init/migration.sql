@@ -65,6 +65,18 @@ CREATE TABLE "messages" (
   CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "users" (
+  "id" TEXT NOT NULL,
+  "email" TEXT NOT NULL,
+  "password" TEXT NOT NULL,
+  "name" TEXT,
+  "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP(3) NOT NULL,
+  CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
 CREATE TABLE "user_visits" (
   "id" TEXT NOT NULL,
   "session_id" TEXT NOT NULL,
