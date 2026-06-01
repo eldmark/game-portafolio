@@ -8,6 +8,8 @@ import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
 import { aboutProfile, futureIdeas, knowledgeNotes } from '@/lib/portfolio-fallback';
 import { usePortfolioStore, type OverlayType } from '@/lib/store';
+import PokemonOverlay from '@/features/pokemon/PokemonOverlay';
+import '@/features/pokemon/styles/pokemon.css';
 
 type PortfolioOverlayProps = {
   projects: Project[];
@@ -701,6 +703,7 @@ export function PortfolioOverlay(props: PortfolioOverlayProps) {
     future: <FutureOverlay />,
     settings: <SettingsOverlay />,
     recruiter: <RecruiterOverlay {...props} />,
+    switch: <PokemonOverlay />,
   };
 
   return (

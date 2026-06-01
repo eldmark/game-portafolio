@@ -9,8 +9,9 @@ import { Player } from './Player';
 import { roomObjects, type RoomObject } from './room-objects';
 
 function MailboxProp() {
+  // swapped with bookshelf: now placed where bookshelf used to be
   return (
-    <group position={[3.02, 0, -1.16]}>
+    <group position={[2.95, 0, 1.2]}>
       <mesh castShadow position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.08, 0.1, 1, 14]} />
         <meshStandardMaterial color="#7a573d" />
@@ -111,8 +112,11 @@ const whiteboardNotes = [
 
 function FloorDetails() {
   const seamGeo = useMemo(() => new THREE.BoxGeometry(7.12, 0.012, 0.018), []);
-  const seamMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6d4932', roughness: 1 }), []);
-  
+  const seamMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#6d4932', roughness: 1 }),
+    [],
+  );
+
   return (
     <group>
       {floorSeams.map((z) => (
@@ -145,8 +149,14 @@ function FloorDetails() {
 function BaseboardTrim() {
   const horizontalGeo = useMemo(() => new THREE.BoxGeometry(7.36, 0.16, 0.06), []);
   const verticalGeo = useMemo(() => new THREE.BoxGeometry(0.06, 0.16, 5.78), []);
-  const mat1 = useMemo(() => new THREE.MeshStandardMaterial({ color: '#7e5b42', roughness: 0.9 }), []);
-  const mat2 = useMemo(() => new THREE.MeshStandardMaterial({ color: '#806149', roughness: 0.9 }), []);
+  const mat1 = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#7e5b42', roughness: 0.9 }),
+    [],
+  );
+  const mat2 = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#806149', roughness: 0.9 }),
+    [],
+  );
 
   return (
     <group>
@@ -159,7 +169,10 @@ function BaseboardTrim() {
 
 function DeskSetup() {
   const keyGeo = useMemo(() => new THREE.BoxGeometry(0.07, 0.018, 0.045), []);
-  const keyMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#c9d0d6', roughness: 0.64 }), []);
+  const keyMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#c9d0d6', roughness: 0.64 }),
+    [],
+  );
 
   return (
     <group position={[-2.7, 0, -2.1]}>
@@ -242,6 +255,30 @@ function DeskSetup() {
   );
 }
 
+function NintendoSwitchProp() {
+  return (
+    <group position={[3.2, 0.58, 2.05]} rotation={[0, 90, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[0.3, 0.18, 0.018]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0, 0.011]}>
+        <boxGeometry args={[0.2, 0.14, 0.002]} />
+        <meshStandardMaterial color="#0d1117" emissive="#4fc3f7" emissiveIntensity={0.18} />
+      </mesh>
+      <mesh castShadow position={[-0.17, 0, 0]}>
+        <boxGeometry args={[0.04, 0.18, 0.022]} />
+        <meshStandardMaterial color="#e53935" roughness={0.5} />
+      </mesh>
+      <mesh castShadow position={[0.17, 0, 0]}>
+        <boxGeometry args={[0.04, 0.18, 0.022]} />
+        <meshStandardMaterial color="#1e88e5" roughness={0.5} />
+      </mesh>
+      <pointLight position={[0, 0, 0.08]} color="#4fc3f7" intensity={0.1} distance={0.8} />
+    </group>
+  );
+}
+
 function BedProp() {
   return (
     <group position={[-2.35, 0, 1.8]}>
@@ -276,32 +313,47 @@ function BedProp() {
 
 function BookshelfProp() {
   const shelfGeo = useMemo(() => new THREE.BoxGeometry(0.82, 0.04, 1.48), []);
-  const shelfMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#735d49', roughness: 0.84 }), []);
+  const shelfMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#735d49', roughness: 0.84 }),
+    [],
+  );
   const bookGeo1 = useMemo(() => new THREE.BoxGeometry(0.16, 0.34, 0.08), []);
   const bookGeo2 = useMemo(() => new THREE.BoxGeometry(0.16, 0.42, 0.08), []);
-  const bookMaterials = useMemo(() => bookColors.map(color => new THREE.MeshStandardMaterial({ color, roughness: 0.78 })), []);
+  const bookMaterials = useMemo(
+    () => bookColors.map((color) => new THREE.MeshStandardMaterial({ color, roughness: 0.78 })),
+    [],
+  );
 
+  // swapped with mailbox: now placed where mailbox used to be
   return (
-    <group position={[2.95, 0, 1.2]}>
+    <group position={[3.02, 0, -1.16]}>
       <mesh castShadow receiveShadow position={[0, 0.92, 0]}>
         <boxGeometry args={[0.78, 1.9, 1.58]} />
         <meshStandardMaterial color="#5c4c3b" roughness={0.86} />
       </mesh>
       {bookRows.map((y) => (
-        <mesh castShadow key={`shelf-${y}`} position={[0, y, 0]} geometry={shelfGeo} material={shelfMat} />
+        <mesh
+          castShadow
+          key={`shelf-${y}`}
+          position={[0, y, 0]}
+          geometry={shelfGeo}
+          material={shelfMat}
+        />
       ))}
-      {bookRows.slice(0, -1).map((y, rowIndex) =>
-        bookColors.map((color, columnIndex) => (
-          <mesh
-            castShadow
-            key={`${rowIndex}-${color}`}
-            position={[0.03, y + 0.18, -0.56 + columnIndex * 0.27 + rowIndex * 0.03]}
-            rotation={[0, 0, (columnIndex % 2 === 0 ? 1 : -1) * 0.04]}
-            geometry={columnIndex % 2 === 0 ? bookGeo1 : bookGeo2}
-            material={bookMaterials[columnIndex]}
-          />
-        )),
-      )}
+      {bookRows
+        .slice(0, -1)
+        .map((y, rowIndex) =>
+          bookColors.map((color, columnIndex) => (
+            <mesh
+              castShadow
+              key={`${rowIndex}-${color}`}
+              position={[0.03, y + 0.18, -0.56 + columnIndex * 0.27 + rowIndex * 0.03]}
+              rotation={[0, 0, (columnIndex % 2 === 0 ? 1 : -1) * 0.04]}
+              geometry={columnIndex % 2 === 0 ? bookGeo1 : bookGeo2}
+              material={bookMaterials[columnIndex]}
+            />
+          )),
+        )}
       <mesh castShadow position={[0.03, 1.82, 0.48]}>
         <boxGeometry args={[0.2, 0.16, 0.2]} />
         <meshStandardMaterial color="#d6bf84" roughness={0.7} />
@@ -413,7 +465,8 @@ function InteractableObject({
         </Text>
       ) : null}
       {active ? (
-        <Html center position={[markerPosition[0], markerHeight + 0.6, markerPosition[2]]}>
+        // place the interaction button at the marker (floor) so the "button" is on the floor
+        <Html center position={[markerPosition[0], markerPosition[1] + 0.02, markerPosition[2]]}>
           <button className="world-prompt" onClick={onOpen} type="button">
             E - {object.hint}
           </button>
@@ -467,6 +520,7 @@ function RoomShell() {
       </mesh>
       <BaseboardTrim />
       <DeskSetup />
+      <NintendoSwitchProp />
       <BedProp />
       <BookshelfProp />
       <ProjectBoardProp />
@@ -488,7 +542,7 @@ export function RoomScene({ activeObjectId }: { activeObjectId: string | null })
       <fog attach="fog" args={['#161b22', 7.5, 13]} />
       <ambientLight intensity={0.52} />
       <directionalLight castShadow position={[2.2, 5.1, 2.6]} intensity={0.94} />
-      <pointLight position={[-2.7, 1.9, -2.1]} color="#ffd99a" intensity={0.95} />
+      <pointLight position={[3.6, 1.9, 1.05]} color="#ffd99a" intensity={0.95} />
       <pointLight position={[0.4, 2.85, 0.2]} color="#ffcb80" intensity={0.68} distance={8} />
       <pointLight position={[0.4, 2.1, -2.8]} color="#8ec8ff" intensity={0.4} distance={5.8} />
       <RoomShell />

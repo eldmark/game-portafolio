@@ -33,18 +33,21 @@ export const roomObjects: RoomObject[] = [
     size: [2.4, 1.4, 0.18],
     color: '#4f6f52',
     interactionDistance: 1.65,
-    markerPosition: [0, 0.46, -2.45],
+    // button on the floor
+    markerPosition: [0, 0.02, -2.45],
   },
   {
     id: 'mailbox',
     label: 'Mailbox',
     hint: 'Send a contact message',
     overlay: 'mailbox',
-    position: [3.02, 0.66, -1.16],
+    // swapped with bookshelf
+    position: [3.1, 1.05, 1.2],
     size: [0.66, 0.92, 0.58],
     color: '#a04747',
     interactionDistance: 1.25,
-    markerPosition: [2.7, 0.42, -1.14],
+    // button on the floor
+    markerPosition: [2.72, 0.02, 1.15],
   },
   {
     id: 'about',
@@ -55,18 +58,20 @@ export const roomObjects: RoomObject[] = [
     size: [0.18, 1.32, 0.92],
     color: '#7f5539',
     interactionDistance: 1.25,
-    markerPosition: [-2.94, 0.48, 0.42],
+    // button on the floor
+    markerPosition: [-2.94, 0.02, 0.42],
   },
   {
     id: 'bookshelf',
     label: 'Bookshelf',
     hint: 'Open technology notes',
     overlay: 'bookshelf',
-    position: [3.1, 1.05, 1.2],
+    // swapped with mailbox
+    position: [3.02, 0.66, -1.16],
     size: [0.55, 1.9, 1.35],
     color: '#6c584c',
     interactionDistance: 1.5,
-    markerPosition: [2.72, 0.48, 1.15],
+    markerPosition: [2.7, 0.42, -1.14],
   },
   {
     id: 'posters',
@@ -77,7 +82,8 @@ export const roomObjects: RoomObject[] = [
     size: [1.22, 1.34, 0.14],
     color: '#2f5f98',
     interactionDistance: 1.35,
-    markerPosition: [1.96, 0.42, -2.48],
+    // button on the floor
+    markerPosition: [1.96, 0.02, -2.48],
   },
   {
     id: 'future',
@@ -89,6 +95,17 @@ export const roomObjects: RoomObject[] = [
     color: '#8e5572',
     interactionDistance: 1.5,
     markerPosition: [-2.1, 0.5, 0.95],
+  },
+  {
+    id: 'switch',
+    label: 'Nintendo Switch',
+    hint: 'Play the Interview Battle',
+    overlay: 'switch',
+    position: [3.2, 0.58, 2.05],
+    size: [0.32, 0.18, 0.06],
+    color: '#1a1a1a',
+    interactionDistance: 1.6,
+    markerPosition: [3.2, 0.02, 2.05],
   },
 ];
 
