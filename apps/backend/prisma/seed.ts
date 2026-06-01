@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 declare const process: {
+  env: Record<string, string | undefined>;
   exit(code?: number): never;
 };
 
@@ -23,10 +24,11 @@ async function main() {
   /*                                    USERS                                   */
   /* -------------------------------------------------------------------------- */
 
-  const adminPassword = await bcrypt.hash('admin123', 10);
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@portfolio.com';
+  const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD ?? 'admin123', 10);
   await prisma.user.create({
     data: {
-      email: 'admin@portfolio.com',
+      email: adminEmail,
       password: adminPassword,
       name: 'Admin User',
     },

@@ -21,10 +21,7 @@ RUN npm run build --workspace @portfolio/shared
 RUN npm run build --workspace @portfolio/ui
 RUN npm run build --workspace @portfolio/frontend
 
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-RUN npm install -g serve
-COPY --from=builder /app/apps/frontend/dist ./dist
-EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+FROM nginx:1.27-alpine AS runner
+COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
+EXPOSE 80
