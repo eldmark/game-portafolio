@@ -1,6 +1,6 @@
 'use client';
 
-import { Html, Text } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo } from 'react';
 import * as THREE from 'three';
@@ -454,15 +454,9 @@ function InteractableObject({
         />
       </mesh>
       {active ? (
-        <Text
-          position={[markerPosition[0], markerHeight + 0.35, markerPosition[2]]}
-          color="#f8f4e3"
-          fontSize={0.14}
-          anchorX="center"
-          anchorY="middle"
-        >
-          {object.label}
-        </Text>
+        <Html center position={[markerPosition[0], markerHeight + 0.35, markerPosition[2]]}>
+          <div className="world-marker-label">{object.label}</div>
+        </Html>
       ) : null}
       {active ? (
         // place the interaction button at the marker (floor) so the "button" is on the floor
@@ -477,14 +471,14 @@ function InteractableObject({
 }
 
 function CameraRig() {
-  const playerPosition = usePortfolioStore((state) => state.playerPosition);
   const { camera } = useThree();
   const target = useMemo(() => new THREE.Vector3(), []);
   const lookAt = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
-    target.set(playerPosition[0], 4.2, playerPosition[2] + 4.9);
-    lookAt.set(playerPosition[0], 0.6, playerPosition[2] - 0.35);
+    const [playerX, , playerZ] = usePortfolioStore.getState().playerPosition;
+    target.set(playerX, 4.2, playerZ + 4.9);
+    lookAt.set(playerX, 0.6, playerZ - 0.35);
     camera.position.lerp(target, 0.08);
     camera.lookAt(lookAt);
   });
@@ -533,7 +527,13 @@ function RoomShell() {
   );
 }
 
-export function RoomScene({ activeObjectId }: { activeObjectId: string | null }) {
+export function RoomScene({
+  activeObjectId,
+  enableShadows,
+}: {
+  activeObjectId: string | null;
+  enableShadows: boolean;
+}) {
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
 
   return (
@@ -541,7 +541,13 @@ export function RoomScene({ activeObjectId }: { activeObjectId: string | null })
       <color attach="background" args={['#161b22']} />
       <fog attach="fog" args={['#161b22', 7.5, 13]} />
       <ambientLight intensity={0.52} />
-      <directionalLight castShadow position={[2.2, 5.1, 2.6]} intensity={0.94} />
+      <directionalLight
+        castShadow={enableShadows}
+        intensity={0.94}
+        position={[2.2, 5.1, 2.6]}
+        shadow-mapSize-height={512}
+        shadow-mapSize-width={512}
+      />
       <pointLight position={[3.6, 1.9, 1.05]} color="#ffd99a" intensity={0.95} />
       <pointLight position={[0.4, 2.85, 0.2]} color="#ffcb80" intensity={0.68} distance={8} />
       <pointLight position={[0.4, 2.1, -2.8]} color="#8ec8ff" intensity={0.4} distance={5.8} />

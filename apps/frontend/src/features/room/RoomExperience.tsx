@@ -1,8 +1,7 @@
 'use client';
 
 import { Link } from 'react-router-dom';
-import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
   Briefcase,
@@ -23,13 +22,16 @@ import { logDialogue, trackVisit, endVisit } from '@/lib/api';
 import { aboutProfile } from '@/lib/portfolio-fallback';
 import { usePortfolioData } from '@/lib/usePortfolioData';
 import { usePortfolioStore } from '@/lib/store';
-import { PortfolioOverlay } from '@/features/overlays/PortfolioOverlay';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import { AudioManager } from './AudioManager';
-import { RoomScene } from './RoomScene';
-import { getNearestObject } from './room-objects';
+import { getNearestObject, type RoomObject } from './room-objects';
 import { setVirtualKey } from './Player';
 import { getMusicTrack, musicTracks, normalizeTrackIndex } from './music-tracks';
+
+const RoomStage = lazy(() => import('./RoomStage'));
+const PortfolioOverlay = lazy(() =>
+  import('@/features/overlays/PortfolioOverlay').then((module) => ({
+    default: module.PortfolioOverlay,
+  })),
+);
 
 function createSessionId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -244,19 +246,49 @@ function MobileControls() {
   );
 }
 
+function RoomStateBridge({
+  onMove,
+  onNearestObjectChange,
+}: {
+  onMove: () => void;
+  onNearestObjectChange: (nextNearestObject: RoomObject | null) => void;
+}) {
+  const playerPosition = usePortfolioStore((state) => state.playerPosition);
+  const nearestObject = useMemo(() => getNearestObject(playerPosition), [playerPosition]);
+
+  useEffect(() => {
+    onNearestObjectChange(nearestObject);
+  }, [nearestObject, onNearestObjectChange]);
+
+  useEffect(() => {
+    const dx = Math.abs(playerPosition[0]);
+    const dz = Math.abs(playerPosition[2] - 2.2);
+    if (dx > 0.2 || dz > 0.2) {
+      onMove();
+    }
+  }, [onMove, playerPosition]);
+
+  return null;
+}
+
 export default function RoomExperience() {
   const data = usePortfolioData();
   const enteredRoom = usePortfolioStore((state) => state.enteredRoom);
   const activeOverlay = usePortfolioStore((state) => state.activeOverlay);
-  const playerPosition = usePortfolioStore((state) => state.playerPosition);
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
   const recruiterMode = usePortfolioStore((state) => state.recruiterMode);
   const sessionRef = useRef<string | null>(null);
   const startedAtRef = useRef<number>(Date.now());
   const [hasMoved, setHasMoved] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [nearestObject, setNearestObject] = useState<RoomObject | null>(null);
+  const [overlayLoaded, setOverlayLoaded] = useState(false);
 
-  const nearestObject = useMemo(() => getNearestObject(playerPosition), [playerPosition]);
+  const handleNearestObjectChange = useCallback((nextNearestObject: RoomObject | null) => {
+    setNearestObject((currentNearestObject) =>
+      currentNearestObject?.id === nextNearestObject?.id ? currentNearestObject : nextNearestObject,
+    );
+  }, []);
 
   useEffect(() => {
     sessionRef.current = window.localStorage.getItem('portfolio-session-id') ?? createSessionId();
@@ -277,12 +309,10 @@ export default function RoomExperience() {
   }, [activeOverlay]);
 
   useEffect(() => {
-    const dx = Math.abs(playerPosition[0]);
-    const dz = Math.abs(playerPosition[2] - 2.2);
-    if (dx > 0.2 || dz > 0.2) {
-      setHasMoved(true);
+    if (activeOverlay) {
+      setOverlayLoaded(true);
     }
-  }, [playerPosition]);
+  }, [activeOverlay]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -315,33 +345,27 @@ export default function RoomExperience() {
 
   return (
     <main className="room-app">
-      <AudioManager />
       {!enteredRoom ? <EntryScreen /> : null}
       {enteredRoom ? (
         <>
+          <RoomStateBridge
+            onMove={() => setHasMoved(true)}
+            onNearestObjectChange={handleNearestObjectChange}
+          />
           <RecruiterNav />
           <VinylMusicPlayer />
-          <section className="room-stage" aria-label="Interactive portfolio room">
-            <ErrorBoundary>
-              <Canvas 
-                camera={{ position: [0, 4.2, 6.5], fov: 45 }} 
-                shadows 
-                gl={{ 
-                  antialias: true,
-                  powerPreference: "high-performance",
-                  preserveDrawingBuffer: true,
-                  failIfMajorPerformanceCaveat: false
-                }}
-              >
-                <Suspense fallback={null}>
-                  <RoomScene activeObjectId={nearestObject?.id ?? null} />
-                </Suspense>
-              </Canvas>
-            </ErrorBoundary>
-            <div className="hud">
-              <p>{nearestObject ? `Press E: ${nearestObject.hint}` : 'Move near an object'}</p>
-            </div>
-          </section>
+          <Suspense
+            fallback={
+              <section className="loading-screen" aria-label="Preparing the room">
+                Preparing the room...
+              </section>
+            }
+          >
+            <RoomStage
+              activeObjectId={nearestObject?.id ?? null}
+              nearestHint={nearestObject?.hint ?? null}
+            />
+          </Suspense>
           <TutorialMascot
             hasInteracted={hasInteracted}
             hasMoved={hasMoved}
@@ -354,7 +378,11 @@ export default function RoomExperience() {
           </button>
         </>
       ) : null}
-      <PortfolioOverlay {...data} />
+      {overlayLoaded ? (
+        <Suspense fallback={activeOverlay ? <div className="overlay-backdrop" /> : null}>
+          <PortfolioOverlay {...data} />
+        </Suspense>
+      ) : null}
     </main>
   );
 }

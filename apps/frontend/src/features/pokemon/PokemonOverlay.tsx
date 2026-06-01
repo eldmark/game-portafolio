@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { usePortfolioStore } from '@/lib/store';
 import PokemonOverlayApp from './PokemonOverlayApp';
+import './styles/pokemon.css';
 
 export default function PokemonOverlay() {
   const closeOverlay = usePortfolioStore((s) => s.closeOverlay);
