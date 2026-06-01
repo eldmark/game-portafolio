@@ -6,15 +6,26 @@ import type {
   Experience,
   Project,
   Skill,
+  LoginInput,
+  ProjectCreate,
+  ProjectUpdate,
+  SkillCreate,
+  SkillUpdate,
+  ExperienceCreate,
+  ExperienceUpdate,
 } from '@portfolio/shared';
+import { useAuthStore } from './auth-store';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const { token } = useAuthStore.getState();
+
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers,
     },
   });
@@ -50,8 +61,29 @@ export async function getAnalyticsSummary() {
   );
 }
 
+export type AdminUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminUserCreate = {
+  email: string;
+  password: string;
+  name?: string | null;
+};
+
 export async function sendMessage(input: ContactMessageInput) {
-  return request<ApiItemResponse<{ id: string; createdAt: string }>>('/messages', {
+  return request<
+    ApiItemResponse<{
+      id: string;
+      createdAt: string;
+      emailDelivery: 'sent' | 'fallback';
+      contactEmail: string;
+    }>
+  >('/messages', {
     method: 'POST',
     body: JSON.stringify(input),
   }).then((response) => response.data);
@@ -83,4 +115,88 @@ export async function endVisit(sessionId: string, duration: number, recruiterMod
       body: JSON.stringify({ duration, recruiterMode }),
     },
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    AUTH                                    */
+/* -------------------------------------------------------------------------- */
+
+export async function login(input: LoginInput) {
+  return request<ApiItemResponse<{ token: string; user: any }>>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  }).then((response) => response.data);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    ADMIN                                   */
+/* -------------------------------------------------------------------------- */
+
+export async function createProject(data: ProjectCreate) {
+  return request<ApiItemResponse<Project>>('/admin/projects', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function updateProject(id: string, data: ProjectUpdate) {
+  return request<ApiItemResponse<Project>>(`/admin/projects/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function deleteProject(id: string) {
+  return request<void>(`/admin/projects/${id}`, { method: 'DELETE' });
+}
+
+export async function createSkill(data: SkillCreate) {
+  return request<ApiItemResponse<Skill>>('/admin/skills', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function updateSkill(id: string, data: SkillUpdate) {
+  return request<ApiItemResponse<Skill>>(`/admin/skills/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function deleteSkill(id: string) {
+  return request<void>(`/admin/skills/${id}`, { method: 'DELETE' });
+}
+
+export async function createExperience(data: ExperienceCreate) {
+  return request<ApiItemResponse<Experience>>('/admin/experiences', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function updateExperience(id: string, data: ExperienceUpdate) {
+  return request<ApiItemResponse<Experience>>(`/admin/experiences/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  }).then((res) => res.data);
+}
+
+export async function deleteExperience(id: string) {
+  return request<void>(`/admin/experiences/${id}`, { method: 'DELETE' });
+}
+
+export async function getUsers() {
+  return request<ApiListResponse<AdminUser>>('/admin/users').then((response) => response.data);
+}
+
+export async function deleteUser(id: string) {
+  return request<void>(`/admin/users/${id}`, { method: 'DELETE' });
+}
+
+export async function createUser(data: AdminUserCreate) {
+  return request<ApiItemResponse<AdminUser>>('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }).then((response) => response.data);
 }

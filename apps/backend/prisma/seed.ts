@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 declare const process: {
   exit(code?: number): never;
@@ -9,6 +10,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log(' Starting portfolio seed...');
 
+  await prisma.user.deleteMany();
   await prisma.projectMedia.deleteMany();
   await prisma.dialogueLog.deleteMany();
   await prisma.userVisit.deleteMany();
@@ -16,6 +18,19 @@ async function main() {
   await prisma.experience.deleteMany();
   await prisma.skill.deleteMany();
   await prisma.project.deleteMany();
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    USERS                                   */
+  /* -------------------------------------------------------------------------- */
+
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  await prisma.user.create({
+    data: {
+      email: 'admin@portfolio.com',
+      password: adminPassword,
+      name: 'Admin User',
+    },
+  });
 
   /* -------------------------------------------------------------------------- */
   /*                                   SKILLS                                   */

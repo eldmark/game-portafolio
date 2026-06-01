@@ -73,8 +73,7 @@ portfolioRouter.post(
     const input = contactMessageInputSchema.parse(req.body);
     const message = await prisma.message.create({ data: input });
 
-    // Send email asynchronously
-    void sendContactEmail({
+    const emailDelivery = await sendContactEmail({
       name: input.name,
       email: input.email,
       message: input.message,
@@ -84,6 +83,8 @@ portfolioRouter.post(
       data: {
         id: message.id,
         createdAt: message.createdAt.toISOString(),
+        emailDelivery,
+        contactEmail: process.env.CONTACT_EMAIL ?? 'delivered@resend.dev',
       },
     });
   }),

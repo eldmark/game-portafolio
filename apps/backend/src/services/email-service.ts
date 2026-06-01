@@ -1,19 +1,19 @@
 import { Resend } from 'resend';
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'delivered@resend.dev';
+
+export type EmailDeliveryStatus = 'sent' | 'fallback';
 
 export async function sendContactEmail(data: {
   name: string;
   email: string;
   message: string;
-}) {
+}): Promise<EmailDeliveryStatus> {
   if (!resend) {
     console.warn('Resend API key not configured, skipping email.');
-    return;
+    return 'fallback';
   }
 
   try {
@@ -30,7 +30,10 @@ export async function sendContactEmail(data: {
         <p>${data.message}</p>
       `,
     });
+
+    return 'sent';
   } catch (error) {
     console.error('Failed to send email via Resend:', error);
+    return 'fallback';
   }
 }
