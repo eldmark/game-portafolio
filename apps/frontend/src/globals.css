@@ -1484,14 +1484,24 @@ code {
 .recruiter-project-media span {
   position: relative;
   z-index: 1;
-  padding: 6px 9px;
-  border-radius: 6px;
-  background: rgba(16, 17, 18, 0.8);
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(200, 90, 60, 0.94);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 22px rgba(200, 90, 60, 0.24);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.recruiter-project-card.is-featured .recruiter-project-media span {
+  background: linear-gradient(180deg, #ff9b5a 0%, #f07f54 100%);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 24px rgba(240, 127, 84, 0.28);
 }
 
 .recruiter-project-body {
