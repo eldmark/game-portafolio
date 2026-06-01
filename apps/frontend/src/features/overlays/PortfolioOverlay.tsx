@@ -1,13 +1,15 @@
 'use client';
 
 import type { FormEvent, ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ExternalLink, Github, Mail, X } from 'lucide-react';
 import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
 import { aboutProfile, futureIdeas, knowledgeNotes } from '@/lib/portfolio-fallback';
 import { usePortfolioStore, type OverlayType } from '@/lib/store';
+
+const PokemonOverlay = lazy(() => import('@/features/pokemon/PokemonOverlay'));
 
 type PortfolioOverlayProps = {
   projects: Project[];
@@ -82,7 +84,7 @@ function DataNotice({
     return <p className="data-notice">Showing local portfolio seed data.</p>;
   }
 
-  return <p className="data-notice">Live API data ready.</p>;
+  return null;
 }
 
 function ChipList({ items, label }: { items: string[]; label: string }) {
@@ -701,6 +703,11 @@ export function PortfolioOverlay(props: PortfolioOverlayProps) {
     future: <FutureOverlay />,
     settings: <SettingsOverlay />,
     recruiter: <RecruiterOverlay {...props} />,
+    switch: (
+      <Suspense fallback={<OverlayShell title="Interview Battle" wide><p>Loading battle...</p></OverlayShell>}>
+        <PokemonOverlay />
+      </Suspense>
+    ),
   };
 
   return (

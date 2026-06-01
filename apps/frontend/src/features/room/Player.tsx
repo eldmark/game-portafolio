@@ -164,12 +164,18 @@ export function Player() {
   const groupRef = useRef<THREE.Group>(null);
 
   const position = useMemo(() => new THREE.Vector3(0, 0.45, 2.2), []);
+  const movementVector = useMemo(() => new THREE.Vector3(), []);
 
   const facingDirectionRef = useRef<FacingDirection>('down');
 
   const currentFrameRef = useRef(0);
 
   const animationTimerRef = useRef(0);
+  const lastPublishedPositionRef = useRef<[number, number, number]>([
+    position.x,
+    position.y,
+    position.z,
+  ]);
 
   const setPlayerPosition = usePortfolioStore((state) => state.setPlayerPosition);
 
@@ -200,7 +206,8 @@ export function Player() {
   useFrame((_state, delta) => {
     const speed = 2.3;
 
-    const direction = new THREE.Vector3();
+    const direction = movementVector;
+    direction.set(0, 0, 0);
 
     if (pressedKeys.has('w') || pressedKeys.has('arrowup')) {
       direction.z -= 1;
@@ -322,7 +329,12 @@ export function Player() {
       groupRef.current.position.copy(position);
     }
 
-    setPlayerPosition([position.x, position.y, position.z]);
+    const [lastX, lastY, lastZ] = lastPublishedPositionRef.current;
+    if (lastX !== position.x || lastY !== position.y || lastZ !== position.z) {
+      const nextPosition: [number, number, number] = [position.x, position.y, position.z];
+      lastPublishedPositionRef.current = nextPosition;
+      setPlayerPosition(nextPosition);
+    }
   });
 
   return (

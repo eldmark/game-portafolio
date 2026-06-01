@@ -10,6 +10,7 @@ export type OverlayType =
   | 'future'
   | 'settings'
   | 'recruiter'
+  | 'switch'
   | null;
 
 type Vec3Tuple = [number, number, number];

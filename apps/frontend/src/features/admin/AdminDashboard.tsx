@@ -211,15 +211,6 @@ function Overview() {
         </article>
       </div>
 
-      <section className="admin-disclaimer-card">
-        <h2>Terms &amp; Conditions</h2>
-        <p>
-          By using this portfolio, I may gather usage data such as visits, recruiter-mode usage,
-          dialogue interactions, and session duration to understand how the portfolio is used and
-          improve the experience.
-        </p>
-      </section>
-
       {!loading && analytics?.popularDialogues?.length ? (
         <section className="admin-analytics-panel">
           <header className="admin-analytics-panel-header">
