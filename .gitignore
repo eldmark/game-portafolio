@@ -11,5 +11,4 @@ coverage
 apps/backend/prisma/migrations/dev.db
 docker-compose.yml
 docs
-senior-engineer-portfolio
-senior-engineer-portfolio.zip
+docker-compose.production.yml
