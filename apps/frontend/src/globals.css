@@ -168,6 +168,10 @@ code {
   align-items: center;
 }
 
+.entry-screen.is-locked {
+  filter: blur(0.6px);
+}
+
 .entry-hero {
   display: grid;
   width: min(1180px, 100%);
@@ -248,6 +252,7 @@ code {
 .entry-actions,
 .link-row,
 .dialogue-actions,
+.terms-modal-actions,
 .recruiter-hero-actions,
 .recruiter-contact-actions {
   display: flex;
@@ -637,6 +642,40 @@ code {
   padding: 80px 16px 16px;
   background: rgba(16, 17, 18, 0.66);
   backdrop-filter: blur(4px);
+}
+
+.terms-modal-backdrop {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(16, 17, 18, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.terms-modal {
+  width: min(720px, 100%);
+  padding: clamp(20px, 4vw, 32px);
+  border: 2px solid var(--line-strong);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(200, 90, 60, 0.08), transparent 40%),
+    var(--bg);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.38);
+}
+
+.terms-modal h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 34px);
+}
+
+.terms-modal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .overlay-panel {
@@ -1791,7 +1830,6 @@ code {
   margin: 0;
 }
 
-.admin-disclaimer-card,
 .admin-analytics-panel {
   margin-top: 24px;
   padding: 24px;
@@ -1800,14 +1838,12 @@ code {
   border-radius: var(--radius-lg);
 }
 
-.admin-disclaimer-card h2,
 .admin-analytics-panel-header h2 {
   margin: 0 0 8px;
   font-family: var(--font-display);
   font-size: 20px;
 }
 
-.admin-disclaimer-card p,
 .admin-analytics-panel-header p {
   margin: 0;
   color: var(--color-text-secondary);

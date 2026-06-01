@@ -91,6 +91,10 @@ function EntryScreen() {
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
   const audioStarted = usePortfolioStore((state) => state.audioStarted);
   const startAudio = usePortfolioStore((state) => state.startAudio);
+  const [termsAccepted, setTermsAccepted] = useState(() => {
+    return typeof window !== 'undefined' &&
+      window.localStorage.getItem('portfolio-terms-accepted') === 'true';
+  });
 
   function enterPortfolio(recruiterMode = false) {
     if (!audioStarted) {
@@ -100,55 +104,96 @@ function EntryScreen() {
     enterRoom(recruiterMode);
   }
 
+  function acceptTerms() {
+    window.localStorage.setItem('portfolio-terms-accepted', 'true');
+    setTermsAccepted(true);
+  }
+
+  function declineTerms() {
+    window.localStorage.removeItem('portfolio-terms-accepted');
+    window.close();
+    window.location.replace('about:blank');
+  }
+
   return (
-    <section className="entry-screen" aria-label="Portfolio entry menu">
-      <div className="entry-hero">
-        <div className="entry-copy">
-          <p className="eyebrow">Interactive Full-Stack Portfolio</p>
-          <h1>{aboutProfile.name}&apos;s Developer Room</h1>
-          <p>
-            Explore a cozy digital workspace where each object reveals project architecture, backend
-            reasoning, frontend craft, and contact paths.
-          </p>
-          <div className="entry-actions">
-            <button className="primary-button" onClick={() => enterPortfolio(false)} type="button">
-              <Map size={18} />
-              Enter Room
-            </button>
-            <button className="secondary-button" onClick={() => enterPortfolio(true)} type="button">
-              <Laptop size={18} />
-              Recruiter Mode
-            </button>
-            <button
-              className="secondary-button"
-              onClick={() => {
-                enterPortfolio(false);
-                setOverlay('about');
-              }}
-              type="button"
-            >
-              <Info size={18} />
-              About
-            </button>
-            <button
-              className="secondary-button"
-              onClick={() => {
-                enterPortfolio(false);
-                setOverlay('settings');
-              }}
-              type="button"
-            >
-              <Settings size={18} />
-              Settings
-            </button>
+    <>
+      <section className={`entry-screen ${termsAccepted ? '' : 'is-locked'}`} aria-label="Portfolio entry menu">
+        <div className="entry-hero">
+          <div className="entry-copy">
+            <p className="eyebrow">Interactive Full-Stack Portfolio</p>
+            <h1>{aboutProfile.name}&apos;s Developer Room</h1>
+            <p>
+              Explore a cozy digital workspace where each object reveals project architecture, backend
+              reasoning, frontend craft, and contact paths.
+            </p>
+            <div className="entry-actions">
+              <button className="primary-button" onClick={() => enterPortfolio(false)} type="button">
+                <Map size={18} />
+                Enter Room
+              </button>
+              <button className="secondary-button" onClick={() => enterPortfolio(true)} type="button">
+                <Laptop size={18} />
+                Recruiter Mode
+              </button>
+              <button
+                className="secondary-button"
+                onClick={() => {
+                  enterPortfolio(false);
+                  setOverlay('about');
+                }}
+                type="button"
+              >
+                <Info size={18} />
+                About
+              </button>
+              <button
+                className="secondary-button"
+                onClick={() => {
+                  enterPortfolio(false);
+                  setOverlay('settings');
+                }}
+                type="button"
+              >
+                <Settings size={18} />
+                Settings
+              </button>
+            </div>
+            <VinylMusicPlayer variant="entry" />
           </div>
-          <VinylMusicPlayer variant="entry" />
+          <figure className="entry-portrait" aria-label={`${aboutProfile.name} portrait`}>
+            <img alt={`${aboutProfile.name} portrait`} src="/assets/Me/yo.jpg" />
+          </figure>
         </div>
-        <figure className="entry-portrait" aria-label={`${aboutProfile.name} portrait`}>
-          <img alt={`${aboutProfile.name} portrait`} src="/assets/Me/yo.jpg" />
-        </figure>
-      </div>
-    </section>
+      </section>
+
+      {!termsAccepted ? (
+        <div className="terms-modal-backdrop" role="presentation">
+          <section
+            aria-describedby="terms-modal-copy"
+            aria-labelledby="terms-modal-title"
+            aria-modal="true"
+            className="terms-modal"
+            role="dialog"
+          >
+            <p className="eyebrow">Terms &amp; Conditions</p>
+            <h2 id="terms-modal-title">Consent required</h2>
+            <p id="terms-modal-copy">
+              By using this portfolio, I may collect usage data such as visits, recruiter-mode
+              usage, dialogue interactions, and session duration for statistics and portfolio
+              improvements.
+            </p>
+            <div className="terms-modal-actions">
+              <button className="primary-button" onClick={acceptTerms} type="button">
+                Accept and continue
+              </button>
+              <button className="secondary-button" onClick={declineTerms} type="button">
+                Decline and exit
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+    </>
   );
 }
 
