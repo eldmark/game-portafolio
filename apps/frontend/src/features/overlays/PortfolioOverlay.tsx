@@ -84,7 +84,7 @@ function DataNotice({
     return <p className="data-notice">Showing local portfolio seed data.</p>;
   }
 
-  return <p className="data-notice">Live API data ready.</p>;
+  return null;
 }
 
 function ChipList({ items, label }: { items: string[]; label: string }) {

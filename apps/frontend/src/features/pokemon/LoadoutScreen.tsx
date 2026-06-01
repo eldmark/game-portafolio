@@ -5,6 +5,10 @@ import { ALL_MOVES } from './lib/data';
 import { useBattleStore } from './useBattleStore';
 import type { Move } from './lib/types';
 
+function typeClass(type: string) {
+  return `type-${type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+}
+
 export default function LoadoutScreen() {
   const setEquipped = useBattleStore((s) => s.setEquipped);
   const appendLog = useBattleStore((s) => s.appendLog);
@@ -21,7 +25,7 @@ export default function LoadoutScreen() {
 
   function start() {
     setEquipped(selected);
-    appendLog('Loadout selected. Battle starting...');
+    appendLog('Loadout selected. Reviewing interview guide...');
   }
 
   return (
@@ -37,20 +41,14 @@ export default function LoadoutScreen() {
           </div>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))',
-            gap: 10,
-          }}
-        >
+        <div className="loadout-move-grid">
           {ALL_MOVES.map((m) => {
             const isSelected = selected.some((s) => s.id === m.id);
             return (
               <button
                 key={m.id}
                 type="button"
-                className={`move-card ${isSelected ? 'selected' : ''}`}
+                className={`move-card ${typeClass(m.type)} ${isSelected ? 'selected' : ''}`}
                 onClick={() => toggle(m)}
               >
                 <div className="move-card-top">
@@ -58,15 +56,15 @@ export default function LoadoutScreen() {
                   <div className="move-card-pill">{m.type}</div>
                 </div>
                 <div className="move-card-meta">PP {m.pp}</div>
-                <div className="move-card-power">Power {m.power}</div>
+                <div className="move-card-power">Power {m.power > 0 ? m.power : '—'}</div>
               </button>
             );
           })}
         </div>
 
         <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button onClick={start} disabled={selected.length !== 4}>
-            Start Battle
+          <button className="start-battle-button" onClick={start} disabled={selected.length !== 4}>
+            Review interview guide
           </button>
           <span className="loadout-hint">
             Pick exactly four moves. Click a selected move again to remove it.
@@ -77,7 +75,7 @@ export default function LoadoutScreen() {
       <aside className="loadout-sidebar">
         <div className="sidebar-card">
           <p className="eyebrow">Selected moveset</p>
-          <h4>Ready for battle</h4>
+          <h4 className="selected-moveset-title">Ready for battle</h4>
           {selected.length === 0 ? (
             <p className="sidebar-empty">No moves selected yet.</p>
           ) : (
@@ -86,12 +84,11 @@ export default function LoadoutScreen() {
                 <button
                   type="button"
                   key={move.id}
-                  className="selected-move"
+                  className={`selected-move ${typeClass(move.type)}`}
                   onClick={() => toggle(move)}
                 >
                   <span className="selected-index">{index + 1}</span>
-                  <span className="selected-name">{move.name}</span>
-                  <span className="selected-meta">{move.type}</span>
+                  <span className="selected-type">{move.type}</span>
                 </button>
               ))}
             </div>

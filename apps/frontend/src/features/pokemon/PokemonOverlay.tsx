@@ -15,11 +15,11 @@ export default function PokemonOverlay() {
   }, []);
 
   return (
-    <div className="overlay-panel overlay-panel-wide">
+    <div className="overlay-panel overlay-panel-wide pokemon-overlay-panel">
       <header className="overlay-header">
         <div>
           <p className="eyebrow">Interview Battle</p>
-          <h2>Nintendo Switch — Interview Battle</h2>
+          <h2>Interview Battle</h2>
         </div>
         <button
           aria-label="Close overlay"
@@ -32,10 +32,6 @@ export default function PokemonOverlay() {
       </header>
 
       <PokemonOverlayApp />
-
-      <footer style={{ marginTop: 12 }}>
-        <p className="muted">Prototype ported into React — responsive layout.</p>
-      </footer>
     </div>
   );
 }

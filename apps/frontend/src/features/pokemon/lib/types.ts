@@ -10,6 +10,7 @@ export type Move = {
   followUpVulnerable?: boolean;
   status?: boolean;
   badgeUnlock?: string;
+  proofTags?: string[];
 };
 
 export type OpponentMove = {
@@ -29,4 +30,5 @@ export type Opponent = {
   moves: OpponentMove[];
   followUp?: boolean;
   socratic?: boolean;
+  weaknesses?: string[];
 };
