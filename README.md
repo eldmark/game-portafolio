@@ -30,6 +30,44 @@ It also includes:
 - Backend: Node.js, Express, Prisma, PostgreSQL, Zod
 - Infrastructure: Docker, Docker Compose, Nginx, GitHub Actions, GHCR
 
+## Why This Stack Was Chosen
+
+- `React + Vite + TypeScript` keep the frontend iteration loop fast while preserving a maintainable typed codebase for a UI with both 3D and recruiter-oriented views.
+- `React Router` fits the SPA requirement cleanly, and `HashRouter` avoids rewrite issues on simpler deployments while still exposing stable recruiter and admin routes.
+- `React Three Fiber + Drei` make the room experience technically interesting without dropping to lower-level Three.js boilerplate for every interaction.
+- `Zustand` keeps room state, overlays, audio, and interaction flow simple without overengineering global state management.
+- `Framer Motion` provides controlled transitions for overlays and recruiter sections, which helps the project feel more product-like than a static portfolio.
+- `Express + Prisma + PostgreSQL` provide a straightforward backend architecture that is easy to explain in an interview: typed validation, explicit routes, relational persistence, and predictable queries.
+- `Docker + Docker Compose` make the full stack reproducible locally and deployable as a cohesive unit.
+- `GitHub Actions + GHCR` move heavy image builds away from the production server, which matters for this project's constrained deployment environment.
+
+## Project Proof And Repository Notes
+
+This portfolio intentionally includes a mix of:
+
+- Public personal or academic projects with repository links when they can be shared.
+- Professional client work where the implementation can be described, but the source repository cannot be published because the code belongs to a company or is protected by NDA/internal ownership rules.
+
+For those private projects, the portfolio still exposes the engineering signal that matters for evaluation:
+
+- architecture summary
+- stack decisions
+- technical challenges
+- deployment and infrastructure notes
+- demo media when available
+
+The goal is to be honest about code ownership boundaries without presenting confidential work as public.
+
+## Screenshots / GIFs
+
+Current interface captures stored in the repository:
+
+![Portfolio room entry](assets/images/Screenshot_20260602_115419.png)
+![Recruiter-oriented portfolio view](assets/images/Screenshot_20260602_115423.png)
+![Interactive portfolio section view](assets/images/Screenshot_20260602_115512.png)
+
+Additional project demos are also embedded in the app through local media assets under `apps/frontend/public/assets/demos`.
+
 ## Repository Layout
 
 ```text
@@ -170,6 +208,8 @@ Primary reference:
 3. Images are pushed to GHCR
 4. The server pulls the images and recreates containers
 5. Nginx serves the frontend and proxies `/api` to the backend
+
+This deployment design was chosen intentionally because the server is resource-constrained. Building frontend and backend container images directly on the machine would add avoidable CPU, RAM, and disk pressure. By pushing the build step into GitHub Actions and publishing images to GHCR first, the server only needs to pull ready-made images and restart containers.
 
 ### Production Compose File
 
@@ -337,6 +377,20 @@ These issues already occurred during deployment and are worth documenting explic
 - If `CORS_ORIGIN` changes in `.env`, the backend container must be recreated to pick up the new value.
 - If the browser still behaves like an old version after deploy, force a hard refresh or test in a private window because stale JS assets can hide server-side fixes.
 - The server currently has low disk headroom. Monitor `df -h` before large image pulls or repeated redeploys.
+
+## Challenges Encountered
+
+- The production server has limited resources, so building images on-host was an unnecessary risk for RAM and disk usage.
+- To avoid overloading the server, the deployment flow was adjusted so GitHub Actions builds the frontend and backend containers, pushes them to GHCR, and the server only pulls and recreates containers.
+- The frontend had to be aligned with a reverse-proxy `/api` setup to avoid CORS issues and direct-browser calls to the backend port.
+- Because the application uses `HashRouter`, deployment and documentation had to stay consistent with `/#/`-based routes for recruiter and admin flows.
+- The portfolio had to remain useful even when the API is unavailable, so the frontend uses fallback content while still demonstrating real async data fetching when the backend is up.
+
+## Future Improvements
+
+- Add more projects with richer case-study detail and more polished engineering writeups.
+- Add more demos and media captures for each project so the portfolio communicates implementation quality faster.
+- Add a dark mode without weakening the current visual identity of the room and recruiter views.
 
 ## Quality Commands
 
