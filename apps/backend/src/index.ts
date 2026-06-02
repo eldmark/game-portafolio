@@ -10,15 +10,25 @@ import { authMiddleware } from './middleware/auth-middleware.js';
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
+function normalizeOrigin(value: string) {
+  const trimmed = value.trim();
+
+  try {
+    return new URL(trimmed).origin;
+  } catch {
+    return trimmed.replace(/\/+$/, '');
+  }
+}
+
 const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:3001,http://localhost:3000')
   .split(',')
-  .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || corsOrigins.includes(origin)) {
+      if (!origin || corsOrigins.includes(normalizeOrigin(origin))) {
         callback(null, true);
         return;
       }

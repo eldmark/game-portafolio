@@ -132,6 +132,7 @@ Important local variables:
   - `JWT_SECRET`
   - `CORS_ORIGIN`
   - `RESEND_API_KEY`
+  - `CONTACT_EMAIL`
 - `apps/frontend/.env`
   - `VITE_API_URL`
 
@@ -230,6 +231,7 @@ Required secrets for the current deploy flow:
 - `JWT_SECRET`
 - `CORS_ORIGIN`
 - `RESEND_API_KEY`
+- `CONTACT_EMAIL`
 - `VITE_API_URL`
 
 Recommended values in the current `sslip.io` single-host setup:
@@ -238,6 +240,8 @@ Recommended values in the current `sslip.io` single-host setup:
 CORS_ORIGIN=http://34.71.234.176.sslip.io,http://portfolio.34.71.234.176.sslip.io
 VITE_API_URL=/api
 ```
+
+Important: `CORS_ORIGIN` must contain the browser origin exactly, without the `/api` path. If the public site is opened at `http://34.71.234.176.sslip.io`, that exact origin must be present in the allowed list.
 
 ### Current `sslip.io` Pattern
 
