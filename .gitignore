@@ -12,3 +12,5 @@ apps/backend/prisma/migrations/dev.db
 docker-compose.yml
 docs
 docker-compose.production.yml
+.codex
+.agents

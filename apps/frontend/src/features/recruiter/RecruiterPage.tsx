@@ -2,7 +2,7 @@
 
 import { Link } from 'react-router-dom';
 import { useState, useMemo, useEffect, type ReactNode } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Briefcase,
@@ -95,6 +95,7 @@ function FilterChips({
       <button
         className={`filter-chip ${activeCategory === 'All' ? 'active' : ''}`}
         onClick={() => onSelect('All')}
+        type="button"
       >
         All
       </button>
@@ -103,6 +104,7 @@ function FilterChips({
           key={cat}
           className={`filter-chip ${activeCategory === cat ? 'active' : ''}`}
           onClick={() => onSelect(cat)}
+          type="button"
         >
           {cat}
         </button>
@@ -120,7 +122,7 @@ function DataStatus({
   error: string | null;
   usingFallback: boolean;
 }) {
-  if (loading) return <p className="data-notice">Loading live API data...</p>;
+  if (loading) return <p className="data-notice">Loading live API data…</p>;
 
   if (error) {
     return (
@@ -149,7 +151,7 @@ function AnimatedSection({
   title: string;
 }) {
   return (
-    <motion.section
+    <m.section
       className={`recruiter-section ${className}`}
       id={id}
       initial="hidden"
@@ -162,7 +164,7 @@ function AnimatedSection({
         <h2>{title}</h2>
       </header>
       {children}
-    </motion.section>
+    </m.section>
   );
 }
 
@@ -172,7 +174,7 @@ function RecruiterProjectCard({ project }: { project: Project }) {
   const isVideo = mediaUrl?.match(/\.(mp4|webm|ogg)$/i);
 
   return (
-    <motion.article
+    <m.article
       className={`recruiter-project-card ${project.featured ? 'is-featured' : ''}`}
       variants={itemVariants}
       initial="hidden"
@@ -236,7 +238,7 @@ function RecruiterProjectCard({ project }: { project: Project }) {
           ) : null}
         </div>
       </div>
-    </motion.article>
+    </m.article>
   );
 }
 
@@ -244,7 +246,7 @@ function SkillCard({ skill }: { skill: Skill }) {
   const level = clampSkillLevel(skill);
 
   return (
-    <motion.article
+    <m.article
       className="recruiter-skill-card"
       variants={itemVariants}
       initial="hidden"
@@ -257,7 +259,7 @@ function SkillCard({ skill }: { skill: Skill }) {
         <span>{skill.category}</span>
       </div>
       <div aria-label={`${level} out of 5`} className="meter recruiter-meter">
-        <motion.span
+        <m.span
           initial={{ width: 0 }}
           whileInView={{ width: `${level * 20}%` }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -265,15 +267,15 @@ function SkillCard({ skill }: { skill: Skill }) {
       </div>
       <p>{skill.reasoning}</p>
       <p className="tag-row">{skill.appliedIn.join(' / ')}</p>
-    </motion.article>
+    </m.article>
   );
 }
 
 function ExperienceTimeline({ experiences }: { experiences: Experience[] }) {
   return (
-    <motion.div className="recruiter-timeline" variants={listVariants}>
+    <m.div className="recruiter-timeline" variants={listVariants}>
       {experiences.map((experience) => (
-        <motion.article
+        <m.article
           className="recruiter-timeline-item"
           key={experience.id}
           variants={itemVariants}
@@ -287,9 +289,9 @@ function ExperienceTimeline({ experiences }: { experiences: Experience[] }) {
             <p>{experience.description}</p>
             <p className="tag-row">{experience.technologies.join(' / ')}</p>
           </div>
-        </motion.article>
+        </m.article>
       ))}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -376,7 +378,7 @@ export default function RecruiterPage() {
 
   return (
     <main className="recruiter-page">
-      <motion.div className="scroll-progress" style={{ scaleX }} />
+      <m.div className="scroll-progress" style={{ scaleX }} />
 
       <nav className="recruiter-page-nav" aria-label="Recruiter page navigation">
         <Link to="/" className={activeSection === '' ? 'active' : ''}>
@@ -396,7 +398,7 @@ export default function RecruiterPage() {
         </a>
       </nav>
 
-      <motion.section
+      <m.section
         animate="visible"
         className="recruiter-hero recruiter-hero-redesign"
         initial="hidden"
@@ -404,25 +406,25 @@ export default function RecruiterPage() {
         variants={sectionVariants}
       >
         <div className="recruiter-hero-copy">
-          <motion.p
+          <m.p
             className="eyebrow"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
             Portfolio
-          </motion.p>
-          <motion.h1
+          </m.p>
+          <m.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             {aboutProfile.name}
-          </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+          </m.h1>
+          <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
             {aboutProfile.summary}
-          </motion.p>
-          <motion.div
+          </m.p>
+          <m.div
             className="recruiter-hero-actions"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -440,11 +442,11 @@ export default function RecruiterPage() {
               <Mail size={18} />
               Contact
             </a>
-          </motion.div>
+          </m.div>
           <DataStatus error={error} loading={loading} usingFallback={usingFallback} />
         </div>
 
-        <motion.div
+        <m.div
           className="recruiter-hero-panel"
           initial={reduceMotion ? false : { opacity: 0, scale: 0.9, rotateY: 15 }}
           animate={reduceMotion ? undefined : { opacity: 1, scale: 1, rotateY: 0 }}
@@ -464,10 +466,10 @@ export default function RecruiterPage() {
           <a className="text-link" href="#projects">
             Explore my work <ArrowRight size={16} />
           </a>
-        </motion.div>
-      </motion.section>
+        </m.div>
+      </m.section>
 
-      <motion.section
+      <m.section
         className="recruiter-stat-grid"
         initial="hidden"
         whileInView="visible"
@@ -478,25 +480,25 @@ export default function RecruiterPage() {
           const Icon = stat.icon;
 
           return (
-            <motion.article
+            <m.article
               className="recruiter-stat-card"
               key={stat.label}
               variants={itemVariants}
             >
               <Icon size={20} />
-              <motion.strong
+              <m.strong
                 initial={{ opacity: 0, scale: 0.5 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 100 }}
               >
                 {stat.value}
-              </motion.strong>
+              </m.strong>
               <span>{stat.label}</span>
               <p>{stat.detail}</p>
-            </motion.article>
+            </m.article>
           );
         })}
-      </motion.section>
+      </m.section>
 
       <AnimatedSection eyebrow="Proof Of Work" id="projects" title="Featured Projects">
         <FilterChips
@@ -504,13 +506,13 @@ export default function RecruiterPage() {
           activeCategory={activeProjectCategory}
           onSelect={setActiveProjectCategory}
         />
-        <motion.div className="recruiter-project-grid" variants={listVariants} layout>
+        <m.div className="recruiter-project-grid" variants={listVariants} layout>
           <AnimatePresence>
             {filteredProjects.map((project) => (
               <RecruiterProjectCard key={project.id} project={project} />
             ))}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       </AnimatedSection>
 
       <AnimatedSection eyebrow="Technical Range" id="skills" title="Technologies">
@@ -519,13 +521,13 @@ export default function RecruiterPage() {
           activeCategory={activeSkillCategory}
           onSelect={setActiveSkillCategory}
         />
-        <motion.div className="recruiter-skill-grid" variants={listVariants} layout>
+        <m.div className="recruiter-skill-grid" variants={listVariants} layout>
           <AnimatePresence>
             {filteredSkills.map((skill) => (
               <SkillCard key={skill.id} skill={skill} />
             ))}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
       </AnimatedSection>
 
       <AnimatedSection eyebrow="Recent Work" id="experience" title="Experience">

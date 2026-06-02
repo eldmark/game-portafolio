@@ -402,7 +402,7 @@ export default function RoomExperience() {
           <Suspense
             fallback={
               <section className="loading-screen" aria-label="Preparing the room">
-                Preparing the room...
+                Preparing the room…
               </section>
             }
           >

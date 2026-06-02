@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { LazyMotion, domMax } from 'framer-motion';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
@@ -10,28 +11,30 @@ const AdminDashboard = lazy(() => import('@/features/admin/AdminDashboard'));
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <Suspense fallback={<main className="loading-screen">Preparing the portfolio...</main>}>
-          <Routes>
-            <Route path="/" element={<RoomExperience />} />
-            <Route path="/recruiter" element={<RecruiterPage />} />
-            
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route 
-              path="/admin/dashboard/*" 
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
+    <LazyMotion features={domMax}>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <Suspense fallback={<main className="loading-screen">Preparing the portfolio…</main>}>
+            <Routes>
+              <Route path="/" element={<RoomExperience />} />
+              <Route path="/recruiter" element={<RecruiterPage />} />
 
-            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route
+                path="/admin/dashboard/*"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </LazyMotion>
   );
 };
 

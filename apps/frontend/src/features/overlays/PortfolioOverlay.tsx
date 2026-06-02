@@ -2,7 +2,7 @@
 
 import type { FormEvent, ReactNode } from 'react';
 import { Suspense, lazy, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { ArrowRight, ExternalLink, Github, Mail, X } from 'lucide-react';
 import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
@@ -34,7 +34,7 @@ function OverlayShell({
   const closeOverlay = usePortfolioStore((state) => state.closeOverlay);
 
   return (
-    <motion.section
+    <m.section
       aria-label={title}
       aria-modal="true"
       className={`overlay-panel ${wide ? 'overlay-panel-wide' : ''} ${className}`.trim()}
@@ -59,7 +59,7 @@ function OverlayShell({
         </button>
       </header>
       {children}
-    </motion.section>
+    </m.section>
   );
 }
 
@@ -69,7 +69,7 @@ function DataNotice({
   usingFallback,
 }: Pick<PortfolioOverlayProps, 'loading' | 'error' | 'usingFallback'>) {
   if (loading) {
-    return <p className="data-notice">Loading live API data...</p>;
+    return <p className="data-notice">Loading live API data…</p>;
   }
 
   if (error) {
@@ -566,7 +566,7 @@ function MailboxOverlay() {
         </label>
         <button className="primary-button" disabled={status === 'loading'} type="submit">
           <Mail size={16} />
-          {status === 'loading' ? 'Sending...' : 'Send message'}
+          {status === 'loading' ? 'Sending…' : 'Send message'}
         </button>
         {message ? <p className={`form-status form-status-${status}`}>{message}</p> : null}
         {status === 'error' ? (
@@ -704,7 +704,7 @@ export function PortfolioOverlay(props: PortfolioOverlayProps) {
     settings: <SettingsOverlay />,
     recruiter: <RecruiterOverlay {...props} />,
     switch: (
-      <Suspense fallback={<OverlayShell title="Interview Battle" wide><p>Loading battle...</p></OverlayShell>}>
+      <Suspense fallback={<OverlayShell title="Interview Battle" wide><p>Loading battle…</p></OverlayShell>}>
         <PokemonOverlay />
       </Suspense>
     ),

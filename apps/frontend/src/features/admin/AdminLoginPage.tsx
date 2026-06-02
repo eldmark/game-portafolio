@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
           </div>
 
           <button className="primary-button full-width" type="submit" disabled={loading}>
-            {loading ? 'Authenticating...' : (
+            {loading ? 'Authenticating…' : (
               <>
                 <LogIn size={18} />
                 Sign In
@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
         </form>
 
         <footer>
-          <button className="text-link" onClick={() => navigate('/')}>
+          <button className="text-link" onClick={() => navigate('/')} type="button">
             Back to Portfolio
           </button>
         </footer>

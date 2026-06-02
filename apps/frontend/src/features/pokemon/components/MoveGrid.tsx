@@ -24,6 +24,7 @@ export default function MoveGrid({
           className={`move-btn ${typeClass(m.type)}`}
           disabled={disabled || m.pp <= 0}
           onClick={() => onUse(i)}
+          type="button"
         >
           <div className="move-btn-top">
             <div className="move-btn-name">{m.name}</div>

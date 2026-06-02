@@ -115,7 +115,7 @@ export default function AdminDashboard() {
         </nav>
 
         <footer className="sidebar-footer">
-          <button className="admin-nav-item full-width" onClick={handleLogout}>
+          <button className="admin-nav-item full-width" onClick={handleLogout} type="button">
             <LogOut size={18} />
             Sign Out
           </button>
@@ -196,7 +196,7 @@ function Overview() {
           <strong>Usage analytics</strong>
           <p>
             {loading
-              ? 'Loading usage summary...'
+              ? 'Loading usage summary…'
               : `${analytics?.totalVisits ?? 0} visits, ${analytics?.recruiterVisits ?? 0} recruiter sessions, ${analytics?.totalDialogueLogs ?? 0} dialogue events.`}
           </p>
         </article>
@@ -205,7 +205,7 @@ function Overview() {
           <strong>Average session</strong>
           <p>
             {loading
-              ? 'Loading session duration...'
+              ? 'Loading session duration…'
               : `${averageDuration} average engagement time.`}
           </p>
         </article>
@@ -274,14 +274,14 @@ function UserManager() {
     <div className="manager-page">
       <header className="admin-header">
         <h1>Users</h1>
-        <button className="primary-button" onClick={openCreate}>
+        <button className="primary-button" onClick={openCreate} type="button">
           <Plus size={18} />
           Add Admin
         </button>
       </header>
 
       {loading ? (
-        <p>Loading users...</p>
+        <p>Loading users…</p>
       ) : (
         <table className="admin-table">
           <thead>
@@ -306,6 +306,7 @@ function UserManager() {
                       className="btn-icon delete"
                       onClick={() => handleDelete(user.id, user.email)}
                       title="Delete user"
+                      type="button"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -361,7 +362,7 @@ function UserModal({ onClose, onSave }: { onClose: () => void; onSave: () => voi
       <div className="admin-modal">
         <header className="overlay-header">
           <h2>Add Admin</h2>
-          <button className="icon-button" onClick={onClose}>
+          <button className="icon-button" onClick={onClose} type="button">
             <X size={24} />
           </button>
         </header>
@@ -402,7 +403,7 @@ function UserModal({ onClose, onSave }: { onClose: () => void; onSave: () => voi
               Cancel
             </button>
             <button className="primary-button" type="submit" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Admin'}
+              {loading ? 'Creating…' : 'Create Admin'}
             </button>
           </div>
         </form>
@@ -460,14 +461,14 @@ function ProjectManager() {
     <div className="manager-page">
       <header className="admin-header">
         <h1>Projects</h1>
-        <button className="primary-button" onClick={openCreate}>
+        <button className="primary-button" onClick={openCreate} type="button">
           <Plus size={18} />
           New Project
         </button>
       </header>
 
       {loading ? (
-        <p>Loading projects...</p>
+        <p>Loading projects…</p>
       ) : (
         <table className="admin-table">
           <thead>
@@ -497,17 +498,23 @@ function ProjectManager() {
                 </td>
                 <td>
                   {project.stack.slice(0, 3).join(', ')}
-                  {project.stack.length > 3 ? '...' : ''}
+                  {project.stack.length > 3 ? '…' : ''}
                 </td>
                 <td>
                   <div className="admin-actions">
-                    <button className="btn-icon" onClick={() => openEdit(project)} title="Edit">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(project)}
+                      title="Edit"
+                      type="button"
+                    >
                       <Pencil size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(project.id)}
                       title="Delete"
+                      type="button"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -601,7 +608,7 @@ function ProjectModal({
       <div className="admin-modal">
         <header className="overlay-header">
           <h2>{project ? 'Edit Project' : 'New Project'}</h2>
-          <button className="icon-button" onClick={onClose}>
+          <button className="icon-button" onClick={onClose} type="button">
             <X size={24} />
           </button>
         </header>
@@ -673,7 +680,7 @@ function ProjectModal({
               Cancel
             </button>
             <button className="primary-button" type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Project'}
+              {loading ? 'Saving…' : 'Save Project'}
             </button>
           </div>
         </form>
@@ -731,14 +738,14 @@ function SkillManager() {
     <div className="manager-page">
       <header className="admin-header">
         <h1>Skills</h1>
-        <button className="primary-button" onClick={openCreate}>
+        <button className="primary-button" onClick={openCreate} type="button">
           <Plus size={18} />
           New Skill
         </button>
       </header>
 
       {loading ? (
-        <p>Loading skills...</p>
+        <p>Loading skills…</p>
       ) : (
         <table className="admin-table">
           <thead>
@@ -759,13 +766,19 @@ function SkillManager() {
                 <td>{skill.level} / 5</td>
                 <td>
                   <div className="admin-actions">
-                    <button className="btn-icon" onClick={() => openEdit(skill)} title="Edit">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(skill)}
+                      title="Edit"
+                      type="button"
+                    >
                       <Pencil size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(skill.id)}
                       title="Delete"
+                      type="button"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -832,7 +845,7 @@ function SkillModal({
       <div className="admin-modal">
         <header className="overlay-header">
           <h2>{skill ? 'Edit Skill' : 'New Skill'}</h2>
-          <button className="icon-button" onClick={onClose}>
+          <button className="icon-button" onClick={onClose} type="button">
             <X size={24} />
           </button>
         </header>
@@ -881,7 +894,7 @@ function SkillModal({
               Cancel
             </button>
             <button className="primary-button" type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Skill'}
+              {loading ? 'Saving…' : 'Save Skill'}
             </button>
           </div>
         </form>
@@ -939,14 +952,14 @@ function ExperienceManager() {
     <div className="manager-page">
       <header className="admin-header">
         <h1>Experience</h1>
-        <button className="primary-button" onClick={openCreate}>
+        <button className="primary-button" onClick={openCreate} type="button">
           <Plus size={18} />
           New Experience
         </button>
       </header>
 
       {loading ? (
-        <p>Loading experiences...</p>
+        <p>Loading experiences…</p>
       ) : (
         <table className="admin-table">
           <thead>
@@ -970,13 +983,19 @@ function ExperienceManager() {
                 </td>
                 <td>
                   <div className="admin-actions">
-                    <button className="btn-icon" onClick={() => openEdit(exp)} title="Edit">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(exp)}
+                      title="Edit"
+                      type="button"
+                    >
                       <Pencil size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(exp.id)}
                       title="Delete"
+                      type="button"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -1045,7 +1064,7 @@ function ExperienceModal({
       <div className="admin-modal">
         <header className="overlay-header">
           <h2>{experience ? 'Edit Experience' : 'New Experience'}</h2>
-          <button className="icon-button" onClick={onClose}>
+          <button className="icon-button" onClick={onClose} type="button">
             <X size={24} />
           </button>
         </header>
@@ -1100,7 +1119,7 @@ function ExperienceModal({
               Cancel
             </button>
             <button className="primary-button" type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Experience'}
+              {loading ? 'Saving…' : 'Save Experience'}
             </button>
           </div>
         </form>

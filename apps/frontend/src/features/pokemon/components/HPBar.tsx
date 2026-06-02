@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import React from 'react';
 
 export default function HPBar({ value, max }: { value: number; max: number }) {
@@ -16,7 +16,7 @@ export default function HPBar({ value, max }: { value: number; max: number }) {
       aria-valuemax={100}
       style={{ '--hp-color': color } as React.CSSProperties}
     >
-      <motion.div
+      <m.div
         className="hp-fill"
         animate={{ width: `${pct}%` }}
         transition={{ duration: 0.5 }}

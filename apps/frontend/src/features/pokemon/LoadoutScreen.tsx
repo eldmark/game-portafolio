@@ -25,7 +25,7 @@ export default function LoadoutScreen() {
 
   function start() {
     setEquipped(selected);
-    appendLog('Loadout selected. Reviewing interview guide...');
+    appendLog('Loadout selected. Reviewing interview guide…');
   }
 
   return (
@@ -63,7 +63,12 @@ export default function LoadoutScreen() {
         </div>
 
         <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button className="start-battle-button" onClick={start} disabled={selected.length !== 4}>
+          <button
+            className="start-battle-button"
+            disabled={selected.length !== 4}
+            onClick={start}
+            type="button"
+          >
             Review interview guide
           </button>
           <span className="loadout-hint">
