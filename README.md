@@ -32,14 +32,7 @@ It also includes:
 
 ## Why This Stack Was Chosen
 
-- `React + Vite + TypeScript` keep the frontend iteration loop fast while preserving a maintainable typed codebase for a UI with both 3D and recruiter-oriented views.
-- `React Router` fits the SPA requirement cleanly, and `HashRouter` avoids rewrite issues on simpler deployments while still exposing stable recruiter and admin routes.
-- `React Three Fiber + Drei` make the room experience technically interesting without dropping to lower-level Three.js boilerplate for every interaction.
-- `Zustand` keeps room state, overlays, audio, and interaction flow simple without overengineering global state management.
-- `Framer Motion` provides controlled transitions for overlays and recruiter sections, which helps the project feel more product-like than a static portfolio.
-- `Express + Prisma + PostgreSQL` provide a straightforward backend architecture that is easy to explain in an interview: typed validation, explicit routes, relational persistence, and predictable queries.
-- `Docker + Docker Compose` make the full stack reproducible locally and deployable as a cohesive unit.
-- `GitHub Actions + GHCR` move heavy image builds away from the production server, which matters for this project's constrained deployment environment.
+This stack is a good fit for this portfolio because it balances presentation, maintainability, and operational reality without overcomplicating the codebase. On the frontend, `React + Vite + TypeScript` give a fast iteration loop while still keeping the room experience and recruiter view strongly typed, and the code makes that decision concrete by using `React.lazy` and `Suspense` in [apps/frontend/src/App.tsx](/home/dmark123/Desktop/homework/web/game-portafolio/apps/frontend/src/App.tsx) to split the heaviest views into separate chunks instead of loading everything at startup. That matters here because the portfolio includes a 3D scene, animated overlays, audio, and a recruiter mode, so the app benefits from deferring non-critical code until it is actually needed. The same logic applies to the data layer: `usePortfolioData` in [apps/frontend/src/lib/usePortfolioData.ts](/home/dmark123/Desktop/homework/web/game-portafolio/apps/frontend/src/lib/usePortfolioData.ts) hydrates live backend data asynchronously but keeps fallback content ready immediately, which means the page stays useful even if the API is slow or unavailable. `React Router` and `HashRouter` are also a practical choice because this project is deployed behind a reverse proxy and should keep stable recruiter and admin routes without depending on server rewrite rules. For state, `Zustand` is the right amount of abstraction because the app only needs lightweight global UI state such as overlays, audio, tutorial visibility, and room interaction flags; using a heavier store pattern would add complexity without improving the user experience. `React Three Fiber + Drei` are justified because they let the portfolio use a 3D room as a differentiator while still staying inside the React component model, and the room can lazily load expensive pieces instead of blocking the rest of the interface. `Framer Motion` adds controlled transitions that make overlays feel intentional rather than bolted on, which helps the product feel polished without introducing expensive rendering logic. On the backend, `Express + Prisma + PostgreSQL` are a strong combination because the API is explicit, the database is relational, and the schema is expressive enough to support projects, skills, experiences, messages, visits, and dialogue analytics with predictable queries and migrations; that is a better fit than a more abstract stack because the portfolio needs to demonstrate real engineering judgment, not just framework usage. Finallya y, `Docker + Docker Compose` and `GitHub Actions + GHCR` are not cosmetic choices: they solve a real production constraint by moving image builds off the server, reducing CPU, RAM, and disk pressure during deployment, which is especially important for a low-resource host and makes the infrastructure easier to reason about, reproduce, and explain in an interview.
 
 ## Project Proof And Repository Notes
 
@@ -252,12 +245,6 @@ Current public hostname shape:
 
 ```text
 http://34.71.234.176.sslip.io
-```
-
-The portfolio has also been configured to answer:
-
-```text
-http://portfolio.34.71.234.176.sslip.io
 ```
 
 For practical consistency, prefer one public hostname and use that same hostname in `CORS_ORIGIN`.
