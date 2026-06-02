@@ -49,6 +49,7 @@ COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 
 # Prune dev dependencies to save space and memory
 RUN npm prune --production --workspace @portfolio/backend --workspace @portfolio/shared
+RUN chown -R expressjs:nodejs /app
 
 USER expressjs
 
