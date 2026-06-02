@@ -125,21 +125,39 @@ function collidesAt(x: number, z: number) {
 /* -------------------------------------------------------------------------- */
 
 export function setVirtualKey(key: string, active: boolean) {
+  const normalizedKey = key?.toLowerCase?.();
+  if (!normalizedKey) return;
+
   if (active) {
-    pressedKeys.add(key.toLowerCase());
+    pressedKeys.add(normalizedKey);
   } else {
-    pressedKeys.delete(key.toLowerCase());
+    pressedKeys.delete(normalizedKey);
   }
 }
 
 function useKeyboardControls() {
   useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) =>
+      target instanceof HTMLElement &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable);
+
     const onKeyDown = (event: KeyboardEvent) => {
-      pressedKeys.add(event.key.toLowerCase());
+      if (isTypingTarget(event.target)) return;
+
+      const normalizedKey = event.key?.toLowerCase?.();
+      if (!normalizedKey) return;
+
+      pressedKeys.add(normalizedKey);
     };
 
     const onKeyUp = (event: KeyboardEvent) => {
-      pressedKeys.delete(event.key.toLowerCase());
+      const normalizedKey = event.key?.toLowerCase?.();
+      if (!normalizedKey) return;
+
+      pressedKeys.delete(normalizedKey);
     };
 
     window.addEventListener('keydown', onKeyDown);

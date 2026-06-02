@@ -360,12 +360,22 @@ export default function RoomExperience() {
   }, [activeOverlay]);
 
   useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) =>
+      target instanceof HTMLElement &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable);
+
     function onKeyDown(event: KeyboardEvent) {
+      if (isTypingTarget(event.target)) return;
+
       if (event.key === 'Escape') {
         setOverlay(null);
       }
 
-      if (event.key.toLowerCase() === 'e' && nearestObject && !activeOverlay) {
+      const normalizedKey = event.key?.toLowerCase?.();
+      if (normalizedKey === 'e' && nearestObject && !activeOverlay) {
         setOverlay(nearestObject.overlay);
       }
     }
