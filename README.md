@@ -1,6 +1,6 @@
 # Interactive Portfolio Room
 
-Interactive portfolio presented as an explorable 3D room with a recruiter-friendly alternate view, admin dashboard, analytics, contact flow, and a small full-stack backend.
+Interactive portfolio presented as an explorable 3D room with a recruiter-friendly alternate view, admin dashboard, analytics, contact flow, and a small full-stack backend. Production: http://34.71.234.176.sslip.io/#/
 
 This repository is a monorepo with:
 
