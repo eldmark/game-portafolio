@@ -1270,13 +1270,12 @@ code {
   position: sticky;
   z-index: 20;
   top: 16px;
-  left: 50%;
   display: flex;
-  width: fit-content;
+  width: max-content;
   max-width: calc(100vw - 32px);
-  transform: translateX(-50%);
   gap: 8px;
   align-items: center;
+  justify-content: center;
   padding: 8px;
   border: 2px solid var(--line-strong);
   border-radius: 8px;
@@ -1621,6 +1620,14 @@ code {
 
   .recruiter-nav-brand {
     display: none;
+  }
+
+  .recruiter-page-nav {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    justify-content: flex-start;
+    margin-bottom: 24px;
+    padding-inline: 6px;
   }
 
   .mobile-controls {
