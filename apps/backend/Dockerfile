@@ -1,29 +1,57 @@
-FROM node:20-bookworm-slim AS deps
+# Build stage for dependencies
+FROM node:20-alpine AS deps
 WORKDIR /app
+
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY apps/backend/package.json apps/backend/package.json
-COPY apps/frontend/package.json apps/frontend/package.json
 COPY packages/shared/package.json packages/shared/package.json
-COPY packages/ui/package.json packages/ui/package.json
+
+# Install only necessary dependencies for building
 RUN npm ci
 
-FROM node:20-bookworm-slim AS builder
+# Build stage
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/package.json ./package.json
-COPY tsconfig.base.json ./
+COPY package.json tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
+
+# Build shared package and backend
 RUN npm run build --workspace @portfolio/shared
 RUN npm run prisma:generate --workspace @portfolio/backend
 RUN npm run build --workspace @portfolio/backend
 
-FROM node:20-bookworm-slim AS runner
+# Production stage
+FROM node:20-alpine AS runner
 WORKDIR /app
+
 ENV NODE_ENV=production
-COPY --from=builder /app/node_modules ./node_modules
+
+# Install openssl for Prisma
+RUN apk add --no-cache openssl
+
+# Create a non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 expressjs
+
+# Copy only the necessary files from builder
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/packages/shared ./packages/shared
-COPY --from=builder /app/apps/backend ./apps/backend
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/packages/shared/package.json ./packages/shared/package.json
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/backend/package.json ./apps/backend/package.json
+COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
+
+# Prune dev dependencies to save space and memory
+RUN npm prune --production --workspace @portfolio/backend --workspace @portfolio/shared
+
+USER expressjs
+
 EXPOSE 4000
+
 CMD ["sh", "-c", "npm run db:deploy --workspace @portfolio/backend && npm run start --workspace @portfolio/backend"]
