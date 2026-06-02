@@ -16,12 +16,45 @@ import type {
 } from '@portfolio/shared';
 import { useAuthStore } from './auth-store';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+function normalizeApiUrl(rawValue?: string) {
+  const raw = rawValue?.trim();
+
+  if (!raw) {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/api`;
+    }
+
+    return 'http://localhost:4000';
+  }
+
+  if (/^https?:\/\//i.test(raw)) {
+    return raw.replace(/\/+$/, '');
+  }
+
+  if (raw.startsWith('/')) {
+    return raw.replace(/\/+$/, '');
+  }
+
+  const protocol = typeof window !== 'undefined' ? window.location.protocol : 'http:';
+  return `${protocol}//${raw}`.replace(/\/+$/, '');
+}
+
+function buildApiUrl(baseUrl: string, path: string) {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  if (/^https?:\/\//i.test(baseUrl)) {
+    return new URL(normalizedPath, `${baseUrl}/`).toString();
+  }
+
+  return `${baseUrl}${normalizedPath}`;
+}
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL);
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const { token } = useAuthStore.getState();
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(buildApiUrl(API_URL, path), {
     ...init,
     headers: {
       'Content-Type': 'application/json',

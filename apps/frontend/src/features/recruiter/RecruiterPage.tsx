@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { m, useReducedMotion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import {
@@ -296,6 +296,7 @@ function ExperienceTimeline({ experiences }: { experiences: Experience[] }) {
 }
 
 export default function RecruiterPage() {
+  const { sectionId } = useParams<{ sectionId?: string }>();
   const { projects, skills, experiences, loading, error, usingFallback } = usePortfolioData();
   const reduceMotion = useReducedMotion();
   const [activeProjectCategory, setActiveProjectCategory] = useState('All');
@@ -336,23 +337,57 @@ export default function RecruiterPage() {
   );
 
   useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('section[id]'));
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
+        const nextActive = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+
+        if (nextActive) {
+          setActiveSection(nextActive.target.id);
+        }
       },
-      { threshold: 0.5 },
+      {
+        rootMargin: '-18% 0px -52% 0px',
+        threshold: [0.15, 0.35, 0.6],
+      },
     );
 
-    document.querySelectorAll('section[id]').forEach((section) => {
+    sections.forEach((section) => {
       observer.observe(section);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+      observer.disconnect();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!sectionId) {
+      setActiveSection('');
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      return;
+    }
+
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    setActiveSection(sectionId);
+    const timer = window.setTimeout(() => {
+      target.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [reduceMotion, sectionId]);
+
+  function sectionHref(section: string) {
+    return `/recruiter/${section}`;
+  }
 
   const stats = [
     {
@@ -381,21 +416,24 @@ export default function RecruiterPage() {
       <m.div className="scroll-progress" style={{ scaleX }} />
 
       <nav className="recruiter-page-nav" aria-label="Recruiter page navigation">
-        <Link to="/" className={activeSection === '' ? 'active' : ''}>
+        <Link to="/" className={!sectionId && activeSection === '' ? 'active' : ''}>
           <Home size={16} /> Room
         </Link>
-        <a href="#projects" className={activeSection === 'projects' ? 'active' : ''}>
+        <Link to={sectionHref('projects')} className={activeSection === 'projects' ? 'active' : ''}>
           Projects
-        </a>
-        <a href="#skills" className={activeSection === 'skills' ? 'active' : ''}>
+        </Link>
+        <Link to={sectionHref('skills')} className={activeSection === 'skills' ? 'active' : ''}>
           Skills
-        </a>
-        <a href="#experience" className={activeSection === 'experience' ? 'active' : ''}>
+        </Link>
+        <Link
+          to={sectionHref('experience')}
+          className={activeSection === 'experience' ? 'active' : ''}
+        >
           Experience
-        </a>
-        <a href="#contact" className={activeSection === 'contact' ? 'active' : ''}>
+        </Link>
+        <Link to={sectionHref('contact')} className={activeSection === 'contact' ? 'active' : ''}>
           Contact
-        </a>
+        </Link>
       </nav>
 
       <m.section
@@ -430,18 +468,18 @@ export default function RecruiterPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <a className="primary-button" href="#projects">
+            <Link className="primary-button" to={sectionHref('projects')}>
               <Rocket size={18} />
               View projects
-            </a>
+            </Link>
             <a className="secondary-button" href="/resume.pdf" target="_blank" rel="noreferrer">
               <FileText size={18} />
               Resume
             </a>
-            <a className="secondary-button" href="#contact">
+            <Link className="secondary-button" to={sectionHref('contact')}>
               <Mail size={18} />
               Contact
-            </a>
+            </Link>
           </m.div>
           <DataStatus error={error} loading={loading} usingFallback={usingFallback} />
         </div>
@@ -463,9 +501,9 @@ export default function RecruiterPage() {
             <li>Strong focus on performance, accessibility, and user experience.</li>
             <li>Proven track record of building scalable and maintainable applications.</li>
           </ul>
-          <a className="text-link" href="#projects">
+          <Link className="text-link" to={sectionHref('projects')}>
             Explore my work <ArrowRight size={16} />
-          </a>
+          </Link>
         </m.div>
       </m.section>
 
