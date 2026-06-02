@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
+  base: './',
   cacheDir: process.env.VITE_CACHE_DIR,
   plugins: [react()],
   resolve: {

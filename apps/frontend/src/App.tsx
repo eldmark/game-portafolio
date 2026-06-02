@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LazyMotion, domMax } from 'framer-motion';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -12,7 +12,7 @@ const AdminDashboard = lazy(() => import('@/features/admin/AdminDashboard'));
 const App: React.FC = () => {
   return (
     <LazyMotion features={domMax}>
-      <BrowserRouter>
+      <HashRouter>
         <ErrorBoundary>
           <Suspense fallback={<main className="loading-screen">Preparing the portfolio…</main>}>
             <Routes>
@@ -33,7 +33,7 @@ const App: React.FC = () => {
             </Routes>
           </Suspense>
         </ErrorBoundary>
-      </BrowserRouter>
+      </HashRouter>
     </LazyMotion>
   );
 };
