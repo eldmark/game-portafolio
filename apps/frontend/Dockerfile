@@ -21,6 +21,18 @@ RUN npm run build --workspace @portfolio/shared
 RUN npm run build --workspace @portfolio/ui
 RUN npm run build --workspace @portfolio/frontend
 
+FROM node:20-alpine AS development
+WORKDIR /app
+ENV NODE_ENV=development
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
+COPY tsconfig.base.json ./
+COPY packages/shared ./packages/shared
+COPY packages/ui ./packages/ui
+COPY apps/frontend ./apps/frontend
+EXPOSE 3001
+CMD ["npm", "run", "dev", "--workspace", "@portfolio/frontend", "--", "--host", "0.0.0.0", "--port", "3001"]
+
 FROM nginx:1.27-alpine AS runner
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html

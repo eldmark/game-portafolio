@@ -25,6 +25,20 @@ RUN npm run build --workspace @portfolio/shared
 RUN npm run prisma:generate --workspace @portfolio/backend
 RUN npm run build --workspace @portfolio/backend
 
+# Development stage
+FROM node:20-alpine AS development
+WORKDIR /app
+ENV NODE_ENV=development
+RUN apk add --no-cache openssl
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 expressjs
+COPY --from=builder /app ./
+RUN chown -R expressjs:nodejs /app
+RUN chmod -R 775 /app/node_modules
+USER expressjs
+EXPOSE 4000
+CMD ["sh", "-c", "npm run db:deploy --workspace @portfolio/backend && npm run dev --workspace @portfolio/backend"]
+
 # Production stage
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -48,8 +62,12 @@ COPY --from=builder /app/apps/backend/package.json ./apps/backend/package.json
 COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 
 # Prune dev dependencies to save space and memory
+# Note: we moved prisma to dependencies in package.json to ensure it's available for migrations
 RUN npm prune --production --workspace @portfolio/backend --workspace @portfolio/shared
+
+# Fix permissions for the entire app directory and specifically node_modules for Prisma
 RUN chown -R expressjs:nodejs /app
+RUN chmod -R 775 /app/node_modules
 
 USER expressjs
 
