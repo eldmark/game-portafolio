@@ -477,7 +477,7 @@ function ProjectBoardCard({ project }: { project: Project }) {
             onClick={() => setExpanded((current) => !current)}
             type="button"
           >
-            {expanded ? 'Mostrar menos' : 'Mostrar mas'}
+            {expanded ? 'Show less' : 'Know more'}
           </button>
           {project.githubUrl ? (
             <a

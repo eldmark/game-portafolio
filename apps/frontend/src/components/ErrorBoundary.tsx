@@ -51,7 +51,7 @@ class ErrorBoundary extends Component<Props, State> {
                   >
                     Try Refreshing
                   </button>
-                  <a href="/recruiter" className="secondary-button">
+                  <a href="/#/recruiter" className="secondary-button">
                     Use 2D Recruiter Mode
                   </a>
                 </div>

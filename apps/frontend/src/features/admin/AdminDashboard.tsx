@@ -44,7 +44,17 @@ import type {
   ProjectCreate,
   SkillCreate,
   ExperienceCreate,
+  ProjectMedia,
 } from '@portfolio/shared';
+
+/* -------------------------------------------------------------------------- */
+/*                                   HELPERS                                  */
+/* -------------------------------------------------------------------------- */
+
+function toDateInputValue(value: string | null | undefined) {
+  if (!value) return '';
+  return value.slice(0, 10);
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   LAYOUT                                   */
@@ -586,6 +596,29 @@ function ProjectModal({
   });
   const [loading, setLoading] = useState(false);
 
+  function addMediaItem() {
+    setFormData({
+      ...formData,
+      media: [
+        ...(formData.media || []),
+        { type: 'image', url: '', alt: '', orderIndex: formData.media?.length || 0 },
+      ],
+    });
+  }
+
+  function updateMediaItem(index: number, updates: Partial<ProjectMedia>) {
+    const newMedia = [...(formData.media || [])];
+    newMedia[index] = { ...newMedia[index], ...updates } as ProjectMedia;
+    setFormData({ ...formData, media: newMedia });
+  }
+
+  function removeMediaItem(index: number) {
+    setFormData({
+      ...formData,
+      media: formData.media?.filter((_, i) => i !== index),
+    });
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -627,7 +660,7 @@ function ProjectModal({
               <label>Slug</label>
               <input
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(event) => setFormData({ ...formData, slug: event.target.value })}
                 required
               />
             </div>
@@ -672,6 +705,48 @@ function ProjectModal({
                 value={formData.liveUrl || ''}
                 onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
               />
+            </div>
+
+            <div className="input-group admin-form-full">
+              <label>Media</label>
+              <div className="admin-media-list">
+                {formData.media?.map((item, index) => (
+                  <div key={index} className="admin-media-row">
+                    <select
+                      value={item.type}
+                      onChange={(e) =>
+                        updateMediaItem(index, { type: e.target.value as 'image' | 'gif' | 'video' })
+                      }
+                    >
+                      <option value="image">Image</option>
+                      <option value="gif">GIF</option>
+                      <option value="video">Video</option>
+                    </select>
+                    <input
+                      value={item.url}
+                      onChange={(e) => updateMediaItem(index, { url: e.target.value })}
+                      placeholder="URL"
+                      required
+                    />
+                    <input
+                      value={item.alt}
+                      onChange={(e) => updateMediaItem(index, { alt: e.target.value })}
+                      placeholder="Alt text"
+                      required
+                    />
+                    <button
+                      className="btn-icon delete"
+                      type="button"
+                      onClick={() => removeMediaItem(index)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+                <button className="secondary-button" type="button" onClick={addMediaItem}>
+                  <Plus size={16} /> Add Media
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1036,8 +1111,8 @@ function ExperienceModal({
     company: experience?.company ?? '',
     role: experience?.role ?? '',
     description: experience?.description ?? '',
-    startDate: experience?.startDate ?? today,
-    endDate: experience?.endDate ?? null,
+    startDate: toDateInputValue(experience?.startDate) || today,
+    endDate: toDateInputValue(experience?.endDate) || null,
     technologies: experience?.technologies ?? [],
   });
   const [loading, setLoading] = useState(false);

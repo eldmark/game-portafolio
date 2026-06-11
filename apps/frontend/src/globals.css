@@ -2004,3 +2004,26 @@ code {
   gap: 16px;
   margin-top: 40px;
 }
+
+.admin-media-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.admin-media-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 600px) {
+  .admin-media-row {
+    grid-template-columns: 1fr;
+  }
+}

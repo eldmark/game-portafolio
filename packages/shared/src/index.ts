@@ -46,8 +46,8 @@ export const experienceSchema = z.object({
   company: z.string().min(1),
   role: z.string().min(1),
   description: z.string().min(10),
-  startDate: z.string(),
-  endDate: z.string().nullable(),
+  startDate: z.string().refine((v) => !isNaN(Date.parse(v)), { message: 'Invalid date format' }),
+  endDate: z.string().nullable().refine((v) => !v || !isNaN(Date.parse(v)), { message: 'Invalid date format' }),
   technologies: z.array(z.string()),
 });
 

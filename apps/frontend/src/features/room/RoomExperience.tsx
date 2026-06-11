@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
@@ -91,6 +91,7 @@ function EntryScreen() {
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
   const audioStarted = usePortfolioStore((state) => state.audioStarted);
   const startAudio = usePortfolioStore((state) => state.startAudio);
+  const navigate = useNavigate();
   const [termsAccepted, setTermsAccepted] = useState(() => {
     return typeof window !== 'undefined' &&
       window.localStorage.getItem('portfolio-terms-accepted') === 'true';
@@ -131,7 +132,7 @@ function EntryScreen() {
                 <Map size={18} />
                 Enter Room
               </button>
-              <button className="secondary-button" onClick={() => enterPortfolio(true)} type="button">
+              <button className="secondary-button" onClick={() => navigate('/recruiter')} type="button">
                 <Laptop size={18} />
                 Recruiter Mode
               </button>
@@ -324,10 +325,15 @@ export default function RoomExperience() {
   const recruiterMode = usePortfolioStore((state) => state.recruiterMode);
   const sessionRef = useRef<string | null>(null);
   const startedAtRef = useRef<number>(Date.now());
+  const recruiterModeRef = useRef(recruiterMode);
   const [hasMoved, setHasMoved] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [nearestObject, setNearestObject] = useState<RoomObject | null>(null);
   const [overlayLoaded, setOverlayLoaded] = useState(false);
+
+  useEffect(() => {
+    recruiterModeRef.current = recruiterMode;
+  }, [recruiterMode]);
 
   const handleNearestObjectChange = useCallback((nextNearestObject: RoomObject | null) => {
     setNearestObject((currentNearestObject) =>
@@ -388,7 +394,7 @@ export default function RoomExperience() {
     function onUnload() {
       if (!sessionRef.current) return;
       const duration = Math.floor((Date.now() - startedAtRef.current) / 1000);
-      void endVisit(sessionRef.current, duration, recruiterMode).catch(() => undefined);
+      void endVisit(sessionRef.current, duration, recruiterModeRef.current).catch(() => undefined);
     }
 
     window.addEventListener('beforeunload', onUnload);
@@ -396,7 +402,7 @@ export default function RoomExperience() {
       window.removeEventListener('beforeunload', onUnload);
       onUnload();
     };
-  }, [recruiterMode]);
+  }, []);
 
   return (
     <main className="room-app">

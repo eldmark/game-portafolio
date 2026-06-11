@@ -42,7 +42,7 @@ export const roomObjects: RoomObject[] = [
     hint: 'Send a contact message',
     overlay: 'mailbox',
     // swapped with bookshelf
-    position: [3.1, 1.05, 1.2],
+    position: [2.95, 1.05, 1.2],
     size: [0.66, 0.92, 0.58],
     color: '#a04747',
     interactionDistance: 1.25,
