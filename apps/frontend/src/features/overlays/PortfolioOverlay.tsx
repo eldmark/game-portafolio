@@ -3,10 +3,18 @@
 import type { FormEvent, ReactNode } from 'react';
 import { Suspense, lazy, useMemo, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
-import { ArrowRight, ExternalLink, Github, Mail, X } from 'lucide-react';
+import { ArrowRight, ExternalLink, GitCommit, Github, Mail, Target, Trophy, X } from 'lucide-react';
 import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
 import { aboutProfile, futureIdeas, knowledgeNotes } from '@/lib/portfolio-fallback';
+import { useBlogData } from '@/lib/useBlogData';
+import {
+  useCharacterStore,
+  type HatId,
+  type PantsColorId,
+  type ShirtColorId,
+} from '@/lib/character-store';
+import { useGoalsAndTrophies } from '@/lib/useGoalsAndTrophies';
 import { usePortfolioStore, type OverlayType } from '@/lib/store';
 
 const PokemonOverlay = lazy(() => import('@/features/pokemon/PokemonOverlay'));
@@ -690,6 +698,231 @@ function SettingsOverlay() {
   );
 }
 
+const GOAL_STATUS_COLUMNS: { status: 'planned' | 'in_progress' | 'done'; label: string }[] = [
+  { status: 'planned', label: 'Planned' },
+  { status: 'in_progress', label: 'In Progress' },
+  { status: 'done', label: 'Done' },
+];
+
+function GoalsOverlay() {
+  const { goals, loading, error, usingFallback } = useGoalsAndTrophies();
+  const setOverlay = usePortfolioStore((state) => state.setOverlay);
+
+  return (
+    <OverlayShell title="Vision Board" wide>
+      <DataNotice error={error} loading={loading} usingFallback={usingFallback} />
+      <div className="project-grid">
+        {GOAL_STATUS_COLUMNS.map((column) => {
+          const columnGoals = goals
+            .filter((goal) => goal.status === column.status)
+            .sort((a, b) => a.orderIndex - b.orderIndex);
+
+          return (
+            <section key={column.status}>
+              <h3>
+                <Target size={18} /> {column.label}
+              </h3>
+              {columnGoals.length === 0 ? (
+                <p className="muted">Nothing here yet.</p>
+              ) : (
+                columnGoals.map((goal) => (
+                  <article className="detail-card" key={goal.id}>
+                    <div className="card-heading">
+                      <h4>{goal.title}</h4>
+                      <span>{goal.category}</span>
+                    </div>
+                    <p>{goal.description}</p>
+                    <p className="muted">Target: {formatTimelineDate(goal.targetDate ?? null)}</p>
+                    {goal.status === 'done' && goal.trophyId ? (
+                      <button
+                        className="card-toggle"
+                        onClick={() => setOverlay('trophies')}
+                        type="button"
+                      >
+                        <Trophy size={16} /> View trophy
+                      </button>
+                    ) : null}
+                  </article>
+                ))
+              )}
+            </section>
+          );
+        })}
+      </div>
+    </OverlayShell>
+  );
+}
+
+function TrophiesOverlay() {
+  const { trophies, loading, error, usingFallback } = useGoalsAndTrophies();
+
+  return (
+    <OverlayShell title="Trophy Shelf" wide>
+      <DataNotice error={error} loading={loading} usingFallback={usingFallback} />
+      <div className="project-grid">
+        {trophies.map((trophy) => (
+          <article className="detail-card" key={trophy.id}>
+            <div className="card-heading">
+              <h3>
+                <Trophy size={18} /> {trophy.title}
+              </h3>
+              <span>{trophy.category}</span>
+            </div>
+            <p>{trophy.description}</p>
+            <p className="muted">Earned {formatTimelineDate(trophy.dateEarned)}</p>
+            {trophy.proofUrl ? (
+              <a
+                className="card-toggle"
+                href={trophy.proofUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Proof <ExternalLink size={16} />
+              </a>
+            ) : null}
+          </article>
+        ))}
+      </div>
+    </OverlayShell>
+  );
+}
+
+function PostsOverlay() {
+  const { posts, loading, error, usingFallback } = useBlogData();
+
+  return (
+    <OverlayShell title="Bulletin Board" wide>
+      <DataNotice error={error} loading={loading} usingFallback={usingFallback} />
+      <div className="grid-list">
+        {posts.map((post) => (
+          <article className="detail-card" key={post.id}>
+            <div className="card-heading">
+              <h3>{post.title}</h3>
+              <span>{formatTimelineDate(post.publishedAt)}</span>
+            </div>
+            <p>{post.body}</p>
+          </article>
+        ))}
+      </div>
+    </OverlayShell>
+  );
+}
+
+function DevlogOverlay() {
+  const { devlog, loading, error, usingFallback } = useBlogData();
+
+  return (
+    <OverlayShell title="Activity Feed" wide>
+      <DataNotice error={error} loading={loading} usingFallback={usingFallback} />
+      <div className="grid-list">
+        {devlog.map((entry) => (
+          <article className="detail-card" key={entry.id}>
+            <div className="card-heading">
+              <h3>
+                <GitCommit size={18} /> {entry.repo}
+              </h3>
+              <span>{formatTimelineDate(entry.createdAt)}</span>
+            </div>
+            <p>{entry.message}</p>
+            <p className="muted">
+              {entry.branch} · {entry.commitCount} commit{entry.commitCount === 1 ? '' : 's'}
+            </p>
+            <a className="card-toggle" href={entry.commitUrl} rel="noreferrer" target="_blank">
+              {entry.commitSha.slice(0, 7)} <ExternalLink size={16} />
+            </a>
+          </article>
+        ))}
+      </div>
+    </OverlayShell>
+  );
+}
+
+const HAT_OPTIONS: HatId[] = ['none', 'cap', 'party', 'beanie'];
+const SHIRT_OPTIONS: ShirtColorId[] = ['default', 'red', 'blue', 'green', 'purple'];
+const PANTS_OPTIONS: PantsColorId[] = ['default', 'black', 'tan', 'navy'];
+
+const SHIRT_PREVIEW: Record<ShirtColorId, string> = {
+  default: '#7a4a2c',
+  red: '#c44040',
+  blue: '#406ec4',
+  green: '#4c9e5c',
+  purple: '#8c5ac4',
+};
+
+const PANTS_PREVIEW: Record<PantsColorId, string> = {
+  default: '#333131',
+  black: '#26262a',
+  tan: '#a88c60',
+  navy: '#2c3a68',
+};
+
+function DressingOverlay() {
+  const hat = useCharacterStore((state) => state.hat);
+  const shirtColor = useCharacterStore((state) => state.shirtColor);
+  const pantsColor = useCharacterStore((state) => state.pantsColor);
+  const setHat = useCharacterStore((state) => state.setHat);
+  const setShirtColor = useCharacterStore((state) => state.setShirtColor);
+  const setPantsColor = useCharacterStore((state) => state.setPantsColor);
+
+  return (
+    <OverlayShell title="Dressing Room">
+      <div className="dressing-preview">
+        <div className="dressing-preview-avatar">
+          <span style={{ flex: '0 0 34%', background: '#f0c9a4' }} />
+          <span style={{ flex: '0 0 33%', background: SHIRT_PREVIEW[shirtColor] }} />
+          <span style={{ flex: '0 0 33%', background: PANTS_PREVIEW[pantsColor] }} />
+        </div>
+        <p className="muted">Hat: {hat}</p>
+      </div>
+      <section>
+        <h3>Hat</h3>
+        <div className="chip-list">
+          {HAT_OPTIONS.map((option) => (
+            <button
+              className={`filter-chip ${hat === option ? 'active' : ''}`}
+              key={option}
+              onClick={() => setHat(option)}
+              type="button"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section>
+        <h3>Shirt</h3>
+        <div className="chip-list">
+          {SHIRT_OPTIONS.map((option) => (
+            <button
+              className={`filter-chip ${shirtColor === option ? 'active' : ''}`}
+              key={option}
+              onClick={() => setShirtColor(option)}
+              type="button"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section>
+        <h3>Pants</h3>
+        <div className="chip-list">
+          {PANTS_OPTIONS.map((option) => (
+            <button
+              className={`filter-chip ${pantsColor === option ? 'active' : ''}`}
+              key={option}
+              onClick={() => setPantsColor(option)}
+              type="button"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </section>
+    </OverlayShell>
+  );
+}
+
 export function PortfolioOverlay(props: PortfolioOverlayProps) {
   const activeOverlay = usePortfolioStore((state) => state.activeOverlay);
 
@@ -703,6 +936,11 @@ export function PortfolioOverlay(props: PortfolioOverlayProps) {
     future: <FutureOverlay />,
     settings: <SettingsOverlay />,
     recruiter: <RecruiterOverlay {...props} />,
+    goals: <GoalsOverlay />,
+    trophies: <TrophiesOverlay />,
+    posts: <PostsOverlay />,
+    devlog: <DevlogOverlay />,
+    dressing: <DressingOverlay />,
     switch: (
       <Suspense fallback={<OverlayShell title="Interview Battle" wide><p>Loading battle…</p></OverlayShell>}>
         <PokemonOverlay />

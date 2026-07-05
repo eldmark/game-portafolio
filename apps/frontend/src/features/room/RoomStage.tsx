@@ -3,10 +3,12 @@
 import { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import type { RoomId } from '@/lib/store';
 import { AudioManager } from './AudioManager';
 import { RoomScene } from './RoomScene';
 
 type RoomStageProps = {
+  roomId: RoomId;
   activeObjectId: string | null;
   nearestHint: string | null;
 };
@@ -56,7 +58,7 @@ function getRenderProfile(): RenderProfile {
       };
 }
 
-export default function RoomStage({ activeObjectId, nearestHint }: RoomStageProps) {
+export default function RoomStage({ roomId, activeObjectId, nearestHint }: RoomStageProps) {
   const renderProfile = useMemo(() => getRenderProfile(), []);
 
   return (
@@ -82,6 +84,7 @@ export default function RoomStage({ activeObjectId, nearestHint }: RoomStageProp
               <RoomScene
                 activeObjectId={activeObjectId}
                 enableShadows={renderProfile.shadows}
+                roomId={roomId}
               />
             </Suspense>
           </Canvas>

@@ -4,9 +4,10 @@ import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { usePortfolioStore } from '@/lib/store';
+import { usePortfolioStore, type RoomId } from '@/lib/store';
 import { Player } from './Player';
-import { roomObjects, type RoomObject } from './room-objects';
+import { rooms, type DoorObject, type RoomDefinition } from './rooms';
+import type { RoomObject } from './room-objects';
 
 function MailboxProp() {
   // swapped with bookshelf: now placed where bookshelf used to be
@@ -411,6 +412,196 @@ function OpenCeilingLight() {
   );
 }
 
+const visionBoardNotes = [
+  { color: '#f1d78c', position: [-0.78, 1.86, 0.11] as [number, number, number], rotation: 0.06 },
+  { color: '#9bd58a', position: [-0.3, 1.62, 0.11] as [number, number, number], rotation: -0.05 },
+  { color: '#8db8e6', position: [0.26, 1.92, 0.11] as [number, number, number], rotation: 0.04 },
+  { color: '#f4a261', position: [0.62, 1.5, 0.11] as [number, number, number], rotation: -0.08 },
+  { color: '#e8a0bf', position: [0.92, 1.86, 0.11] as [number, number, number], rotation: 0.07 },
+] as const;
+
+function VisionBoardProp() {
+  return (
+    <group position={[-0.4, 0, -2.92]}>
+      <mesh castShadow receiveShadow position={[0, 1.62, 0]}>
+        <boxGeometry args={[2.5, 1.6, 0.08]} />
+        <meshStandardMaterial color="#73492f" roughness={0.86} />
+      </mesh>
+      <mesh castShadow position={[0, 1.62, 0.05]}>
+        <boxGeometry args={[2.3, 1.4, 0.04]} />
+        <meshStandardMaterial color="#b08968" roughness={0.92} />
+      </mesh>
+      {visionBoardNotes.map((note) => (
+        <mesh
+          castShadow
+          key={`${note.color}-${note.position[0]}`}
+          position={note.position}
+          rotation={[0, 0, note.rotation]}
+        >
+          <boxGeometry args={[0.36, 0.28, 0.025]} />
+          <meshStandardMaterial color={note.color} roughness={0.82} />
+        </mesh>
+      ))}
+      {/* red string connecting the notes */}
+      <mesh position={[-0.26, 1.78, 0.12]} rotation={[0, 0, -0.42]}>
+        <boxGeometry args={[1.16, 0.014, 0.012]} />
+        <meshStandardMaterial color="#c0392b" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.44, 1.72, 0.12]} rotation={[0, 0, 0.55]}>
+        <boxGeometry args={[0.92, 0.014, 0.012]} />
+        <meshStandardMaterial color="#c0392b" roughness={0.7} />
+      </mesh>
+      {/* pins */}
+      {visionBoardNotes.map((note) => (
+        <mesh
+          key={`pin-${note.color}`}
+          position={[note.position[0], note.position[1] + 0.11, 0.13]}
+        >
+          <sphereGeometry args={[0.022, 10, 10]} />
+          <meshStandardMaterial color="#d44343" roughness={0.4} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+const trophyShelfRows = [0.62, 1.18, 1.74] as const;
+const trophySlots = [-0.55, 0, 0.55] as const;
+
+function PlaceholderTrophy({
+  position,
+  scale = 1,
+}: {
+  position: [number, number, number];
+  scale?: number;
+}) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh castShadow position={[0, 0.035, 0]}>
+        <cylinderGeometry args={[0.06, 0.075, 0.07, 12]} />
+        <meshStandardMaterial color="#8a5a2b" roughness={0.6} />
+      </mesh>
+      <mesh castShadow position={[0, 0.1, 0]}>
+        <cylinderGeometry args={[0.025, 0.035, 0.07, 10]} />
+        <meshStandardMaterial color="#d4af37" metalness={0.6} roughness={0.34} />
+      </mesh>
+      <mesh castShadow position={[0, 0.19, 0]}>
+        <coneGeometry args={[0.07, 0.12, 12]} />
+        <meshStandardMaterial
+          color="#f1c40f"
+          emissive="#b8860b"
+          emissiveIntensity={0.16}
+          metalness={0.62}
+          roughness={0.3}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function TrophyShelfProp() {
+  return (
+    <group position={[3.08, 0, 0]}>
+      <mesh castShadow receiveShadow position={[0, 1.05, 0]}>
+        <boxGeometry args={[0.56, 2.1, 1.86]} />
+        <meshStandardMaterial color="#4a3a59" roughness={0.86} />
+      </mesh>
+      {trophyShelfRows.map((y) => (
+        <mesh castShadow key={`trophy-shelf-${y}`} position={[-0.06, y, 0]}>
+          <boxGeometry args={[0.52, 0.05, 1.7]} />
+          <meshStandardMaterial color="#6a5478" roughness={0.8} />
+        </mesh>
+      ))}
+      {trophyShelfRows.map((y, rowIndex) =>
+        trophySlots.map((z, slotIndex) => (
+          <PlaceholderTrophy
+            key={`trophy-${rowIndex}-${slotIndex}`}
+            position={[-0.12, y + 0.03, z + (rowIndex % 2 === 0 ? 0.06 : -0.06)]}
+            scale={rowIndex === 1 && slotIndex === 1 ? 1.35 : 1}
+          />
+        )),
+      )}
+      <pointLight color="#ffd98c" distance={3.4} intensity={0.5} position={[-0.7, 1.9, 0]} />
+    </group>
+  );
+}
+
+const bulletinPapers = [
+  { color: '#f3ecd7', position: [-0.62, 1.78, 0.1] as [number, number, number], rotation: 0.05 },
+  { color: '#f3ecd7', position: [-0.14, 1.5, 0.1] as [number, number, number], rotation: -0.04 },
+  { color: '#f1d78c', position: [0.34, 1.84, 0.1] as [number, number, number], rotation: 0.08 },
+  { color: '#f3ecd7', position: [0.66, 1.4, 0.1] as [number, number, number], rotation: -0.07 },
+] as const;
+
+function BulletinBoardProp() {
+  return (
+    <group position={[-1, 0, -2.92]}>
+      <mesh castShadow receiveShadow position={[0, 1.6, 0]}>
+        <boxGeometry args={[2.1, 1.45, 0.08]} />
+        <meshStandardMaterial color="#5c4533" roughness={0.86} />
+      </mesh>
+      <mesh castShadow position={[0, 1.6, 0.04]}>
+        <boxGeometry args={[1.92, 1.27, 0.04]} />
+        <meshStandardMaterial color="#9c6644" roughness={0.92} />
+      </mesh>
+      {bulletinPapers.map((paper) => (
+        <mesh
+          castShadow
+          key={`paper-${paper.position[0]}`}
+          position={paper.position}
+          rotation={[0, 0, paper.rotation]}
+        >
+          <boxGeometry args={[0.34, 0.42, 0.02]} />
+          <meshStandardMaterial color={paper.color} roughness={0.8} />
+        </mesh>
+      ))}
+      <mesh castShadow position={[-0.62, 2, 0.11]}>
+        <sphereGeometry args={[0.02, 10, 10]} />
+        <meshStandardMaterial color="#d44343" roughness={0.4} />
+      </mesh>
+      <mesh castShadow position={[0.34, 2.06, 0.11]}>
+        <sphereGeometry args={[0.02, 10, 10]} />
+        <meshStandardMaterial color="#2f5f98" roughness={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+function DevTerminalProp() {
+  return (
+    <group position={[2.95, 0, -0.9]}>
+      {/* desk */}
+      <mesh castShadow receiveShadow position={[0, 0.46, 0]}>
+        <boxGeometry args={[0.8, 0.12, 1.3]} />
+        <meshStandardMaterial color="#3a5244" roughness={0.84} />
+      </mesh>
+      <mesh castShadow position={[0, 0.2, -0.5]}>
+        <boxGeometry args={[0.7, 0.4, 0.12]} />
+        <meshStandardMaterial color="#2c4036" roughness={0.9} />
+      </mesh>
+      <mesh castShadow position={[0, 0.2, 0.5]}>
+        <boxGeometry args={[0.7, 0.4, 0.12]} />
+        <meshStandardMaterial color="#2c4036" roughness={0.9} />
+      </mesh>
+      {/* CRT-style terminal facing into the room */}
+      <mesh castShadow position={[0.12, 0.78, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[0.74, 0.56, 0.3]} />
+        <meshStandardMaterial color="#22302a" roughness={0.7} />
+      </mesh>
+      <mesh position={[-0.05, 0.8, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[0.58, 0.4, 0.02]} />
+        <meshStandardMaterial color="#0b1f14" emissive="#52e09a" emissiveIntensity={0.5} />
+      </mesh>
+      {/* keyboard */}
+      <mesh castShadow position={[-0.28, 0.55, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[0.5, 0.04, 0.18]} />
+        <meshStandardMaterial color="#242a31" roughness={0.78} />
+      </mesh>
+      <pointLight color="#6cf5b2" distance={2.6} intensity={0.4} position={[-0.4, 1, 0]} />
+    </group>
+  );
+}
+
 function InteractableObject({
   object,
   active,
@@ -470,6 +661,70 @@ function InteractableObject({
   );
 }
 
+function DoorInteractable({ door, active }: { door: DoorObject; active: boolean }) {
+  const setRoom = usePortfolioStore((state) => state.setRoom);
+  const onOpen = () => setRoom(door.targetRoom);
+
+  // door panel pokes out of the wall along its thin axis and is inset on the others
+  const panelSize: [number, number, number] = [
+    door.size[0] <= 0.3 ? door.size[0] + 0.06 : door.size[0] - 0.16,
+    door.size[1] - 0.18,
+    door.size[2] <= 0.3 ? door.size[2] + 0.06 : door.size[2] - 0.16,
+  ];
+
+  const markerPosition: [number, number, number] = door.markerPosition ?? [
+    door.position[0],
+    Math.max(0.2, door.size[1] * 0.2),
+    door.position[2],
+  ];
+  const markerHeight = markerPosition[1];
+
+  return (
+    <group>
+      <group position={door.position}>
+        <mesh castShadow onClick={onOpen}>
+          <boxGeometry args={door.size} />
+          <meshStandardMaterial color="#4a3526" roughness={0.86} />
+        </mesh>
+        <mesh castShadow position={[0, -0.09, 0]} onClick={onOpen}>
+          <boxGeometry args={panelSize} />
+          <meshStandardMaterial
+            color="#6b4d33"
+            roughness={0.78}
+            emissive={active ? '#f2c06e' : '#000000'}
+            emissiveIntensity={active ? 0.18 : 0}
+          />
+        </mesh>
+      </group>
+      <mesh castShadow position={markerPosition}>
+        <cylinderGeometry args={[0.1, 0.13, 0.08, 14]} />
+        <meshStandardMaterial color={active ? '#f4a261' : '#5a4a3b'} />
+      </mesh>
+      <mesh position={[markerPosition[0], markerHeight + 0.09, markerPosition[2]]}>
+        <sphereGeometry args={[0.07, 14, 14]} />
+        <meshStandardMaterial
+          color={active ? '#ffd89a' : '#8f7e67'}
+          emissive={active ? '#ffbe63' : '#000000'}
+          emissiveIntensity={active ? 0.55 : 0}
+        />
+      </mesh>
+      {active ? (
+        <Html center position={[markerPosition[0], markerHeight + 0.35, markerPosition[2]]}>
+          <div className="world-marker-label">{door.label}</div>
+        </Html>
+      ) : null}
+      {active ? (
+        // place the interaction button at the marker (floor) so the "button" is on the floor
+        <Html center position={[markerPosition[0], markerPosition[1] + 0.02, markerPosition[2]]}>
+          <button className="world-prompt" onClick={onOpen} type="button">
+            E - {door.hint}
+          </button>
+        </Html>
+      ) : null}
+    </group>
+  );
+}
+
 function CameraRig() {
   const { camera } = useThree();
   const target = useMemo(() => new THREE.Vector3(), []);
@@ -486,7 +741,45 @@ function CameraRig() {
   return null;
 }
 
-function RoomShell() {
+function GenericRoomShell({ room }: { room: RoomDefinition }) {
+  return (
+    <group>
+      <mesh receiveShadow position={[0, -0.03, 0]}>
+        <boxGeometry args={[7.5, 0.1, 6]} />
+        <meshStandardMaterial color="#7f5b3f" />
+      </mesh>
+
+      <mesh receiveShadow position={[0, 0.02, 0]}>
+        <boxGeometry args={[7.2, 0.02, 5.7]} />
+        <meshStandardMaterial color={room.floorColor} roughness={0.96} metalness={0} />
+      </mesh>
+
+      <mesh receiveShadow position={[0, 1.5, -3]}>
+        <boxGeometry args={[7.5, 3, 0.12]} />
+        <meshStandardMaterial color={room.wallColor} />
+      </mesh>
+      <mesh receiveShadow position={[-3.75, 1.5, 0]}>
+        <boxGeometry args={[0.12, 3, 6]} />
+        <meshStandardMaterial color={room.wallColor} />
+      </mesh>
+      <mesh receiveShadow position={[3.75, 1.5, 0]}>
+        <boxGeometry args={[0.12, 3, 6]} />
+        <meshStandardMaterial color={room.wallColor} />
+      </mesh>
+      {room.id === 'goals' ? <VisionBoardProp /> : null}
+      {room.id === 'trophy' ? <TrophyShelfProp /> : null}
+      {room.id === 'blog' ? (
+        <>
+          <BulletinBoardProp />
+          <DevTerminalProp />
+        </>
+      ) : null}
+      <OpenCeilingLight />
+    </group>
+  );
+}
+
+function MainRoomShell() {
   return (
     <group>
       <mesh receiveShadow position={[0, -0.03, 0]}>
@@ -528,18 +821,21 @@ function RoomShell() {
 }
 
 export function RoomScene({
+  roomId,
   activeObjectId,
   enableShadows,
 }: {
+  roomId: RoomId;
   activeObjectId: string | null;
   enableShadows: boolean;
 }) {
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
+  const room = rooms[roomId];
 
   return (
     <>
-      <color attach="background" args={['#161b22']} />
-      <fog attach="fog" args={['#161b22', 7.5, 13]} />
+      <color attach="background" args={[room.background]} />
+      <fog attach="fog" args={[room.fog.color, room.fog.near, room.fog.far]} />
       <ambientLight intensity={0.52} />
       <directionalLight
         castShadow={enableShadows}
@@ -551,14 +847,17 @@ export function RoomScene({
       <pointLight position={[3.6, 1.9, 1.05]} color="#ffd99a" intensity={0.95} />
       <pointLight position={[0.4, 2.85, 0.2]} color="#ffcb80" intensity={0.68} distance={8} />
       <pointLight position={[0.4, 2.1, -2.8]} color="#8ec8ff" intensity={0.4} distance={5.8} />
-      <RoomShell />
-      {roomObjects.map((object) => (
+      {roomId === 'main' ? <MainRoomShell /> : <GenericRoomShell room={room} />}
+      {room.objects.map((object) => (
         <InteractableObject
           active={object.id === activeObjectId}
           key={object.id}
           object={object}
           onOpen={() => setOverlay(object.overlay)}
         />
+      ))}
+      {room.doors.map((door) => (
+        <DoorInteractable active={door.id === activeObjectId} door={door} key={door.id} />
       ))}
       <Player />
       <CameraRig />
