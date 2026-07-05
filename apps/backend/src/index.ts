@@ -1,11 +1,12 @@
 import cors from 'cors';
 import 'dotenv/config';
-import express from 'express';
+import express, { type Request } from 'express';
 import { errorHandler, notFound } from './lib/errors.js';
 import { prisma } from './lib/prisma.js';
 import { portfolioRouter } from './routes/portfolio-routes.js';
 import { authRouter } from './routes/auth-routes.js';
 import { adminRouter } from './routes/admin-routes.js';
+import { webhookRouter } from './routes/webhook-routes.js';
 import { authMiddleware } from './middleware/auth-middleware.js';
 
 const app = express();
@@ -37,9 +38,18 @@ app.use(
     },
   }),
 );
-app.use(express.json({ limit: '1mb' }));
+app.use(
+  express.json({
+    limit: '1mb',
+    verify: (req, _res, buf) => {
+      // Keep the raw body bytes for webhook HMAC signature verification
+      (req as Request).rawBody = buf;
+    },
+  }),
+);
 
 app.use('/auth', authRouter);
+app.use('/webhooks', webhookRouter);
 app.use('/admin', authMiddleware, adminRouter);
 
 app.get('/health', (_req, res) => {
