@@ -62,7 +62,6 @@ export default function PokemonSprite({
       img.removeEventListener('error', onError);
       stopLoop();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, fps, width, height]);
 
   function drawFrame(idx: number, img: HTMLImageElement, count: number, frameSize: number) {
