@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, Suspense, lazy } from 'react';
 import { NavLink, useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,6 +14,9 @@ import {
   Check,
   X,
   User,
+  Target,
+  Trophy as TrophyIcon,
+  FileText,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth-store';
 import {
@@ -21,6 +24,10 @@ import {
   getSkills,
   getExperiences,
   getAnalyticsSummary,
+  getAnalyticsTimeseries,
+  getGoals,
+  getTrophies,
+  getPosts,
   getUsers,
   createUser,
   deleteProject,
@@ -33,19 +40,36 @@ import {
   updateSkill,
   createExperience,
   updateExperience,
+  createGoal,
+  updateGoal,
+  deleteGoal,
+  createTrophy,
+  updateTrophy,
+  deleteTrophy,
+  createPost,
+  updatePost,
+  deletePost,
   type AdminUser,
   type AdminUserCreate,
 } from '@/lib/api';
 import type {
   AnalyticsSummary,
+  AnalyticsTimeseries,
   Project,
   Skill,
   Experience,
+  Goal,
+  Trophy,
+  Post,
   ProjectCreate,
   SkillCreate,
   ExperienceCreate,
+  GoalCreate,
+  TrophyCreate,
   ProjectMedia,
 } from '@portfolio/shared';
+
+const OverviewCharts = lazy(() => import('./OverviewCharts'));
 
 /* -------------------------------------------------------------------------- */
 /*                                   HELPERS                                  */
@@ -116,6 +140,27 @@ export default function AdminDashboard() {
             Experience
           </NavLink>
           <NavLink
+            to="/admin/dashboard/goals"
+            className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+          >
+            <Target size={18} />
+            Goals
+          </NavLink>
+          <NavLink
+            to="/admin/dashboard/trophies"
+            className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+          >
+            <TrophyIcon size={18} />
+            Trophies
+          </NavLink>
+          <NavLink
+            to="/admin/dashboard/posts"
+            className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+          >
+            <FileText size={18} />
+            Posts
+          </NavLink>
+          <NavLink
             to="/admin/dashboard/users"
             className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
           >
@@ -138,6 +183,9 @@ export default function AdminDashboard() {
           <Route path="/projects" element={<ProjectManager />} />
           <Route path="/skills" element={<SkillManager />} />
           <Route path="/experience" element={<ExperienceManager />} />
+          <Route path="/goals" element={<GoalManager />} />
+          <Route path="/trophies" element={<TrophyManager />} />
+          <Route path="/posts" element={<PostManager />} />
           <Route path="/users" element={<UserManager />} />
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
@@ -152,22 +200,40 @@ export default function AdminDashboard() {
 
 function Overview() {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [timeseries, setTimeseries] = useState<AnalyticsTimeseries | null>(null);
   const [loading, setLoading] = useState(true);
+  const [timeseriesLoading, setTimeseriesLoading] = useState(true);
+  const [days, setDays] = useState(30);
 
   useEffect(() => {
-    loadAnalytics();
-  }, []);
+    let cancelled = false;
 
-  async function loadAnalytics() {
-    try {
-      const data = await getAnalyticsSummary();
-      setAnalytics(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+    async function loadAnalytics() {
+      setTimeseriesLoading(true);
+      try {
+        const [summaryData, timeseriesData] = await Promise.all([
+          getAnalyticsSummary(),
+          getAnalyticsTimeseries(days),
+        ]);
+        if (cancelled) return;
+        setAnalytics(summaryData);
+        setTimeseries(timeseriesData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+          setTimeseriesLoading(false);
+        }
+      }
     }
-  }
+
+    loadAnalytics();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [days]);
 
   function formatDuration(value: number | null | undefined) {
     if (value === null || value === undefined) {
@@ -220,6 +286,34 @@ function Overview() {
           </p>
         </article>
       </div>
+
+      {loading ? (
+        <section className="admin-analytics-panel">
+          <header className="admin-analytics-panel-header">
+            <h2>Analytics</h2>
+            <p>Loading analytics charts…</p>
+          </header>
+        </section>
+      ) : (
+        <Suspense
+          fallback={
+            <section className="admin-analytics-panel">
+              <header className="admin-analytics-panel-header">
+                <h2>Analytics</h2>
+                <p>Loading analytics charts…</p>
+              </header>
+            </section>
+          }
+        >
+          <OverviewCharts
+            analytics={analytics}
+            timeseries={timeseries}
+            timeseriesLoading={timeseriesLoading}
+            days={days}
+            onDaysChange={setDays}
+          />
+        </Suspense>
+      )}
 
       {!loading && analytics?.popularDialogues?.length ? (
         <section className="admin-analytics-panel">
@@ -1195,6 +1289,776 @@ function ExperienceModal({
             </button>
             <button className="primary-button" type="submit" disabled={loading}>
               {loading ? 'Saving…' : 'Save Experience'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                GOAL MANAGER                                */
+/* -------------------------------------------------------------------------- */
+
+const GOAL_STATUS_LABELS: Record<Goal['status'], string> = {
+  planned: 'Planned',
+  in_progress: 'In progress',
+  done: 'Done',
+};
+
+function GoalManager() {
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [trophies, setTrophies] = useState<Trophy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+
+  useEffect(() => {
+    loadGoals();
+  }, []);
+
+  async function loadGoals() {
+    try {
+      const [goalsData, trophiesData] = await Promise.all([getGoals(), getTrophies()]);
+      setGoals(goalsData);
+      setTrophies(trophiesData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Are you sure you want to delete this goal?')) return;
+    try {
+      await deleteGoal(id);
+      setGoals(goals.filter((g) => g.id !== id));
+    } catch (err) {
+      alert('Failed to delete goal');
+    }
+  }
+
+  function openCreate() {
+    setEditingGoal(null);
+    setModalOpen(true);
+  }
+
+  function openEdit(goal: Goal) {
+    setEditingGoal(goal);
+    setModalOpen(true);
+  }
+
+  return (
+    <div className="manager-page">
+      <header className="admin-header">
+        <h1>Goals</h1>
+        <button className="primary-button" onClick={openCreate} type="button">
+          <Plus size={18} />
+          New Goal
+        </button>
+      </header>
+
+      {loading ? (
+        <p>Loading goals…</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Target Date</th>
+              <th>Order</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {goals.map((goal) => (
+              <tr key={goal.id}>
+                <td>
+                  <strong>{goal.title}</strong>
+                </td>
+                <td>{goal.category}</td>
+                <td>{GOAL_STATUS_LABELS[goal.status]}</td>
+                <td className="text-xs">
+                  {goal.targetDate ? new Date(goal.targetDate).toLocaleDateString() : 'No date'}
+                </td>
+                <td>{goal.orderIndex}</td>
+                <td>
+                  <div className="admin-actions">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(goal)}
+                      title="Edit"
+                      type="button"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(goal.id)}
+                      title="Delete"
+                      type="button"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {modalOpen && (
+        <GoalModal
+          goal={editingGoal}
+          trophies={trophies}
+          onClose={() => setModalOpen(false)}
+          onSave={() => {
+            setModalOpen(false);
+            loadGoals();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function GoalModal({
+  goal,
+  trophies,
+  onClose,
+  onSave,
+}: {
+  goal: Goal | null;
+  trophies: Trophy[];
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const [formData, setFormData] = useState<GoalCreate>({
+    title: goal?.title || '',
+    description: goal?.description || '',
+    category: goal?.category || '',
+    status: goal?.status || 'planned',
+    targetDate: toDateInputValue(goal?.targetDate) || null,
+    orderIndex: goal?.orderIndex ?? 0,
+    trophyId: goal?.trophyId || null,
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload: GoalCreate = {
+        ...formData,
+        targetDate: formData.targetDate || null,
+        trophyId: formData.trophyId || null,
+      };
+      if (goal) {
+        await updateGoal(goal.id, payload);
+      } else {
+        await createGoal(payload);
+      }
+      onSave();
+    } catch (err) {
+      alert('Failed to save goal');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="admin-modal-overlay">
+      <div className="admin-modal">
+        <header className="overlay-header">
+          <h2>{goal ? 'Edit Goal' : 'New Goal'}</h2>
+          <button className="icon-button" onClick={onClose} type="button">
+            <X size={24} />
+          </button>
+        </header>
+
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-form-grid">
+            <div className="input-group">
+              <label>Title</label>
+              <input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Category</label>
+              <input
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group admin-form-full">
+              <label>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value as Goal['status'] })
+                }
+              >
+                <option value="planned">Planned</option>
+                <option value="in_progress">In progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+            <div className="input-group">
+              <label>Target Date (Optional)</label>
+              <input
+                type="date"
+                value={formData.targetDate || ''}
+                onChange={(e) => setFormData({ ...formData, targetDate: e.target.value || null })}
+              />
+            </div>
+            <div className="input-group">
+              <label>Order Index</label>
+              <input
+                type="number"
+                min="0"
+                value={formData.orderIndex}
+                onChange={(e) =>
+                  setFormData({ ...formData, orderIndex: parseInt(e.target.value) || 0 })
+                }
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Linked Trophy (Optional)</label>
+              <select
+                value={formData.trophyId || ''}
+                onChange={(e) => setFormData({ ...formData, trophyId: e.target.value || null })}
+              >
+                <option value="">No trophy</option>
+                {trophies.map((trophy) => (
+                  <option key={trophy.id} value={trophy.id}>
+                    {trophy.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button className="secondary-button" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="primary-button" type="submit" disabled={loading}>
+              {loading ? 'Saving…' : 'Save Goal'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               TROPHY MANAGER                               */
+/* -------------------------------------------------------------------------- */
+
+function TrophyManager() {
+  const [trophies, setTrophies] = useState<Trophy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingTrophy, setEditingTrophy] = useState<Trophy | null>(null);
+
+  useEffect(() => {
+    loadTrophies();
+  }, []);
+
+  async function loadTrophies() {
+    try {
+      const data = await getTrophies();
+      setTrophies(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Are you sure you want to delete this trophy?')) return;
+    try {
+      await deleteTrophy(id);
+      setTrophies(trophies.filter((t) => t.id !== id));
+    } catch (err) {
+      alert('Failed to delete trophy');
+    }
+  }
+
+  function openCreate() {
+    setEditingTrophy(null);
+    setModalOpen(true);
+  }
+
+  function openEdit(trophy: Trophy) {
+    setEditingTrophy(trophy);
+    setModalOpen(true);
+  }
+
+  return (
+    <div className="manager-page">
+      <header className="admin-header">
+        <h1>Trophies</h1>
+        <button className="primary-button" onClick={openCreate} type="button">
+          <Plus size={18} />
+          New Trophy
+        </button>
+      </header>
+
+      {loading ? (
+        <p>Loading trophies…</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Earned</th>
+              <th>Icon</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trophies.map((trophy) => (
+              <tr key={trophy.id}>
+                <td>
+                  <strong>{trophy.title}</strong>
+                </td>
+                <td>{trophy.category}</td>
+                <td className="text-xs">{new Date(trophy.dateEarned).toLocaleDateString()}</td>
+                <td>
+                  <code className="text-xs">{trophy.icon || '—'}</code>
+                </td>
+                <td>
+                  <div className="admin-actions">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(trophy)}
+                      title="Edit"
+                      type="button"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(trophy.id)}
+                      title="Delete"
+                      type="button"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    {trophy.proofUrl && (
+                      <a
+                        className="btn-icon"
+                        href={trophy.proofUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="View proof"
+                      >
+                        <ExternalLink size={16} />
+                      </a>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {modalOpen && (
+        <TrophyModal
+          trophy={editingTrophy}
+          onClose={() => setModalOpen(false)}
+          onSave={() => {
+            setModalOpen(false);
+            loadTrophies();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function TrophyModal({
+  trophy,
+  onClose,
+  onSave,
+}: {
+  trophy: Trophy | null;
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const [formData, setFormData] = useState<TrophyCreate>({
+    title: trophy?.title || '',
+    description: trophy?.description || '',
+    category: trophy?.category || '',
+    icon: trophy?.icon || '',
+    dateEarned: toDateInputValue(trophy?.dateEarned) || today,
+    proofUrl: trophy?.proofUrl || '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload: TrophyCreate = {
+        ...formData,
+        icon: formData.icon || null,
+        proofUrl: formData.proofUrl || null,
+      };
+      if (trophy) {
+        await updateTrophy(trophy.id, payload);
+      } else {
+        await createTrophy(payload);
+      }
+      onSave();
+    } catch (err) {
+      alert('Failed to save trophy');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="admin-modal-overlay">
+      <div className="admin-modal">
+        <header className="overlay-header">
+          <h2>{trophy ? 'Edit Trophy' : 'New Trophy'}</h2>
+          <button className="icon-button" onClick={onClose} type="button">
+            <X size={24} />
+          </button>
+        </header>
+
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-form-grid">
+            <div className="input-group">
+              <label>Title</label>
+              <input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Category</label>
+              <input
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group admin-form-full">
+              <label>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Icon (lucide name)</label>
+              <input
+                value={formData.icon || ''}
+                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                placeholder="e.g. Trophy, Medal, Award"
+              />
+            </div>
+            <div className="input-group">
+              <label>Date Earned</label>
+              <input
+                type="date"
+                value={formData.dateEarned}
+                onChange={(e) => setFormData({ ...formData, dateEarned: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group admin-form-full">
+              <label>Proof URL (Optional)</label>
+              <input
+                type="url"
+                value={formData.proofUrl || ''}
+                onChange={(e) => setFormData({ ...formData, proofUrl: e.target.value })}
+                placeholder="https://…"
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button className="secondary-button" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="primary-button" type="submit" disabled={loading}>
+              {loading ? 'Saving…' : 'Save Trophy'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                POST MANAGER                                */
+/* -------------------------------------------------------------------------- */
+
+function PostManager() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  async function loadPosts() {
+    try {
+      const [postsData, projectsData] = await Promise.all([getPosts(), getProjects()]);
+      setPosts(postsData);
+      setProjects(projectsData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    try {
+      await deletePost(id);
+      setPosts(posts.filter((p) => p.id !== id));
+    } catch (err) {
+      alert('Failed to delete post');
+    }
+  }
+
+  function openCreate() {
+    setEditingPost(null);
+    setModalOpen(true);
+  }
+
+  function openEdit(post: Post) {
+    setEditingPost(post);
+    setModalOpen(true);
+  }
+
+  function projectTitle(projectId: string | null | undefined) {
+    if (!projectId) return '—';
+    return projects.find((project) => project.id === projectId)?.title ?? 'Unknown project';
+  }
+
+  return (
+    <div className="manager-page">
+      <header className="admin-header">
+        <h1>Posts</h1>
+        <button className="primary-button" onClick={openCreate} type="button">
+          <Plus size={18} />
+          New Post
+        </button>
+      </header>
+
+      {loading ? (
+        <p>Loading posts…</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Slug</th>
+              <th>Published</th>
+              <th>Project</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.map((post) => (
+              <tr key={post.id}>
+                <td>
+                  <strong>{post.title}</strong>
+                </td>
+                <td>
+                  <code className="text-xs">{post.slug}</code>
+                </td>
+                <td className="text-xs">{new Date(post.publishedAt).toLocaleDateString()}</td>
+                <td>{projectTitle(post.projectId)}</td>
+                <td>
+                  <div className="admin-actions">
+                    <button
+                      className="btn-icon"
+                      onClick={() => openEdit(post)}
+                      title="Edit"
+                      type="button"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(post.id)}
+                      title="Delete"
+                      type="button"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {modalOpen && (
+        <PostModal
+          post={editingPost}
+          projects={projects}
+          onClose={() => setModalOpen(false)}
+          onSave={() => {
+            setModalOpen(false);
+            loadPosts();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function PostModal({
+  post,
+  projects,
+  onClose,
+  onSave,
+}: {
+  post: Post | null;
+  projects: Project[];
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    title: post?.title || '',
+    slug: post?.slug || '',
+    body: post?.body || '',
+    projectId: post?.projectId || '',
+    publishedAt: toDateInputValue(post?.publishedAt),
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        title: formData.title,
+        slug: formData.slug,
+        body: formData.body,
+        projectId: formData.projectId || null,
+        publishedAt: formData.publishedAt || undefined,
+      };
+      if (post) {
+        await updatePost(post.id, payload);
+      } else {
+        await createPost(payload);
+      }
+      onSave();
+    } catch (err) {
+      alert('Failed to save post');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="admin-modal-overlay">
+      <div className="admin-modal">
+        <header className="overlay-header">
+          <h2>{post ? 'Edit Post' : 'New Post'}</h2>
+          <button className="icon-button" onClick={onClose} type="button">
+            <X size={24} />
+          </button>
+        </header>
+
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-form-grid">
+            <div className="input-group">
+              <label>Title</label>
+              <input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Slug</label>
+              <input
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                required
+              />
+            </div>
+            <div className="input-group admin-form-full">
+              <label>Body (Markdown)</label>
+              <textarea
+                value={formData.body}
+                onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+                rows={10}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Linked Project (Optional)</label>
+              <select
+                value={formData.projectId}
+                onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+              >
+                <option value="">No project</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="input-group">
+              <label>Publish Date (Optional)</label>
+              <input
+                type="date"
+                value={formData.publishedAt}
+                onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button className="secondary-button" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="primary-button" type="submit" disabled={loading}>
+              {loading ? 'Saving…' : 'Save Post'}
             </button>
           </div>
         </form>
