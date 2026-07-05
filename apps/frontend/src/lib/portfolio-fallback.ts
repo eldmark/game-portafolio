@@ -1,4 +1,4 @@
-import type { Experience, Project, Skill } from '@portfolio/shared';
+import type { DevlogEntry, Experience, Goal, Post, Project, Skill, Trophy } from '@portfolio/shared';
 
 export const fallbackProjects: Project[] = [
   {
@@ -427,4 +427,210 @@ export const futureIdeas = [
   'Diving deeper into WebGL and advanced 3D shaders.',
   'Implementing CI/CD pipelines for automated deployments.',
   'Contributing to open-source projects in the Node.js ecosystem.',
+];
+
+export const fallbackTrophies: Trophy[] = [
+  {
+    id: 'trophy-first-deploy',
+    title: 'First Production Deployment',
+    description:
+      'Shipped the interactive portfolio room to a live server with Docker and GitHub Actions.',
+    icon: 'Rocket',
+    category: 'Infrastructure',
+    dateEarned: '2026-06-01T00:00:00.000Z',
+    proofUrl: 'http://34.71.234.176.sslip.io/#/',
+  },
+  {
+    id: 'trophy-teaching-assistant',
+    title: 'Teaching Assistant Appointment',
+    description:
+      'Selected as Teaching Assistant for Algorithms & Data Structures at Universidad del Valle de Guatemala.',
+    icon: 'GraduationCap',
+    category: 'Academic',
+    dateEarned: '2026-01-15T00:00:00.000Z',
+    proofUrl: null,
+  },
+  {
+    id: 'trophy-first-freelance',
+    title: 'First Freelance Contract Delivered',
+    description:
+      'Delivered a production backend with REST APIs, PostgreSQL, and Dockerized deployment for a freelance client.',
+    icon: 'Briefcase',
+    category: 'Career',
+    dateEarned: '2025-05-01T00:00:00.000Z',
+    proofUrl: null,
+  },
+  {
+    id: 'trophy-lisp-interpreter',
+    title: 'Built a Working Lisp Interpreter',
+    description:
+      'Implemented a custom Lisp interpreter in Java with lexer, parser, and recursive evaluation engine.',
+    icon: 'Code',
+    category: 'Technical',
+    dateEarned: '2025-11-20T00:00:00.000Z',
+    proofUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter',
+  },
+];
+
+export const fallbackGoals: Goal[] = [
+  {
+    id: 'goal-ship-portfolio',
+    title: 'Ship the interactive portfolio',
+    description:
+      'Deploy the 3D portfolio room to a production server with typed contracts, CI/CD, and analytics.',
+    category: 'Technical',
+    status: 'done',
+    targetDate: '2026-06-01T00:00:00.000Z',
+    orderIndex: 0,
+    trophyId: 'trophy-first-deploy',
+  },
+  {
+    id: 'goal-open-source',
+    title: 'Contribute to an open-source project',
+    description: 'Land a merged pull request in a project with 1k+ stars in the Node.js ecosystem.',
+    category: 'Open Source',
+    status: 'in_progress',
+    targetDate: '2026-12-31T00:00:00.000Z',
+    orderIndex: 0,
+    trophyId: null,
+  },
+  {
+    id: 'goal-go-microservices',
+    title: 'Build a microservices side project in Go',
+    description:
+      'Design and ship a small distributed system with Go services, message queues, and Kubernetes.',
+    category: 'Technical',
+    status: 'planned',
+    targetDate: null,
+    orderIndex: 0,
+    trophyId: null,
+  },
+  {
+    id: 'goal-cloud-cert',
+    title: 'Earn a cloud certification',
+    description:
+      'Pass the AWS Solutions Architect Associate exam to back up infrastructure experience.',
+    category: 'Career',
+    status: 'planned',
+    targetDate: '2027-06-30T00:00:00.000Z',
+    orderIndex: 1,
+    trophyId: null,
+  },
+];
+
+export const fallbackPosts: Post[] = [
+  {
+    id: 'post-building-this-room',
+    title: 'Building a Portfolio You Can Walk Around In',
+    slug: 'building-a-portfolio-you-can-walk-around-in',
+    body: [
+      '# Building a Portfolio You Can Walk Around In',
+      '',
+      'Most portfolios are a scrolling page. I wanted mine to feel like a **place**: a cozy developer room where every object tells part of the story.',
+      '',
+      '## The stack',
+      '',
+      '- React Three Fiber for the 3D scene',
+      '- Zustand for game state (player position, overlays, rooms)',
+      '- Express + Prisma + PostgreSQL behind a typed REST API',
+      '',
+      'The whole thing is a monorepo with a shared `zod` schema package, so the frontend and backend never disagree about shapes.',
+      '',
+      '## What I learned',
+      '',
+      'Keeping the scene cheap matters more than making it pretty. Simple box geometry with *good lighting* beats heavy models every time.',
+    ].join('\n'),
+    projectId: null,
+    publishedAt: '2026-05-20T00:00:00.000Z',
+  },
+  {
+    id: 'post-multi-room-refactor',
+    title: 'From One Room to Five: A Registry-Driven Refactor',
+    slug: 'from-one-room-to-five',
+    body: [
+      '# From One Room to Five',
+      '',
+      'The original scene hardcoded every interactable. Adding a second room meant a refactor into a **central room registry**.',
+      '',
+      '## The registry pattern',
+      '',
+      'Each room is plain data: spawn point, bounds, colliders, objects, and doors.',
+      '',
+      '```ts',
+      'export const rooms: Record<RoomId, RoomDefinition> = {',
+      '  main: { id: "main", doors: [...], objects: [...] },',
+      '  goals: { ... },',
+      '};',
+      '```',
+      '',
+      'The scene component renders whatever room the store points at. Doors are just interactables that call `setRoom(targetRoom)`.',
+      '',
+      'New rooms now cost a data entry, not a rewrite.',
+    ].join('\n'),
+    projectId: null,
+    publishedAt: '2026-06-05T00:00:00.000Z',
+  },
+  {
+    id: 'post-production-lessons',
+    title: 'Lessons From Deploying on a Tiny Server',
+    slug: 'lessons-from-deploying-on-a-tiny-server',
+    body: [
+      '# Lessons From Deploying on a Tiny Server',
+      '',
+      'This portfolio runs on a resource-constrained VM. Some things that helped:',
+      '',
+      '1. Lazy-load the heavy 3D scene and overlays with `React.lazy`',
+      '2. Cap Docker memory limits per service',
+      '3. Serve fallback seed data when the API is down, so the site *never looks broken*',
+      '',
+      'The fallback pattern is simple: render seeded local data immediately, then swap in live API data when the fetch resolves.',
+      '',
+      'See the deployment at [the live site](http://34.71.234.176.sslip.io/#/).',
+    ].join('\n'),
+    projectId: null,
+    publishedAt: '2026-06-08T00:00:00.000Z',
+  },
+];
+
+export const fallbackDevlog: DevlogEntry[] = [
+  {
+    id: 'devlog-portfolio-rooms',
+    repo: 'eldmark/game-portafolio',
+    branch: 'main',
+    commitSha: '6db2b12',
+    commitUrl: 'https://github.com/eldmark/game-portafolio/commit/6db2b12',
+    message: 'Landed a batch of 3 changes in game-portafolio.',
+    commitCount: 3,
+    createdAt: '2026-06-09T16:20:00.000Z',
+  },
+  {
+    id: 'devlog-portfolio-email',
+    repo: 'eldmark/game-portafolio',
+    branch: 'main',
+    commitSha: '8441771',
+    commitUrl: 'https://github.com/eldmark/game-portafolio/commit/8441771',
+    message: 'Shipped a small update to game-portafolio.',
+    commitCount: 1,
+    createdAt: '2026-06-06T11:05:00.000Z',
+  },
+  {
+    id: 'devlog-barbershop',
+    repo: 'eldmark/db_barbershop',
+    branch: 'main',
+    commitSha: 'a1b2c3d',
+    commitUrl: 'https://github.com/eldmark/db_barbershop/commits/main',
+    message: 'Made progress on db_barbershop.',
+    commitCount: 1,
+    createdAt: '2026-06-02T09:40:00.000Z',
+  },
+  {
+    id: 'devlog-ecoscan',
+    repo: 'eldmark/backend-ecoscan',
+    branch: 'main',
+    commitSha: 'e4f5a6b',
+    commitUrl: 'https://github.com/eldmark/backend-ecoscan/commits/main',
+    message: 'Cranked out 5 commits for backend-ecoscan.',
+    commitCount: 5,
+    createdAt: '2026-05-28T19:55:00.000Z',
+  },
 ];
