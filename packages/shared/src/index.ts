@@ -97,10 +97,99 @@ export const analyticsSummarySchema = z.object({
   ),
 });
 
+export const goalSchema = z.object({
+  id: z.string(),
+  title: z.string().min(2),
+  description: z.string().min(5),
+  category: z.string(),
+  status: z.enum(['planned', 'in_progress', 'done']).default('planned'),
+  targetDate: z.string().nullable().optional(),
+  orderIndex: z.number().int().default(0),
+  trophyId: z.string().nullable().optional(),
+});
+
+export const goalCreateSchema = goalSchema.omit({ id: true });
+export const goalUpdateSchema = goalCreateSchema.partial();
+
+export const trophySchema = z.object({
+  id: z.string(),
+  title: z.string().min(2),
+  description: z.string().min(5),
+  icon: z.string().nullable().optional(),
+  category: z.string(),
+  dateEarned: z.string(),
+  proofUrl: z.string().url().nullable().optional(),
+});
+
+export const trophyCreateSchema = trophySchema.omit({ id: true });
+export const trophyUpdateSchema = trophyCreateSchema.partial();
+
+export const postSchema = z.object({
+  id: z.string(),
+  title: z.string().min(2),
+  slug: z.string().min(2),
+  body: z.string().min(10),
+  projectId: z.string().nullable().optional(),
+  publishedAt: z.string(),
+});
+
+export const postCreateSchema = postSchema.omit({ id: true, publishedAt: true }).extend({
+  publishedAt: z.string().optional(),
+});
+export const postUpdateSchema = postCreateSchema.partial();
+
+export const devlogEntrySchema = z.object({
+  id: z.string(),
+  repo: z.string(),
+  branch: z.string(),
+  commitSha: z.string(),
+  commitUrl: z.string().url(),
+  message: z.string(),
+  commitCount: z.number().int().min(1),
+  createdAt: z.string(),
+});
+
+// GitHub webhook payload (minimal subset we care about)
+export const githubPushWebhookSchema = z.object({
+  ref: z.string(), // "refs/heads/main"
+  repository: z.object({
+    full_name: z.string(), // "eldmark/db_barbershop"
+  }),
+  commits: z.array(
+    z.object({
+      id: z.string(),
+      message: z.string(),
+      url: z.string().url(),
+    }),
+  ),
+});
+
+export const analyticsTimeseriesSchema = z.object({
+  visitsOverTime: z.array(
+    z.object({ date: z.string(), total: z.number(), recruiter: z.number() }),
+  ),
+  deviceBreakdown: z.array(z.object({ device: z.string(), count: z.number() })),
+  countryBreakdown: z.array(z.object({ country: z.string(), count: z.number() })),
+});
+
 export type ProjectMedia = z.infer<typeof projectMediaSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type ProjectCreate = z.infer<typeof projectCreateSchema>;
 export type ProjectUpdate = z.infer<typeof projectUpdateSchema>;
+
+export const presencePingSchema = z.object({
+  sessionId: sessionIdSchema,
+  name: z.string().trim().max(20),
+  roomId: z.string(),
+  position: z.tuple([z.number(), z.number(), z.number()]),
+  hat: z.string(),
+  shirtColor: z.string(),
+  pantsColor: z.string(),
+});
+
+export const presenceEntrySchema = presencePingSchema.extend({
+  lastSeen: z.number(),
+});
 
 export type Skill = z.infer<typeof skillSchema>;
 export type SkillCreate = z.infer<typeof skillCreateSchema>;
@@ -117,6 +206,24 @@ export type VisitInput = z.infer<typeof visitInputSchema>;
 export type VisitPatch = z.infer<typeof visitPatchSchema>;
 export type DialogueLogInput = z.infer<typeof dialogueLogInputSchema>;
 export type AnalyticsSummary = z.infer<typeof analyticsSummarySchema>;
+export type AnalyticsTimeseries = z.infer<typeof analyticsTimeseriesSchema>;
+
+export type Goal = z.infer<typeof goalSchema>;
+export type GoalCreate = z.infer<typeof goalCreateSchema>;
+export type GoalUpdate = z.infer<typeof goalUpdateSchema>;
+
+export type Trophy = z.infer<typeof trophySchema>;
+export type TrophyCreate = z.infer<typeof trophyCreateSchema>;
+export type TrophyUpdate = z.infer<typeof trophyUpdateSchema>;
+
+export type Post = z.infer<typeof postSchema>;
+export type PostCreate = z.infer<typeof postCreateSchema>;
+export type PostUpdate = z.infer<typeof postUpdateSchema>;
+export type DevlogEntry = z.infer<typeof devlogEntrySchema>;
+export type GithubPushWebhook = z.infer<typeof githubPushWebhookSchema>;
+
+export type PresencePing = z.infer<typeof presencePingSchema>;
+export type PresenceEntry = z.infer<typeof presenceEntrySchema>;
 
 export type ApiError = {
   error: string;
