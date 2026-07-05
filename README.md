@@ -278,10 +278,25 @@ Errors use:
 - `PATCH /visits/:sessionId`
 - `POST /dialogue-logs`
 - `GET /analytics/summary`
+- `GET /analytics/timeseries?days=30` — visits over time + device/country breakdowns (max 90 days)
+- `GET /goals`
+- `GET /trophies`
+- `GET /posts`
+- `GET /posts/:slug`
+- `GET /devlog?limit=20` — auto-generated GitHub activity feed (max 50)
+- `POST /presence/ping` — heartbeat with room/position/cosmetics (in-memory, no DB)
+- `GET /presence/:roomId?sessionId=...` — other visitors currently in a room
+- `POST /presence/leave`
 
 ### Auth
 
 - `POST /auth/login`
+
+### Webhooks
+
+- `POST /webhooks/github` — GitHub push webhook (HMAC-SHA256 signed with
+  `GITHUB_WEBHOOK_SECRET`, see `docs/devlog-webhook-workflow.md`); creates
+  devlog entries for pushes to `main`/`master`
 
 ### Admin
 
@@ -299,6 +314,16 @@ Requires `Authorization: Bearer <token>`.
 - `POST /admin/experiences`
 - `PATCH /admin/experiences/:id`
 - `DELETE /admin/experiences/:id`
+- `POST /admin/goals`
+- `PATCH /admin/goals/:id`
+- `DELETE /admin/goals/:id`
+- `POST /admin/trophies`
+- `PATCH /admin/trophies/:id`
+- `DELETE /admin/trophies/:id`
+- `POST /admin/posts`
+- `PATCH /admin/posts/:id`
+- `DELETE /admin/posts/:id`
+- `DELETE /admin/devlog/:id`
 
 ## Admin Access
 
