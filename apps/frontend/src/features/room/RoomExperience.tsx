@@ -2,6 +2,7 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { m } from 'framer-motion';
 import {
   BookOpen,
   Briefcase,
@@ -18,11 +19,13 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
+import { useCharacterStore } from '@/lib/character-store';
 import { logDialogue, trackVisit, endVisit } from '@/lib/api';
 import { aboutProfile } from '@/lib/portfolio-fallback';
 import { usePortfolioData } from '@/lib/usePortfolioData';
 import { usePortfolioStore } from '@/lib/store';
 import { getNearestObject, type RoomObject } from './room-objects';
+import { rooms, type DoorObject } from './rooms';
 import { setVirtualKey } from './Player';
 import { getMusicTrack, musicTracks, normalizeTrackIndex } from './music-tracks';
 
@@ -83,6 +86,46 @@ function VinylMusicPlayer({ variant = 'floating' }: { variant?: 'entry' | 'float
         </button>
       </div>
     </aside>
+  );
+}
+
+function NameTagModal() {
+  const hasSetName = useCharacterStore((state) => state.hasSetName);
+  const setName = useCharacterStore((state) => state.setName);
+  const [value, setValue] = useState('');
+
+  if (hasSetName) return null;
+
+  return (
+    <div className="terms-modal-backdrop" role="presentation">
+      <section
+        aria-labelledby="name-modal-title"
+        aria-modal="true"
+        className="terms-modal"
+        role="dialog"
+      >
+        <p className="eyebrow">Welcome</p>
+        <h2 id="name-modal-title">What should we call you?</h2>
+        <p>
+          This name appears as a tag above your character. You can change your look in the Dressing
+          Room.
+        </p>
+        <input
+          maxLength={20}
+          onChange={(event) => setValue(event.target.value)}
+          placeholder="Your name"
+          value={value}
+        />
+        <div className="terms-modal-actions">
+          <button className="primary-button" onClick={() => setName(value || 'Visitor')} type="button">
+            Continue
+          </button>
+          <button className="secondary-button" onClick={() => setName('Visitor')} type="button">
+            Skip
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -194,6 +237,7 @@ function EntryScreen() {
           </section>
         </div>
       ) : null}
+      {termsAccepted ? <NameTagModal /> : null}
     </>
   );
 }
@@ -292,29 +336,64 @@ function MobileControls() {
   );
 }
 
+type RoomInteractable = RoomObject | DoorObject;
+
+function isDoor(interactable: RoomInteractable): interactable is DoorObject {
+  return 'kind' in interactable && interactable.kind === 'door';
+}
+
 function RoomStateBridge({
   onMove,
   onNearestObjectChange,
 }: {
   onMove: () => void;
-  onNearestObjectChange: (nextNearestObject: RoomObject | null) => void;
+  onNearestObjectChange: (nextNearestObject: RoomInteractable | null) => void;
 }) {
+  const currentRoomId = usePortfolioStore((state) => state.currentRoomId);
   const playerPosition = usePortfolioStore((state) => state.playerPosition);
-  const nearestObject = useMemo(() => getNearestObject(playerPosition), [playerPosition]);
+  const nearestObject = useMemo(() => {
+    const room = rooms[currentRoomId];
+    return getNearestObject<RoomInteractable>([...room.objects, ...room.doors], playerPosition);
+  }, [currentRoomId, playerPosition]);
 
   useEffect(() => {
     onNearestObjectChange(nearestObject);
   }, [nearestObject, onNearestObjectChange]);
 
   useEffect(() => {
-    const dx = Math.abs(playerPosition[0]);
-    const dz = Math.abs(playerPosition[2] - 2.2);
+    const [spawnX, , spawnZ] = rooms[currentRoomId].spawnPoint;
+    const dx = Math.abs(playerPosition[0] - spawnX);
+    const dz = Math.abs(playerPosition[2] - spawnZ);
     if (dx > 0.2 || dz > 0.2) {
       onMove();
     }
-  }, [onMove, playerPosition]);
+  }, [currentRoomId, onMove, playerPosition]);
 
   return null;
+}
+
+function RoomTransitionFade({ roomId }: { roomId: string }) {
+  const previousRoomIdRef = useRef(roomId);
+  const [fadeKey, setFadeKey] = useState(0);
+
+  useEffect(() => {
+    if (previousRoomIdRef.current === roomId) return;
+
+    previousRoomIdRef.current = roomId;
+    setFadeKey((currentFadeKey) => currentFadeKey + 1);
+  }, [roomId]);
+
+  if (fadeKey === 0) return null;
+
+  return (
+    <m.div
+      animate={{ opacity: 0 }}
+      className="room-transition-fade"
+      initial={{ opacity: 1 }}
+      key={fadeKey}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    />
+  );
 }
 
 export default function RoomExperience() {
@@ -322,20 +401,22 @@ export default function RoomExperience() {
   const enteredRoom = usePortfolioStore((state) => state.enteredRoom);
   const activeOverlay = usePortfolioStore((state) => state.activeOverlay);
   const setOverlay = usePortfolioStore((state) => state.setOverlay);
+  const setRoom = usePortfolioStore((state) => state.setRoom);
+  const currentRoomId = usePortfolioStore((state) => state.currentRoomId);
   const recruiterMode = usePortfolioStore((state) => state.recruiterMode);
   const sessionRef = useRef<string | null>(null);
   const startedAtRef = useRef<number>(Date.now());
   const recruiterModeRef = useRef(recruiterMode);
   const [hasMoved, setHasMoved] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [nearestObject, setNearestObject] = useState<RoomObject | null>(null);
+  const [nearestObject, setNearestObject] = useState<RoomInteractable | null>(null);
   const [overlayLoaded, setOverlayLoaded] = useState(false);
 
   useEffect(() => {
     recruiterModeRef.current = recruiterMode;
   }, [recruiterMode]);
 
-  const handleNearestObjectChange = useCallback((nextNearestObject: RoomObject | null) => {
+  const handleNearestObjectChange = useCallback((nextNearestObject: RoomInteractable | null) => {
     setNearestObject((currentNearestObject) =>
       currentNearestObject?.id === nextNearestObject?.id ? currentNearestObject : nextNearestObject,
     );
@@ -381,14 +462,18 @@ export default function RoomExperience() {
       }
 
       const normalizedKey = event.key?.toLowerCase?.();
-      if (normalizedKey === 'e' && nearestObject && !activeOverlay) {
-        setOverlay(nearestObject.overlay);
+      if (normalizedKey === 'e' && !event.repeat && nearestObject && !activeOverlay) {
+        if (isDoor(nearestObject)) {
+          setRoom(nearestObject.targetRoom);
+        } else {
+          setOverlay(nearestObject.overlay);
+        }
       }
     }
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeOverlay, nearestObject, setOverlay]);
+  }, [activeOverlay, nearestObject, setOverlay, setRoom]);
 
   useEffect(() => {
     function onUnload() {
@@ -425,8 +510,10 @@ export default function RoomExperience() {
             <RoomStage
               activeObjectId={nearestObject?.id ?? null}
               nearestHint={nearestObject?.hint ?? null}
+              roomId={currentRoomId}
             />
           </Suspense>
+          <RoomTransitionFade roomId={currentRoomId} />
           <TutorialMascot
             hasInteracted={hasInteracted}
             hasMoved={hasMoved}

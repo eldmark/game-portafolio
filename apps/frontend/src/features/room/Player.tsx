@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useTexture } from '@react-three/drei';
+import { useTexture, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePortfolioStore } from '@/lib/store';
+import { useCharacterStore, type HatId } from '@/lib/character-store';
+import { rooms, type Collider } from './rooms';
 
 const pressedKeys = new Set<string>();
 
@@ -81,35 +83,14 @@ type FacingDirection = 'down' | 'left' | 'right' | 'up';
 
 type AnimationKey = keyof typeof ANIMATIONS;
 
-type Collider = {
-  minX: number;
-  maxX: number;
-  minZ: number;
-  maxZ: number;
-};
-
 /* -------------------------------------------------------------------------- */
 /*                             PLAYER COLLISIONS                              */
 /* -------------------------------------------------------------------------- */
 
 const PLAYER_RADIUS = 0.22;
 
-const ROOM_LIMITS = {
-  minX: -3.25,
-  maxX: 3.25,
-  minZ: -2.35,
-  maxZ: 2.65,
-} as const;
-
-const ROOM_COLLIDERS: Collider[] = [
-  { minX: -3.1, maxX: -2.05, minZ: -2.65, maxZ: -1.55 },
-  { minX: -3.35, maxX: -1.25, minZ: 1.02, maxZ: 2.58 },
-  { minX: 2.42, maxX: 3.35, minZ: 0.28, maxZ: 2.08 },
-  { minX: 2.74, maxX: 3.32, minZ: -1.54, maxZ: -0.88 },
-];
-
-function collidesAt(x: number, z: number) {
-  for (const collider of ROOM_COLLIDERS) {
+function collidesAt(colliders: Collider[], x: number, z: number) {
+  for (const collider of colliders) {
     const overlapsX = x + PLAYER_RADIUS > collider.minX && x - PLAYER_RADIUS < collider.maxX;
 
     const overlapsZ = z + PLAYER_RADIUS > collider.minZ && z - PLAYER_RADIUS < collider.maxZ;
@@ -118,6 +99,112 @@ function collidesAt(x: number, z: number) {
   }
 
   return false;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             COSMETIC RECOLOR                               */
+/* -------------------------------------------------------------------------- */
+
+// Base sprite palette regions sampled from the spritesheet:
+const SHIRT_BASE: [number, number, number] = [119, 74, 44];
+const SHIRT_SHADE: [number, number, number] = [128, 86, 57];
+const PANTS_BASE: [number, number, number] = [51, 49, 49];
+const PANTS_SHADE: [number, number, number] = [31, 31, 31];
+
+const SHIRT_COLORS: Record<string, [number, number, number] | null> = {
+  default: null,
+  red: [196, 64, 64],
+  blue: [64, 110, 196],
+  green: [76, 158, 92],
+  purple: [140, 90, 196],
+};
+
+const PANTS_COLORS: Record<string, [number, number, number] | null> = {
+  default: null,
+  black: [38, 38, 42],
+  tan: [168, 140, 96],
+  navy: [44, 58, 104],
+};
+
+type ColorSwap = { from: [number, number, number]; to: [number, number, number]; tolerance: number };
+
+function darken(c: [number, number, number], f: number): [number, number, number] {
+  return [Math.round(c[0] * f), Math.round(c[1] * f), Math.round(c[2] * f)];
+}
+
+function buildSwaps(shirt: string, pants: string): ColorSwap[] {
+  const swaps: ColorSwap[] = [];
+  const shirtTarget = SHIRT_COLORS[shirt] ?? null;
+  if (shirtTarget) {
+    swaps.push({ from: SHIRT_BASE, to: shirtTarget, tolerance: 14 });
+    swaps.push({ from: SHIRT_SHADE, to: darken(shirtTarget, 0.8), tolerance: 10 });
+  }
+  const pantsTarget = PANTS_COLORS[pants] ?? null;
+  if (pantsTarget) {
+    swaps.push({ from: PANTS_BASE, to: pantsTarget, tolerance: 10 });
+    swaps.push({ from: PANTS_SHADE, to: darken(pantsTarget, 0.7), tolerance: 10 });
+  }
+  return swaps;
+}
+
+function recolorCanvas(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  swaps: ColorSwap[],
+) {
+  if (swaps.length === 0) return;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3] ?? 0;
+    if (a === 0) continue;
+    const r = data[i] ?? 0;
+    const g = data[i + 1] ?? 0;
+    const b = data[i + 2] ?? 0;
+    for (const swap of swaps) {
+      const tol = swap.tolerance;
+      if (
+        Math.abs(r - swap.from[0]) <= tol &&
+        Math.abs(g - swap.from[1]) <= tol &&
+        Math.abs(b - swap.from[2]) <= tol
+      ) {
+        data[i] = swap.to[0];
+        data[i + 1] = swap.to[1];
+        data[i + 2] = swap.to[2];
+        break;
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function HatMesh({ hat }: { hat: HatId }) {
+  if (hat === 'cap') {
+    return (
+      <mesh position={[0, 0.92, 0.05]}>
+        <boxGeometry args={[0.28, 0.12, 0.28]} />
+        <meshStandardMaterial color="#3a6ea5" />
+      </mesh>
+    );
+  }
+  if (hat === 'party') {
+    return (
+      <mesh position={[0, 1.0, 0]}>
+        <coneGeometry args={[0.16, 0.32, 16]} />
+        <meshStandardMaterial color="#e07a5f" />
+      </mesh>
+    );
+  }
+  if (hat === 'beanie') {
+    return (
+      <mesh position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.18, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.6]} />
+        <meshStandardMaterial color="#6a4f9e" />
+      </mesh>
+    );
+  }
+  return null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -196,8 +283,45 @@ export function Player() {
   ]);
 
   const setPlayerPosition = usePortfolioStore((state) => state.setPlayerPosition);
+  const currentRoomId = usePortfolioStore((state) => state.currentRoomId);
+  const room = rooms[currentRoomId];
 
-  const spriteSheet = useTexture(SPRITE_SHEET_URL);
+  const baseSheet = useTexture(SPRITE_SHEET_URL);
+  const shirtColor = useCharacterStore((state) => state.shirtColor);
+  const pantsColor = useCharacterStore((state) => state.pantsColor);
+  const hat = useCharacterStore((state) => state.hat);
+  const name = useCharacterStore((state) => state.name);
+
+  const spriteSheet = useMemo(() => {
+    const image = baseSheet.image as HTMLImageElement | undefined;
+    if (!image || typeof document === 'undefined') return baseSheet;
+    const swaps = buildSwaps(shirtColor, pantsColor);
+    if (swaps.length === 0) return baseSheet;
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return baseSheet;
+    ctx.drawImage(image, 0, 0);
+    recolorCanvas(ctx, canvas.width, canvas.height, swaps);
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  }, [baseSheet, shirtColor, pantsColor]);
+
+  /* ------------------------------------------------------------------------ */
+  /*                              ROOM TRANSITION                             */
+  /* ------------------------------------------------------------------------ */
+
+  useEffect(() => {
+    // snap to the new room's spawn point (set by the store's setRoom action)
+    const [spawnX, spawnY, spawnZ] = usePortfolioStore.getState().playerPosition;
+    position.set(spawnX, spawnY, spawnZ);
+    lastPublishedPositionRef.current = [spawnX, spawnY, spawnZ];
+
+    if (groupRef.current) {
+      groupRef.current.position.copy(position);
+    }
+  }, [currentRoomId, position]);
 
   /* ------------------------------------------------------------------------ */
   /*                             TEXTURE SETTINGS                             */
@@ -254,19 +378,19 @@ export function Player() {
 
       const nextX = THREE.MathUtils.clamp(
         position.x + direction.x * speed * delta,
-        ROOM_LIMITS.minX,
-        ROOM_LIMITS.maxX,
+        room.bounds.minX,
+        room.bounds.maxX,
       );
 
       const nextZ = THREE.MathUtils.clamp(
         position.z + direction.z * speed * delta,
-        ROOM_LIMITS.minZ,
-        ROOM_LIMITS.maxZ,
+        room.bounds.minZ,
+        room.bounds.maxZ,
       );
 
-      const canMoveX = !collidesAt(nextX, position.z);
-      const canMoveZ = !collidesAt(position.x, nextZ);
-      const canMoveDiagonal = !collidesAt(nextX, nextZ);
+      const canMoveX = !collidesAt(room.colliders, nextX, position.z);
+      const canMoveZ = !collidesAt(room.colliders, position.x, nextZ);
+      const canMoveDiagonal = !collidesAt(room.colliders, nextX, nextZ);
 
       if (canMoveDiagonal) {
         position.x = nextX;
@@ -370,6 +494,14 @@ export function Player() {
       <sprite position={[0, 0.62, 0]} scale={[0.95, 0.95, 1]}>
         <spriteMaterial map={spriteSheet} transparent alphaTest={0.1} />
       </sprite>
+
+      <HatMesh hat={hat} />
+
+      {name ? (
+        <Html center distanceFactor={6} position={[0, 1.32, 0]}>
+          <div className="player-name-tag">{name}</div>
+        </Html>
+      ) : null}
     </group>
   );
 }
