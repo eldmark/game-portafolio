@@ -2,10 +2,16 @@ import { Router } from 'express';
 import {
   experienceCreateSchema,
   experienceUpdateSchema,
+  goalCreateSchema,
+  goalUpdateSchema,
+  postCreateSchema,
+  postUpdateSchema,
   projectCreateSchema,
   projectUpdateSchema,
   skillCreateSchema,
   skillUpdateSchema,
+  trophyCreateSchema,
+  trophyUpdateSchema,
 } from '@portfolio/shared';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
@@ -252,6 +258,149 @@ adminRouter.delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     await prisma.experience.delete({ where: { id } });
+    res.status(204).end();
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                    GOALS                                   */
+/* -------------------------------------------------------------------------- */
+
+adminRouter.post(
+  '/goals',
+  asyncHandler(async (req, res) => {
+    const input = goalCreateSchema.parse(req.body);
+    const goal = await prisma.goal.create({
+      data: {
+        ...input,
+        targetDate: input.targetDate ? new Date(input.targetDate) : null,
+      },
+    });
+    res.status(201).json({ data: goal });
+  }),
+);
+
+adminRouter.patch(
+  '/goals/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const input = goalUpdateSchema.parse(req.body);
+    const goal = await prisma.goal.update({
+      where: { id },
+      data: {
+        ...input,
+        targetDate: input.targetDate
+          ? new Date(input.targetDate)
+          : input.targetDate === null
+            ? null
+            : undefined,
+      },
+    });
+    res.json({ data: goal });
+  }),
+);
+
+adminRouter.delete(
+  '/goals/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    await prisma.goal.delete({ where: { id } });
+    res.status(204).end();
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                  TROPHIES                                  */
+/* -------------------------------------------------------------------------- */
+
+adminRouter.post(
+  '/trophies',
+  asyncHandler(async (req, res) => {
+    const input = trophyCreateSchema.parse(req.body);
+    const trophy = await prisma.trophy.create({
+      data: { ...input, dateEarned: new Date(input.dateEarned) },
+    });
+    res.status(201).json({ data: trophy });
+  }),
+);
+
+adminRouter.patch(
+  '/trophies/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const input = trophyUpdateSchema.parse(req.body);
+    const trophy = await prisma.trophy.update({
+      where: { id },
+      data: {
+        ...input,
+        dateEarned: input.dateEarned ? new Date(input.dateEarned) : undefined,
+      },
+    });
+    res.json({ data: trophy });
+  }),
+);
+
+adminRouter.delete(
+  '/trophies/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    await prisma.trophy.delete({ where: { id } });
+    res.status(204).end();
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                    POSTS                                   */
+/* -------------------------------------------------------------------------- */
+
+adminRouter.post(
+  '/posts',
+  asyncHandler(async (req, res) => {
+    const input = postCreateSchema.parse(req.body);
+    const post = await prisma.post.create({
+      data: {
+        ...input,
+        publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
+      },
+    });
+    res.status(201).json({ data: post });
+  }),
+);
+
+adminRouter.patch(
+  '/posts/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const input = postUpdateSchema.parse(req.body);
+    const post = await prisma.post.update({
+      where: { id },
+      data: {
+        ...input,
+        publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
+      },
+    });
+    res.json({ data: post });
+  }),
+);
+
+adminRouter.delete(
+  '/posts/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    await prisma.post.delete({ where: { id } });
+    res.status(204).end();
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                   DEVLOG                                   */
+/* -------------------------------------------------------------------------- */
+
+adminRouter.delete(
+  '/devlog/:id',
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    await prisma.devlogEntry.delete({ where: { id } });
     res.status(204).end();
   }),
 );

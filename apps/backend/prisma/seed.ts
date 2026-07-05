@@ -18,7 +18,12 @@ async function main() {
   await prisma.message.deleteMany();
   await prisma.experience.deleteMany();
   await prisma.skill.deleteMany();
+  await prisma.devlogEntry.deleteMany();
+  await prisma.post.deleteMany();
   await prisma.project.deleteMany();
+  // Goals before trophies — Goal holds the FK to Trophy
+  await prisma.goal.deleteMany();
+  await prisma.trophy.deleteMany();
 
   /* -------------------------------------------------------------------------- */
   /*                                    USERS                                   */
@@ -409,6 +414,164 @@ async function main() {
         featured: false,
         thumbnail: null,
         gifDemo: null,
+      },
+    ],
+  });
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  TROPHIES                                  */
+  /* -------------------------------------------------------------------------- */
+
+  const deploymentTrophy = await prisma.trophy.create({
+    data: {
+      title: 'First Production Deployment',
+      description:
+        'Shipped the portfolio room to a live server with Docker + GitHub Actions.',
+      category: 'Infrastructure',
+      dateEarned: new Date('2026-06-01'),
+      icon: 'Rocket',
+      proofUrl: 'http://34.71.234.176.sslip.io/#/',
+    },
+  });
+
+  await prisma.trophy.createMany({
+    data: [
+      {
+        title: 'Teaching Assistant x2',
+        description:
+          'Selected twice as TA at UVG — Algorithms & Data Structures, then Microprocessor Programming.',
+        category: 'Academic',
+        dateEarned: new Date('2026-01-15'),
+        icon: 'GraduationCap',
+        proofUrl: null,
+      },
+      {
+        title: 'Built a Lisp Interpreter from Scratch',
+        description:
+          'Lexer, parser, AST evaluation, and lexical scoping implemented in Java with no frameworks.',
+        category: 'Technical',
+        dateEarned: new Date('2025-04-20'),
+        icon: 'Braces',
+        proofUrl: 'https://github.com/eldmark/Proyect-Lisp-interpeter.git',
+      },
+      {
+        title: 'First Paid Client Project',
+        description:
+          'Delivered a Node.js + TypeScript backend with Jest tests and Docker deployment for a freelance client.',
+        category: 'Career',
+        dateEarned: new Date('2025-05-01'),
+        icon: 'Briefcase',
+        proofUrl: null,
+      },
+    ],
+  });
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    GOALS                                   */
+  /* -------------------------------------------------------------------------- */
+
+  await prisma.goal.createMany({
+    data: [
+      {
+        title: 'Contribute to an open-source project',
+        description: 'Land a merged PR in a project with 1k+ stars.',
+        category: 'Open Source',
+        status: 'in_progress',
+        targetDate: new Date('2026-12-31'),
+        orderIndex: 0,
+      },
+      {
+        title: 'Deploy the portfolio to production',
+        description:
+          'Ship the interactive 3D portfolio to a live server with CI/CD and monitoring.',
+        category: 'Infrastructure',
+        status: 'done',
+        targetDate: new Date('2026-06-01'),
+        orderIndex: 1,
+        trophyId: deploymentTrophy.id,
+      },
+      {
+        title: 'Master systems programming with Go',
+        description:
+          'Build three non-trivial Go projects: an HTTP server, a CLI tool, and a concurrent worker pool.',
+        category: 'Technical',
+        status: 'in_progress',
+        targetDate: new Date('2026-10-01'),
+        orderIndex: 2,
+      },
+      {
+        title: 'Speak at a local tech meetup',
+        description:
+          'Give a talk about building game-like web experiences with React Three Fiber.',
+        category: 'Career',
+        status: 'planned',
+        targetDate: new Date('2027-03-01'),
+        orderIndex: 3,
+      },
+    ],
+  });
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    POSTS                                   */
+  /* -------------------------------------------------------------------------- */
+
+  await prisma.post.createMany({
+    data: [
+      {
+        title: 'Why I Built My Portfolio as a Game',
+        slug: 'why-i-built-my-portfolio-as-a-game',
+        body: [
+          '# Why I Built My Portfolio as a Game',
+          '',
+          'Most portfolios are a scrollable list of cards. I wanted mine to feel like a place you *visit*.',
+          '',
+          '## The idea',
+          '',
+          'A small 3D room rendered with **React Three Fiber**, where each prop is an interactable that opens an overlay: projects on the desk, skills on the bookshelf, contact on the mailbox.',
+          '',
+          '## What I learned',
+          '',
+          '- Keeping draw calls low matters more than fancy materials.',
+          '- Lazy-loading the 3D scene keeps the initial bundle sane.',
+          '- A typed API client shared with the backend via Zod schemas removes a whole class of bugs.',
+        ].join('\n'),
+        publishedAt: new Date('2026-05-20'),
+      },
+      {
+        title: 'Shipping to Production on a Tiny Server',
+        slug: 'shipping-to-production-on-a-tiny-server',
+        body: [
+          '# Shipping to Production on a Tiny Server',
+          '',
+          'The portfolio runs on a small VM with strict memory limits, so every container counts.',
+          '',
+          '## The stack',
+          '',
+          '- Express + Prisma + PostgreSQL on the backend',
+          '- Vite-built React frontend served by nginx',
+          '- Docker Compose with memory caps per service',
+          '',
+          '## Lessons',
+          '',
+          'CORS origins, email delivery, and room boundaries all behave differently in production. Test the deployed build, not just `npm run dev`.',
+        ].join('\n'),
+        publishedAt: new Date('2026-06-02'),
+      },
+      {
+        title: 'Devlog: Goals, Trophies, and a Blog Room',
+        slug: 'devlog-goals-trophies-blog-room',
+        body: [
+          '# Devlog: Goals, Trophies, and a Blog Room',
+          '',
+          'This update adds three new content types to the portfolio:',
+          '',
+          '1. **Goals** — what I am working toward, kanban-style.',
+          '2. **Trophies** — milestones already earned, displayed on a shelf.',
+          '3. **Posts** — this very devlog, plus an auto-generated activity feed fed by GitHub webhooks.',
+          '',
+          'The activity feed uses a phrase bank instead of an LLM: cheap, fast, and deterministic to test.',
+        ].join('\n'),
+        publishedAt: new Date('2026-06-09'),
       },
     ],
   });

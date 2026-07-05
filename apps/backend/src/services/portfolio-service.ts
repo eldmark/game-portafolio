@@ -1,4 +1,13 @@
-import type { AnalyticsSummary, Experience, Project, ProjectMedia, Skill } from '@portfolio/shared';
+import type { DevlogEntry as DevlogEntryRecord, Post as PostRecord } from '@prisma/client';
+import type {
+  AnalyticsSummary,
+  DevlogEntry,
+  Experience,
+  Post,
+  Project,
+  ProjectMedia,
+  Skill,
+} from '@portfolio/shared';
 import { prisma } from '../lib/prisma.js';
 
 type ProjectRecord = Awaited<ReturnType<typeof prisma.project.findMany>>[number] & {
@@ -133,6 +142,100 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
           ? (dialogue._count.dialogueKey ?? 0)
           : 0,
     })),
+  };
+}
+
+export async function getVisitsTimeseries(days = 30) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  // Raw SQL for date_trunc grouping (Prisma groupBy can't truncate dates)
+  const rows = await prisma.$queryRaw<{ day: Date; total: bigint; recruiter: bigint }[]>`
+    SELECT
+      date_trunc('day', "created_at") AS day,
+      COUNT(*) AS total,
+      COUNT(*) FILTER (WHERE "recruiter_mode" = true) AS recruiter
+    FROM "user_visits"
+    WHERE "created_at" >= ${since}
+    GROUP BY day
+    ORDER BY day ASC
+  `;
+
+  return rows.map((row) => ({
+    date: row.day.toISOString().slice(0, 10),
+    total: Number(row.total),
+    recruiter: Number(row.recruiter),
+  }));
+}
+
+export function classifyDevice(userAgent: string): string {
+  if (/ipad|tablet|kindle|silk|playbook|android(?!.*mobi)/i.test(userAgent)) {
+    return 'Tablet';
+  }
+
+  if (/mobi|iphone|ipod|android|blackberry|windows phone|opera mini/i.test(userAgent)) {
+    return 'Mobile';
+  }
+
+  return 'Desktop';
+}
+
+export async function getDeviceBreakdown() {
+  const rows = await prisma.userVisit.groupBy({
+    by: ['device'],
+    _count: { device: true },
+    where: { device: { not: null } },
+  });
+
+  const buckets = new Map<string, number>();
+
+  for (const row of rows) {
+    const bucket = row.device ? classifyDevice(row.device) : 'Unknown';
+    buckets.set(bucket, (buckets.get(bucket) ?? 0) + row._count.device);
+  }
+
+  return [...buckets.entries()]
+    .map(([device, count]) => ({ device, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+}
+
+export async function getCountryBreakdown() {
+  const rows = await prisma.userVisit.groupBy({
+    by: ['country'],
+    _count: { country: true },
+    where: { country: { not: null } },
+    orderBy: { _count: { country: 'desc' } },
+    take: 10,
+  });
+
+  return rows.map((row) => ({
+    country: row.country ?? 'Unknown',
+    count: row._count.country,
+  }));
+}
+
+export function mapPost(post: PostRecord): Post {
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    body: post.body,
+    projectId: post.projectId,
+    publishedAt: post.publishedAt.toISOString(),
+  };
+}
+
+export function mapDevlogEntry(entry: DevlogEntryRecord): DevlogEntry {
+  return {
+    id: entry.id,
+    repo: entry.repo,
+    branch: entry.branch,
+    commitSha: entry.commitSha,
+    commitUrl: entry.commitUrl,
+    message: entry.message,
+    commitCount: entry.commitCount,
+    createdAt: entry.createdAt.toISOString(),
   };
 }
 
