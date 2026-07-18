@@ -85,6 +85,7 @@ jobs:
             echo "CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}" >> .env
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env
             echo "CONTACT_EMAIL=${{ secrets.CONTACT_EMAIL }}" >> .env
+            echo "GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}" >> .env
 
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker compose -f docker-compose.prod.yml pull
