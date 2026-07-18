@@ -106,10 +106,7 @@ function NameTagModal() {
       >
         <p className="eyebrow">Welcome</p>
         <h2 id="name-modal-title">What should we call you?</h2>
-        <p>
-          This name appears as a tag above your character. You can change your look in the Dressing
-          Room.
-        </p>
+        <p>This name appears as a tag above your character.</p>
         <input
           maxLength={20}
           onChange={(event) => setValue(event.target.value)}

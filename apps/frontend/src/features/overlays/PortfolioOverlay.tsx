@@ -8,12 +8,6 @@ import type { Experience, Project, Skill } from '@portfolio/shared';
 import { sendMessage } from '@/lib/api';
 import { aboutProfile, futureIdeas, knowledgeNotes } from '@/lib/portfolio-fallback';
 import { useBlogData } from '@/lib/useBlogData';
-import {
-  useCharacterStore,
-  type HatId,
-  type PantsColorId,
-  type ShirtColorId,
-} from '@/lib/character-store';
 import { useGoalsAndTrophies } from '@/lib/useGoalsAndTrophies';
 import { usePortfolioStore, type OverlayType } from '@/lib/store';
 
@@ -837,92 +831,6 @@ function DevlogOverlay() {
   );
 }
 
-const HAT_OPTIONS: HatId[] = ['none', 'cap', 'party', 'beanie'];
-const SHIRT_OPTIONS: ShirtColorId[] = ['default', 'red', 'blue', 'green', 'purple'];
-const PANTS_OPTIONS: PantsColorId[] = ['default', 'black', 'tan', 'navy'];
-
-const SHIRT_PREVIEW: Record<ShirtColorId, string> = {
-  default: '#7a4a2c',
-  red: '#c44040',
-  blue: '#406ec4',
-  green: '#4c9e5c',
-  purple: '#8c5ac4',
-};
-
-const PANTS_PREVIEW: Record<PantsColorId, string> = {
-  default: '#333131',
-  black: '#26262a',
-  tan: '#a88c60',
-  navy: '#2c3a68',
-};
-
-function DressingOverlay() {
-  const hat = useCharacterStore((state) => state.hat);
-  const shirtColor = useCharacterStore((state) => state.shirtColor);
-  const pantsColor = useCharacterStore((state) => state.pantsColor);
-  const setHat = useCharacterStore((state) => state.setHat);
-  const setShirtColor = useCharacterStore((state) => state.setShirtColor);
-  const setPantsColor = useCharacterStore((state) => state.setPantsColor);
-
-  return (
-    <OverlayShell title="Dressing Room">
-      <div className="dressing-preview">
-        <div className="dressing-preview-avatar">
-          <span style={{ flex: '0 0 34%', background: '#f0c9a4' }} />
-          <span style={{ flex: '0 0 33%', background: SHIRT_PREVIEW[shirtColor] }} />
-          <span style={{ flex: '0 0 33%', background: PANTS_PREVIEW[pantsColor] }} />
-        </div>
-        <p className="muted">Hat: {hat}</p>
-      </div>
-      <section>
-        <h3>Hat</h3>
-        <div className="chip-list">
-          {HAT_OPTIONS.map((option) => (
-            <button
-              className={`filter-chip ${hat === option ? 'active' : ''}`}
-              key={option}
-              onClick={() => setHat(option)}
-              type="button"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </section>
-      <section>
-        <h3>Shirt</h3>
-        <div className="chip-list">
-          {SHIRT_OPTIONS.map((option) => (
-            <button
-              className={`filter-chip ${shirtColor === option ? 'active' : ''}`}
-              key={option}
-              onClick={() => setShirtColor(option)}
-              type="button"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </section>
-      <section>
-        <h3>Pants</h3>
-        <div className="chip-list">
-          {PANTS_OPTIONS.map((option) => (
-            <button
-              className={`filter-chip ${pantsColor === option ? 'active' : ''}`}
-              key={option}
-              onClick={() => setPantsColor(option)}
-              type="button"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </section>
-    </OverlayShell>
-  );
-}
-
 export function PortfolioOverlay(props: PortfolioOverlayProps) {
   const activeOverlay = usePortfolioStore((state) => state.activeOverlay);
 
@@ -940,7 +848,6 @@ export function PortfolioOverlay(props: PortfolioOverlayProps) {
     trophies: <TrophiesOverlay />,
     posts: <PostsOverlay />,
     devlog: <DevlogOverlay />,
-    dressing: <DressingOverlay />,
     switch: (
       <Suspense fallback={<OverlayShell title="Interview Battle" wide><p>Loading battle…</p></OverlayShell>}>
         <PokemonOverlay />

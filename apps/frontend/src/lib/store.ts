@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getRoomSpawnPoint } from '@/features/room/rooms';
 
-export type RoomId = 'main' | 'goals' | 'trophy' | 'blog' | 'dressing';
+export type RoomId = 'main' | 'archive';
 
 export type OverlayType =
   | 'computer'
@@ -18,7 +18,6 @@ export type OverlayType =
   | 'trophies'
   | 'posts'
   | 'devlog'
-  | 'dressing'
   | null;
 
 type Vec3Tuple = [number, number, number];

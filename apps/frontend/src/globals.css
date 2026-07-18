@@ -597,28 +597,6 @@ code {
   transform: translateY(-4px);
 }
 
-.dressing-preview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.dressing-preview-avatar {
-  width: 54px;
-  height: 84px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.dressing-preview-avatar span {
-  display: block;
-}
-
 .mascot-dialogue {
   position: fixed;
   z-index: 18;

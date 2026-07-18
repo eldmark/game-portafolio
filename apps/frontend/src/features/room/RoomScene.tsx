@@ -2,7 +2,7 @@
 
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { usePortfolioStore, type RoomId } from '@/lib/store';
 import { Player } from './Player';
@@ -12,7 +12,7 @@ import type { RoomObject } from './room-objects';
 function MailboxProp() {
   // swapped with bookshelf: now placed where bookshelf used to be
   return (
-    <group position={[2.95, 0, 1.2]}>
+    <group position={[3.7, 0, 1.2]}>
       <mesh castShadow position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.08, 0.1, 1, 14]} />
         <meshStandardMaterial color="#7a573d" />
@@ -43,7 +43,7 @@ function MailboxProp() {
 
 function PortraitProp() {
   return (
-    <group position={[-3.69, 0, 0.42]}>
+    <group position={[-4.44, 0, 0.42]}>
       <mesh castShadow position={[0, 1.62, 0]}>
         <boxGeometry args={[0.08, 1.44, 1.06]} />
         <meshStandardMaterial color="#73492f" />
@@ -70,7 +70,7 @@ function PortraitProp() {
 
 function PosterWallProps() {
   return (
-    <group position={[2.02, 0, -2.95]}>
+    <group position={[2.02, 0, -3.6]}>
       <mesh castShadow position={[-0.52, 1.75, 0.02]}>
         <boxGeometry args={[0.9, 1.28, 0.03]} />
         <meshStandardMaterial color="#2f4b68" />
@@ -99,7 +99,9 @@ function PosterWallProps() {
   );
 }
 
-const floorSeams = [-2.25, -1.7, -1.15, -0.6, -0.05, 0.5, 1.05, 1.6, 2.15] as const;
+const floorSeams = [
+  -3.35, -2.8, -2.25, -1.7, -1.15, -0.6, -0.05, 0.5, 1.05, 1.6, 2.15, 2.7, 3.25,
+] as const;
 const deskKeyRows = [-0.5, -0.38, -0.26] as const;
 const deskKeyColumns = [-0.42, -0.28, -0.14, 0, 0.14, 0.28, 0.42] as const;
 const bookRows = [0.28, 0.72, 1.17, 1.62] as const;
@@ -112,7 +114,7 @@ const whiteboardNotes = [
 ] as const;
 
 function FloorDetails() {
-  const seamGeo = useMemo(() => new THREE.BoxGeometry(7.12, 0.012, 0.018), []);
+  const seamGeo = useMemo(() => new THREE.BoxGeometry(8.62, 0.012, 0.018), []);
   const seamMat = useMemo(
     () => new THREE.MeshStandardMaterial({ color: '#6d4932', roughness: 1 }),
     [],
@@ -148,8 +150,8 @@ function FloorDetails() {
 }
 
 function BaseboardTrim() {
-  const horizontalGeo = useMemo(() => new THREE.BoxGeometry(7.36, 0.16, 0.06), []);
-  const verticalGeo = useMemo(() => new THREE.BoxGeometry(0.06, 0.16, 5.78), []);
+  const horizontalGeo = useMemo(() => new THREE.BoxGeometry(8.86, 0.16, 0.06), []);
+  const verticalGeo = useMemo(() => new THREE.BoxGeometry(0.06, 0.16, 7.08), []);
   const mat1 = useMemo(
     () => new THREE.MeshStandardMaterial({ color: '#7e5b42', roughness: 0.9 }),
     [],
@@ -161,9 +163,9 @@ function BaseboardTrim() {
 
   return (
     <group>
-      <mesh receiveShadow position={[0, 0.28, -2.91]} geometry={horizontalGeo} material={mat1} />
-      <mesh receiveShadow position={[-3.64, 0.28, 0]} geometry={verticalGeo} material={mat2} />
-      <mesh receiveShadow position={[3.64, 0.28, 0]} geometry={verticalGeo} material={mat2} />
+      <mesh receiveShadow position={[0, 0.28, -3.56]} geometry={horizontalGeo} material={mat1} />
+      <mesh receiveShadow position={[-4.39, 0.28, 0]} geometry={verticalGeo} material={mat2} />
+      <mesh receiveShadow position={[4.39, 0.28, 0]} geometry={verticalGeo} material={mat2} />
     </group>
   );
 }
@@ -176,7 +178,7 @@ function DeskSetup() {
   );
 
   return (
-    <group position={[-2.7, 0, -2.1]}>
+    <group position={[-3.45, 0, -2.75]}>
       <mesh castShadow receiveShadow position={[0, 0.48, -0.2]}>
         <boxGeometry args={[1.95, 0.14, 0.9]} />
         <meshStandardMaterial color="#5a3f31" roughness={0.82} />
@@ -258,7 +260,7 @@ function DeskSetup() {
 
 function NintendoSwitchProp() {
   return (
-    <group position={[3.2, 0.58, 2.05]} rotation={[0, 90, 0]}>
+    <group position={[3.95, 0.58, 2.7]} rotation={[0, 90, 0]}>
       <mesh castShadow>
         <boxGeometry args={[0.3, 0.18, 0.018]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.6} />
@@ -282,7 +284,7 @@ function NintendoSwitchProp() {
 
 function BedProp() {
   return (
-    <group position={[-2.35, 0, 1.8]}>
+    <group position={[-3.1, 0, 2.45]}>
       <mesh castShadow receiveShadow position={[0, 0.26, 0]}>
         <boxGeometry args={[2.1, 0.42, 1.45]} />
         <meshStandardMaterial color="#8562a1" roughness={0.82} />
@@ -327,7 +329,7 @@ function BookshelfProp() {
 
   // swapped with mailbox: now placed where mailbox used to be
   return (
-    <group position={[3.02, 0, -1.16]}>
+    <group position={[3.77, 0, -1.16]}>
       <mesh castShadow receiveShadow position={[0, 0.92, 0]}>
         <boxGeometry args={[0.78, 1.9, 1.58]} />
         <meshStandardMaterial color="#5c4c3b" roughness={0.86} />
@@ -365,7 +367,7 @@ function BookshelfProp() {
 
 function ProjectBoardProp() {
   return (
-    <group position={[0, 0, -2.82]}>
+    <group position={[0, 0, -3.47]}>
       <mesh castShadow receiveShadow position={[0, 1.62, 0]}>
         <boxGeometry args={[2.35, 1.48, 0.08]} />
         <meshStandardMaterial color="#4d684a" roughness={0.84} />
@@ -422,7 +424,7 @@ const visionBoardNotes = [
 
 function VisionBoardProp() {
   return (
-    <group position={[-0.4, 0, -2.92]}>
+    <group position={[-1.5, 0, -2.92]}>
       <mesh castShadow receiveShadow position={[0, 1.62, 0]}>
         <boxGeometry args={[2.5, 1.6, 0.08]} />
         <meshStandardMaterial color="#73492f" roughness={0.86} />
@@ -501,7 +503,7 @@ function PlaceholderTrophy({
 
 function TrophyShelfProp() {
   return (
-    <group position={[3.08, 0, 0]}>
+    <group position={[3.08, 0, 1.2]}>
       <mesh castShadow receiveShadow position={[0, 1.05, 0]}>
         <boxGeometry args={[0.56, 2.1, 1.86]} />
         <meshStandardMaterial color="#4a3a59" roughness={0.86} />
@@ -535,7 +537,7 @@ const bulletinPapers = [
 
 function BulletinBoardProp() {
   return (
-    <group position={[-1, 0, -2.92]}>
+    <group position={[1.3, 0, -2.92]}>
       <mesh castShadow receiveShadow position={[0, 1.6, 0]}>
         <boxGeometry args={[2.1, 1.45, 0.08]} />
         <meshStandardMaterial color="#5c4533" roughness={0.86} />
@@ -741,80 +743,57 @@ function CameraRig() {
   return null;
 }
 
-function GenericRoomShell({ room }: { room: RoomDefinition }) {
+function GenericRoomShell({
+  room,
+  children,
+  backWallColor,
+}: {
+  room: RoomDefinition;
+  children?: ReactNode;
+  backWallColor?: string;
+}) {
+  const { bounds } = room;
+  const wallX = bounds.maxX + 0.5;
+  const backWallZ = bounds.minZ - 0.65;
+  const floorWidth = 2 * (wallX - 0.15);
+  const floorZMin = backWallZ + 0.15;
+  const floorZMax = bounds.maxZ + 0.2;
+  const floorDepth = floorZMax - floorZMin;
+  const floorZCenter = (floorZMin + floorZMax) / 2;
+
   return (
     <group>
-      <mesh receiveShadow position={[0, -0.03, 0]}>
-        <boxGeometry args={[7.5, 0.1, 6]} />
+      <mesh receiveShadow position={[0, -0.03, floorZCenter]}>
+        <boxGeometry args={[2 * wallX, 0.1, floorDepth + 0.3]} />
         <meshStandardMaterial color="#7f5b3f" />
       </mesh>
 
-      <mesh receiveShadow position={[0, 0.02, 0]}>
-        <boxGeometry args={[7.2, 0.02, 5.7]} />
+      <mesh receiveShadow position={[0, 0.02, floorZCenter]}>
+        <boxGeometry args={[floorWidth, 0.02, floorDepth]} />
         <meshStandardMaterial color={room.floorColor} roughness={0.96} metalness={0} />
       </mesh>
 
-      <mesh receiveShadow position={[0, 1.5, -3]}>
-        <boxGeometry args={[7.5, 3, 0.12]} />
+      <mesh receiveShadow position={[0, 1.5, backWallZ]}>
+        <boxGeometry args={[2 * wallX, 3, 0.12]} />
+        <meshStandardMaterial color={backWallColor ?? room.wallColor} />
+      </mesh>
+      <mesh receiveShadow position={[-wallX, 1.5, floorZCenter]}>
+        <boxGeometry args={[0.12, 3, floorDepth + 0.3]} />
         <meshStandardMaterial color={room.wallColor} />
       </mesh>
-      <mesh receiveShadow position={[-3.75, 1.5, 0]}>
-        <boxGeometry args={[0.12, 3, 6]} />
+      <mesh receiveShadow position={[wallX, 1.5, floorZCenter]}>
+        <boxGeometry args={[0.12, 3, floorDepth + 0.3]} />
         <meshStandardMaterial color={room.wallColor} />
       </mesh>
-      <mesh receiveShadow position={[3.75, 1.5, 0]}>
-        <boxGeometry args={[0.12, 3, 6]} />
-        <meshStandardMaterial color={room.wallColor} />
-      </mesh>
-      {room.id === 'goals' ? <VisionBoardProp /> : null}
-      {room.id === 'trophy' ? <TrophyShelfProp /> : null}
-      {room.id === 'blog' ? (
+      {room.id === 'archive' ? (
         <>
+          <VisionBoardProp />
+          <TrophyShelfProp />
           <BulletinBoardProp />
           <DevTerminalProp />
         </>
       ) : null}
-      <OpenCeilingLight />
-    </group>
-  );
-}
-
-function MainRoomShell() {
-  return (
-    <group>
-      <mesh receiveShadow position={[0, -0.03, 0]}>
-        <boxGeometry args={[7.5, 0.1, 6]} />
-        <meshStandardMaterial color="#7f5b3f" />
-      </mesh>
-
-      <mesh receiveShadow position={[0, 0.02, 0]}>
-        <boxGeometry args={[7.2, 0.02, 5.7]} />
-        <meshStandardMaterial color="#91633f" roughness={0.96} metalness={0} />
-      </mesh>
-      <FloorDetails />
-
-      <mesh receiveShadow position={[0, 1.5, -3]}>
-        <boxGeometry args={[7.5, 3, 0.12]} />
-        <meshStandardMaterial color="#36424d" />
-      </mesh>
-      <mesh receiveShadow position={[-3.75, 1.5, 0]}>
-        <boxGeometry args={[0.12, 3, 6]} />
-        <meshStandardMaterial color="#5d4b3f" />
-      </mesh>
-      <mesh receiveShadow position={[3.75, 1.5, 0]}>
-        <boxGeometry args={[0.12, 3, 6]} />
-        <meshStandardMaterial color="#5d4b3f" />
-      </mesh>
-      <BaseboardTrim />
-      <DeskSetup />
-      <NintendoSwitchProp />
-      <BedProp />
-      <BookshelfProp />
-      <ProjectBoardProp />
-
-      <PortraitProp />
-      <PosterWallProps />
-      <MailboxProp />
+      {children}
       <OpenCeilingLight />
     </group>
   );
@@ -844,10 +823,25 @@ export function RoomScene({
         shadow-mapSize-height={512}
         shadow-mapSize-width={512}
       />
-      <pointLight position={[3.6, 1.9, 1.05]} color="#ffd99a" intensity={0.95} />
+      <pointLight position={[4.35, 1.9, 1.05]} color="#ffd99a" intensity={0.95} />
       <pointLight position={[0.4, 2.85, 0.2]} color="#ffcb80" intensity={0.68} distance={8} />
-      <pointLight position={[0.4, 2.1, -2.8]} color="#8ec8ff" intensity={0.4} distance={5.8} />
-      {roomId === 'main' ? <MainRoomShell /> : <GenericRoomShell room={room} />}
+      <pointLight position={[0.4, 2.1, -3.45]} color="#8ec8ff" intensity={0.4} distance={5.8} />
+      {roomId === 'main' ? (
+        <GenericRoomShell room={room} backWallColor="#36424d">
+          <FloorDetails />
+          <BaseboardTrim />
+          <DeskSetup />
+          <NintendoSwitchProp />
+          <BedProp />
+          <BookshelfProp />
+          <ProjectBoardProp />
+          <PortraitProp />
+          <PosterWallProps />
+          <MailboxProp />
+        </GenericRoomShell>
+      ) : (
+        <GenericRoomShell room={room} />
+      )}
       {room.objects.map((object) => (
         <InteractableObject
           active={object.id === activeObjectId}
