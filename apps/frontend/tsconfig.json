@@ -10,9 +10,6 @@
       ],
       "@portfolio/shared": [
         "../../packages/shared/src"
-      ],
-      "@portfolio/ui": [
-        "../../packages/ui/src"
       ]
     },
     "allowJs": true

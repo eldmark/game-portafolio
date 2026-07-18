@@ -7,7 +7,6 @@ This repository is a monorepo with:
 - `apps/frontend`: Vite + React portfolio client
 - `apps/backend`: Express + Prisma + PostgreSQL API
 - `packages/shared`: shared contracts and schemas
-- `packages/ui`: shared UI package
 - `docs/`: deployment and project documentation
 
 ## What This Project Does
@@ -284,9 +283,6 @@ Errors use:
 - `GET /posts`
 - `GET /posts/:slug`
 - `GET /devlog?limit=20` — auto-generated GitHub activity feed (max 50)
-- `POST /presence/ping` — heartbeat with room/position/cosmetics (in-memory, no DB)
-- `GET /presence/:roomId?sessionId=...` — other visitors currently in a room
-- `POST /presence/leave`
 
 ### Auth
 

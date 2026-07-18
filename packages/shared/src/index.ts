@@ -177,20 +177,6 @@ export type Project = z.infer<typeof projectSchema>;
 export type ProjectCreate = z.infer<typeof projectCreateSchema>;
 export type ProjectUpdate = z.infer<typeof projectUpdateSchema>;
 
-export const presencePingSchema = z.object({
-  sessionId: sessionIdSchema,
-  name: z.string().trim().max(20),
-  roomId: z.string(),
-  position: z.tuple([z.number(), z.number(), z.number()]),
-  hat: z.string(),
-  shirtColor: z.string(),
-  pantsColor: z.string(),
-});
-
-export const presenceEntrySchema = presencePingSchema.extend({
-  lastSeen: z.number(),
-});
-
 export type Skill = z.infer<typeof skillSchema>;
 export type SkillCreate = z.infer<typeof skillCreateSchema>;
 export type SkillUpdate = z.infer<typeof skillUpdateSchema>;
@@ -221,9 +207,6 @@ export type PostCreate = z.infer<typeof postCreateSchema>;
 export type PostUpdate = z.infer<typeof postUpdateSchema>;
 export type DevlogEntry = z.infer<typeof devlogEntrySchema>;
 export type GithubPushWebhook = z.infer<typeof githubPushWebhookSchema>;
-
-export type PresencePing = z.infer<typeof presencePingSchema>;
-export type PresenceEntry = z.infer<typeof presenceEntrySchema>;
 
 export type ApiError = {
   error: string;

@@ -7,7 +7,6 @@ export type RoomObject = {
   overlay: Exclude<OverlayType, null>;
   position: [number, number, number];
   size: [number, number, number];
-  color: string;
   interactionDistance?: number;
   markerPosition?: [number, number, number];
 };

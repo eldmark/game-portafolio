@@ -12,8 +12,6 @@ import type {
   Post,
   PostCreate,
   PostUpdate,
-  PresenceEntry,
-  PresencePing,
   Project,
   Skill,
   Trophy,
@@ -125,41 +123,10 @@ export async function getPosts() {
   return request<ApiListResponse<Post>>('/posts').then((response) => response.data);
 }
 
-export async function getPostBySlug(slug: string) {
-  return request<ApiItemResponse<Post>>(`/posts/${slug}`).then((response) => response.data);
-}
-
 export async function getDevlog(limit = 20) {
   return request<ApiListResponse<DevlogEntry>>(`/devlog?limit=${limit}`).then(
     (response) => response.data,
   );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                  PRESENCE                                  */
-/* -------------------------------------------------------------------------- */
-
-export type RemotePresence = Omit<PresenceEntry, 'sessionId'>;
-
-export async function pingPresence(input: PresencePing) {
-  return request<ApiItemResponse<{ ok: boolean }>>('/presence/ping', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  }).then((response) => response.data);
-}
-
-export async function getPresence(roomId: string, sessionId?: string) {
-  const query = sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : '';
-  return request<ApiListResponse<RemotePresence>>(`/presence/${roomId}${query}`).then(
-    (response) => response.data,
-  );
-}
-
-export async function leavePresence(sessionId: string) {
-  return request<void>('/presence/leave', {
-    method: 'POST',
-    body: JSON.stringify({ sessionId }),
-  });
 }
 
 export type AdminUser = {
@@ -339,10 +306,6 @@ export async function updatePost(id: string, data: PostUpdate) {
 
 export async function deletePost(id: string) {
   return request<void>(`/admin/posts/${id}`, { method: 'DELETE' });
-}
-
-export async function deleteDevlogEntry(id: string) {
-  return request<void>(`/admin/devlog/${id}`, { method: 'DELETE' });
 }
 
 export async function getUsers() {

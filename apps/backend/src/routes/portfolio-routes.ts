@@ -3,14 +3,12 @@ import { z } from 'zod';
 import {
   contactMessageInputSchema,
   dialogueLogInputSchema,
-  presencePingSchema,
   sessionIdSchema,
   visitInputSchema,
   visitPatchSchema,
 } from '@portfolio/shared';
 import { asyncHandler, notFound } from '../lib/errors.js';
 import { prisma } from '../lib/prisma.js';
-import { getPresenceInRoom, removePresence, upsertPresence } from '../lib/presence-store.js';
 import { sendContactEmail } from '../services/email-service.js';
 import { getGoals, getTrophies } from '../services/goals-trophies-service.js';
 import {
@@ -139,40 +137,6 @@ portfolioRouter.get(
       getCountryBreakdown(),
     ]);
     res.json({ data: { visitsOverTime, deviceBreakdown, countryBreakdown } });
-  }),
-);
-
-portfolioRouter.post(
-  '/presence/ping',
-  asyncHandler(async (req, res) => {
-    const input = presencePingSchema.parse(req.body);
-    upsertPresence({ ...input, lastSeen: Date.now() });
-    res.json({ data: { ok: true } });
-  }),
-);
-
-portfolioRouter.get(
-  '/presence/:roomId',
-  asyncHandler(async (req, res) => {
-    const { roomId } = req.params;
-
-    if (!roomId) {
-      throw notFound('Room not found');
-    }
-
-    const sessionId = typeof req.query.sessionId === 'string' ? req.query.sessionId : undefined;
-    const others = getPresenceInRoom(roomId, sessionId);
-    // Strip session IDs so other visitors only ever see names, never identifiers
-    res.json({ data: others.map(({ sessionId: _id, ...rest }) => rest) });
-  }),
-);
-
-portfolioRouter.post(
-  '/presence/leave',
-  asyncHandler(async (req, res) => {
-    const { sessionId } = z.object({ sessionId: sessionIdSchema }).parse(req.body);
-    removePresence(sessionId);
-    res.status(204).end();
   }),
 );
 

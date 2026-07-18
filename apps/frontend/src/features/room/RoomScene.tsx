@@ -629,7 +629,6 @@ function InteractableObject({
             transparent
             opacity={0}
             depthWrite={false}
-            color={object.color}
             emissive={active ? '#4b8f8c' : '#000000'}
           />
         </mesh>

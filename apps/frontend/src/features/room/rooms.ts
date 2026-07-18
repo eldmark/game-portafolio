@@ -72,7 +72,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'computer',
         position: [-3.45, 0.85, -3.05],
         size: [1.5, 1.1, 0.35],
-        color: '#263238',
         interactionDistance: 1.6,
         markerPosition: [-3.45, 0.56, -3.1],
       },
@@ -83,7 +82,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'projects',
         position: [0, 1.55, -3.5],
         size: [2.4, 1.4, 0.18],
-        color: '#4f6f52',
         interactionDistance: 1.65,
         // button on the floor
         markerPosition: [0, 0.02, -3.1],
@@ -96,7 +94,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // swapped with bookshelf
         position: [3.7, 1.05, 1.2],
         size: [0.66, 0.92, 0.58],
-        color: '#a04747',
         interactionDistance: 1.25,
         // button on the floor
         markerPosition: [3.47, 0.02, 1.15],
@@ -108,7 +105,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'about',
         position: [-3.96, 1.6, 0.42],
         size: [0.18, 1.32, 0.92],
-        color: '#7f5539',
         interactionDistance: 1.25,
         // button on the floor
         markerPosition: [-3.69, 0.02, 0.42],
@@ -121,7 +117,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // swapped with mailbox
         position: [3.77, 0.66, -1.16],
         size: [0.55, 1.9, 1.35],
-        color: '#6c584c',
         interactionDistance: 1.5,
         markerPosition: [3.45, 0.42, -1.14],
       },
@@ -132,7 +127,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'posters',
         position: [1.95, 1.72, -3.51],
         size: [1.22, 1.34, 0.14],
-        color: '#2f5f98',
         interactionDistance: 1.35,
         // button on the floor
         markerPosition: [1.96, 0.02, -3.13],
@@ -144,7 +138,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'future',
         position: [-2.95, 0.45, 2.45],
         size: [1.8, 0.55, 1.35],
-        color: '#8e5572',
         interactionDistance: 1.5,
         markerPosition: [-2.85, 0.5, 1.6],
       },
@@ -155,7 +148,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         overlay: 'switch',
         position: [3.95, 0.58, 2.7],
         size: [0.32, 0.18, 0.06],
-        color: '#1a1a1a',
         interactionDistance: 1.6,
         markerPosition: [3.95, 0.02, 2.7],
       },
@@ -196,7 +188,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // corkboard on the back wall, far from the right-wall door
         position: [-1.5, 1.55, -2.85],
         size: [2.4, 1.5, 0.18],
-        color: '#b08968',
         interactionDistance: 1.65,
         // button on the floor
         markerPosition: [-1.5, 0.02, -2.45],
@@ -209,7 +200,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // board on the back wall, far from the left-wall door
         position: [1.3, 1.55, -2.85],
         size: [2, 1.35, 0.16],
-        color: '#9c6644',
         interactionDistance: 1.65,
         // button on the floor
         markerPosition: [1.3, 0.02, -2.45],
@@ -222,7 +212,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // shelf against the right wall, opposite the left-wall door
         position: [3.05, 0.95, 1.2],
         size: [0.6, 1.9, 1.8],
-        color: '#caa64b',
         interactionDistance: 1.7,
         // button on the floor
         markerPosition: [2.5, 0.02, 1.2],
@@ -235,7 +224,6 @@ export const rooms: Record<RoomId, RoomDefinition> = {
         // desk with terminal against the right wall
         position: [2.95, 0.8, -0.9],
         size: [0.85, 1, 1.25],
-        color: '#1c2a22',
         interactionDistance: 1.7,
         // button on the floor
         markerPosition: [2.45, 0.02, -0.9],
