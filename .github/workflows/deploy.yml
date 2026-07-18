@@ -85,7 +85,9 @@ jobs:
             echo "CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}" >> .env
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env
             echo "CONTACT_EMAIL=${{ secrets.CONTACT_EMAIL }}" >> .env
-            echo "GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}" >> .env
+            # GitHub reserves the GITHUB_ prefix for secret names, so the secret is
+            # stored as DEVLOG_WEBHOOK_SECRET and mapped to the env var the backend reads.
+            echo "GITHUB_WEBHOOK_SECRET=${{ secrets.DEVLOG_WEBHOOK_SECRET }}" >> .env
 
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker compose -f docker-compose.prod.yml pull
