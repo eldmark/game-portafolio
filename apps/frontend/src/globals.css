@@ -701,6 +701,14 @@ code {
   line-height: 1.7;
 }
 
+.terms-modal input {
+  margin-top: 20px;
+}
+
+.terms-modal-actions {
+  margin-top: 20px;
+}
+
 .overlay-panel {
   width: min(1000px, 100%);
   max-height: calc(100vh - 112px);
@@ -1224,7 +1232,8 @@ code {
 
 .terminal-form input,
 .contact-form input,
-.contact-form textarea {
+.contact-form textarea,
+.terms-modal input {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;

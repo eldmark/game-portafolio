@@ -1,464 +1,218 @@
 # Interactive Portfolio Room
 
-Interactive portfolio presented as an explorable 3D room with a recruiter-friendly alternate view, admin dashboard, analytics, contact flow, and a small full-stack backend. production https://marcodiaz.me/
+An interactive developer portfolio built as an explorable 3D room — walk around a scene, interact with objects, and open project, skill, and contact panels. A recruiter mode offers the same content as a fast, linear page for people who want the proof of work without the game.
 
-This repository is a monorepo with:
+**Live:** <https://marcodiaz.me>
 
-- `apps/frontend`: Vite + React portfolio client
-- `apps/backend`: Express + Prisma + PostgreSQL API
-- `packages/shared`: shared contracts and schemas
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D20.11-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
+![CI](https://github.com/eldmark/game-portafolio/actions/workflows/deploy.yml/badge.svg)
 
-## What This Project Does
+---
 
-The project exposes two primary user experiences:
+## Screenshots
 
-- A room-based portfolio where visitors move around a scene, interact with objects, and open overlays for projects, skills, contact, and resume content.
-- A recruiter page with a faster linear navigation flow for proof-of-work review.
+| Room entry | Recruiter view |
+| --- | --- |
+| ![Portfolio room entry](assets/images/Screenshot_20260602_115419.png) | ![Recruiter-oriented view](assets/images/Screenshot_20260602_115423.png) |
 
-It also includes:
+![Interactive section view](assets/images/Screenshot_20260602_115512.png)
 
-- Admin authentication and dashboard routes
-- Contact form delivery with Resend and fallback behavior
-- Visit tracking and dialogue analytics
-- Dockerized deployment for frontend, backend, and PostgreSQL
+---
+
+## Features
+
+- **3D room experience** — React Three Fiber scene with interactable objects that open project, skills, resume, and contact overlays.
+- **Recruiter mode** — linear, scannable route (`/#/recruiter`) for fast evaluation.
+- **Full-stack backend** — Express + Prisma + PostgreSQL API serving projects, skills, experiences, posts, goals, and trophies.
+- **Admin dashboard** — JWT-authenticated CRUD for all portfolio content.
+- **Contact flow** — validated form delivered through Resend, with graceful fallback.
+- **Analytics** — visit tracking, device/country breakdowns, and dialogue interaction logs.
+- **Auto devlog** — GitHub push webhook (HMAC-signed) generates a live activity feed.
+- **Offline-tolerant frontend** — bundled fallback content keeps the site useful if the API is down.
+- **CI/CD** — GitHub Actions builds images, pushes to GHCR, and the server only pulls and restarts.
+
+---
 
 ## Stack
 
-- Frontend: React, Vite, TypeScript, React Router, React Three Fiber, Drei, Zustand, Framer Motion
-- Backend: Node.js, Express, Prisma, PostgreSQL, Zod
-- Infrastructure: Docker, Docker Compose, Nginx, GitHub Actions, GHCR
+| Layer | Technology |
+| --- | --- |
+| Frontend | React, Vite, TypeScript, React Router, React Three Fiber, Drei, Zustand, Framer Motion |
+| Backend | Node.js, Express, Prisma, PostgreSQL, Zod |
+| Infrastructure | Docker, Docker Compose, Nginx, Let's Encrypt, GitHub Actions, GHCR |
+| Testing | `node:test` (Node built-in runner) + `tsx` |
 
-## Why This Stack Was Chosen
+### Why this stack
 
-This stack is a good fit for this portfolio because it balances presentation, maintainability, and operational reality without overcomplicating the codebase. On the frontend, `React + Vite + TypeScript` give a fast iteration loop while still keeping the room experience and recruiter view strongly typed, and the code makes that decision concrete by using `React.lazy` and `Suspense` in [apps/frontend/src/App.tsx](apps/frontend/src/App.tsx) to split the heaviest views into separate chunks instead of loading everything at startup. That matters here because the portfolio includes a 3D scene, animated overlays, audio, and a recruiter mode, so the app benefits from deferring non-critical code until it is actually needed. The same logic applies to the data layer: `usePortfolioData` in [apps/frontend/src/lib/usePortfolioData.ts](apps/frontend/src/lib/usePortfolioData.ts) hydrates live backend data asynchronously but keeps fallback content ready immediately, which means the page stays useful even if the API is slow or unavailable. `React Router` and `HashRouter` are also a practical choice because this project is deployed behind a reverse proxy and should keep stable recruiter and admin routes without depending on server rewrite rules. For state, `Zustand` is the right amount of abstraction because the app only needs lightweight global UI state such as overlays, audio, tutorial visibility, and room interaction flags; using a heavier store pattern would add complexity without improving the user experience. `React Three Fiber + Drei` are justified because they let the portfolio use a 3D room as a differentiator while still staying inside the React component model, and the room can lazily load expensive pieces instead of blocking the rest of the interface. `Framer Motion` adds controlled transitions that make overlays feel intentional rather than bolted on, which helps the product feel polished without introducing expensive rendering logic. On the backend, `Express + Prisma + PostgreSQL` are a strong combination because the API is explicit, the database is relational, and the schema is expressive enough to support projects, skills, experiences, messages, visits, and dialogue analytics with predictable queries and migrations; that is a better fit than a more abstract stack because the portfolio needs to demonstrate real engineering judgment, not just framework usage. Finally, `Docker + Docker Compose` and `GitHub Actions + GHCR` are not cosmetic choices: they solve a real production constraint by moving image builds off the server, reducing CPU, RAM, and disk pressure during deployment, which is especially important for a low-resource host and makes the infrastructure easier to reason about, reproduce, and explain in an interview.
+**React + Vite + TypeScript** keep iteration fast while the room, overlays, and recruiter view stay strongly typed. The heaviest views are code-split with `React.lazy`/`Suspense` in [App.tsx](apps/frontend/src/App.tsx) so a visitor does not download the 3D scene, audio, and recruiter mode up front.
 
-## Project Proof And Repository Notes
+**Zustand** is the right size for the global state this app actually has — overlays, audio, tutorial visibility, interaction flags. A heavier store would add ceremony without improving anything.
 
-This portfolio intentionally includes a mix of:
+**React Three Fiber + Drei** make the 3D room the differentiator while staying inside the React component model, so scene pieces can be lazily mounted like any other component.
 
-- Public personal or academic projects with repository links when they can be shared.
-- Professional client work where the implementation can be described, but the source repository cannot be published because the code belongs to a company or is protected by NDA/internal ownership rules.
+**Express + Prisma + PostgreSQL** fit a genuinely relational domain (projects, skills, experiences, messages, visits, analytics) with predictable queries and real migrations.
 
-For those private projects, the portfolio still exposes the engineering signal that matters for evaluation:
+**Docker + GitHub Actions + GHCR** solve a concrete constraint: the production host is a 1 GB VM. Building images on the server would exhaust its RAM and disk, so builds run in CI and the server only pulls ready-made images.
 
-- architecture summary
-- stack decisions
-- technical challenges
-- deployment and infrastructure notes
-- demo media when available
+**Fallback-first data loading** — [`usePortfolioData`](apps/frontend/src/lib/usePortfolioData.ts) renders bundled content immediately and hydrates from the API when it responds, so a slow or down backend degrades quietly instead of showing an empty page.
 
-The goal is to be honest about code ownership boundaries without presenting confidential work as public.
+---
 
-## Screenshots / GIFs
+## Architecture
 
-Current interface captures stored in the repository:
+```mermaid
+flowchart TD
+    Browser["🌐 Browser"]
+    Nginx["Nginx — host<br/>TLS via Let's Encrypt"]
+    Frontend["frontend :8082<br/>Nginx + Vite build"]
+    Backend["backend :4000<br/>Express + Prisma"]
+    Postgres[("postgres :5432<br/>internal only")]
 
-![Portfolio room entry](assets/images/Screenshot_20260602_115419.png)
-![Recruiter-oriented portfolio view](assets/images/Screenshot_20260602_115423.png)
-![Interactive portfolio section view](assets/images/Screenshot_20260602_115512.png)
+    Browser -->|HTTPS| Nginx
+    Nginx -->|/| Frontend
+    Nginx -->|/api/| Backend
+    Backend --> Postgres
+```
 
-Additional project demos are also embedded in the app through local media assets under `apps/frontend/public/assets/demos`.
+The browser never talks to the backend port directly — all API traffic goes through `/api` on the same origin, which keeps CORS simple and avoids mixed-content issues. Postgres is not published to the host; only the backend reaches it over the Compose network.
 
-## Repository Layout
+Full breakdown — request pipeline, data model, frontend modules, and the reasoning behind each decision: [documentations/architecture.md](documentations/architecture.md).
+
+### Repository layout
 
 ```text
 .
 ├── apps
-│   ├── backend
+│   ├── backend          # Express + Prisma API
+│   │   ├── prisma       # schema, migrations, seed
 │   │   ├── src
 │   │   └── test
-│   └── frontend
+│   └── frontend         # Vite + React client
 │       ├── src
 │       └── test
 ├── packages
-│   └── shared
-├── docker-compose.prod.yml
+│   └── shared           # Zod contracts shared by both apps
+├── documentations       # public documentation
+├── docs                 # internal notes and runbooks
+├── docker-compose.yml       # local full stack
+├── docker-compose.prod.yml  # production (GHCR images)
 └── .github/workflows/deploy.yml
 ```
 
-## Routing Model
+---
 
-The frontend uses `HashRouter`.
+## Documentation
 
-That matters for production URLs:
+| Document | Covers |
+| --- | --- |
+| [architecture.md](documentations/architecture.md) | Topology, repository layout, backend layers, data model, frontend structure |
+| [deployment.md](documentations/deployment.md) | CI/CD pipeline, images, Compose topology, configuration, rollback |
+| [api.md](documentations/api.md) | Endpoint reference, response envelope, auth, rate limits, webhooks |
+| [security.md](documentations/security.md) | Threat model, auth, validation, network exposure, known limitations |
+| [operations.md](documentations/operations.md) | Commands, health checks, database ops, troubleshooting, incident response |
 
-- Public home: `http://<host>/#/`
-- Recruiter page: `http://<host>/#/recruiter`
-- Recruiter section example: `http://<host>/#/recruiter/projects`
-- Admin login: `http://<host>/#/admin/login`
-- Admin dashboard: `http://<host>/#/admin/dashboard`
+---
 
-This was chosen because the project may be hosted behind simple static hosting or nested paths where server-side SPA rewrites are not guaranteed.
-
-## API Model
-
-The frontend should call the backend through `/api` in production.
-
-That means:
-
-- Browser -> `http://<host>/api/...`
-- Nginx -> proxies `/api` to the backend container
-
-Do not build production frontend images with `VITE_API_URL=<server-ip>:4000`. That bypasses the reverse proxy, creates CORS issues, and breaks browser behavior.
-
-Correct production value:
-
-```env
-VITE_API_URL=/api
-```
-
-## Local Development
+## Getting Started
 
 ### Prerequisites
 
 - Node.js `>= 20.11.0`
 - npm `>= 10.2.0`
-- PostgreSQL if running outside Docker
+- PostgreSQL (or Docker)
 
-### Environment Files
-
-Create local env files as needed:
+### Setup
 
 ```bash
-cp .env.example .env
+git clone https://github.com/eldmark/game-portafolio.git
+cd game-portafolio
+npm install
+
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env
-```
 
-Important local variables:
-
-- `apps/backend/.env`
-  - `DATABASE_URL`
-  - `JWT_SECRET`
-  - `CORS_ORIGIN`
-  - `RESEND_API_KEY`
-  - `CONTACT_EMAIL`
-- `apps/frontend/.env`
-  - `VITE_API_URL`
-
-### Install
-
-```bash
-npm install
-```
-
-### Database
-
-Apply migrations:
-
-```bash
-npm run db:migrate
-```
-
-Seed data:
-
-```bash
-npm run db:seed
-```
-
-Bootstrap from scratch:
-
-```bash
-npm run db:bootstrap
-```
-
-### Run Locally
-
-```bash
+npm run db:bootstrap   # migrate + seed
 npm run dev
 ```
 
-Expected local URLs:
+- Frontend: <http://localhost:3000>
+- API: <http://localhost:4000>
 
-- Frontend dev server: `http://localhost:3000`
-- Backend API: `http://localhost:4000`
+> The seed script is destructive — it wipes existing records before recreating them. Use it on development databases only.
 
-## Docker
+### Environment variables
 
-For local full-stack execution:
+**`apps/backend/.env`**
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Signing secret for admin tokens (HS256) |
+| `CORS_ORIGIN` | Comma-separated allowlist of browser origins |
+| `RESEND_API_KEY` | Contact form delivery |
+| `CONTACT_EMAIL` | Destination inbox |
+| `GITHUB_WEBHOOK_SECRET` | HMAC secret for the devlog webhook |
+
+**`apps/frontend/.env`**
+
+| Variable | Purpose |
+| --- | --- |
+| `VITE_API_URL` | `http://localhost:4000` locally, `/api` in production |
+
+> In production `VITE_API_URL` must be `/api`. Baking a host and port into the bundle bypasses the reverse proxy and reintroduces CORS problems.
+
+### Docker (local)
 
 ```bash
-npm run docker:up
-```
-
-Stop containers:
-
-```bash
+npm run docker:up     # full stack
 npm run docker:down
 ```
 
-## Production Deployment
+### Routes
 
-The production stack is designed for low-memory servers and expects images to be built in GitHub Actions, not on the server.
+`HashRouter` keeps URLs hash-based, so the app stays portable across hosts that do not guarantee SPA rewrite rules: `/#/`, `/#/recruiter`, `/#/admin/login`.
 
-### Production Flow
+---
 
-1. Push to `main`
-2. GitHub Actions builds frontend and backend images
-3. Images are pushed to GHCR
-4. The server pulls the images and recreates containers
-5. Nginx serves the frontend and proxies `/api` to the backend
+## API
 
-This deployment design was chosen intentionally because the server is resource-constrained. Building frontend and backend container images directly on the machine would add avoidable CPU, RAM, and disk pressure. By pushing the build step into GitHub Actions and publishing images to GHCR first, the server only needs to pull ready-made images and restart containers.
+Successful responses are `{ "data": ... }`; errors are `{ "error": "message" }`.
 
-### Production Compose File
+Public endpoints cover projects, skills, experiences, posts, goals, trophies, the devlog feed, and aggregate analytics. Writes cover the contact form and session telemetry. Everything under `/admin` requires a bearer token, and `/webhooks/github` requires an HMAC signature.
 
-- [docker-compose.prod.yml](docker-compose.prod.yml)
+Full endpoint reference with request and response shapes: [documentations/api.md](documentations/api.md).
 
-Current production port mapping in that file:
+---
 
-- Frontend container -> host `8082`
-- Backend container -> host `4000`
-- Postgres container -> host `5432`
+## Security
 
-Nginx should proxy:
+The admin surface is scoped to a **single administrator** — the portfolio owner. Every authenticated user shares the same privilege level by design: there are no roles or permission tiers. That is a deliberate trade-off for a personal site and **not** an enterprise IAM design. Do not reuse this auth layer for multi-tenant or multi-role applications.
 
-- `/` -> `http://127.0.0.1:8082`
-- `/api/` -> `http://127.0.0.1:4000/`
+Headline controls: bcrypt password hashing, HS256 JWTs with a pinned algorithm and 1-hour expiry, per-route rate limiting, Zod validation on every request body, `helmet` headers with an explicit CORS allowlist, an unpublished database, and constant-time HMAC verification on the webhook.
 
-### GitHub Actions Secrets
+Threat model, control details, and known limitations: [documentations/security.md](documentations/security.md).
 
-Required secrets for the current deploy flow:
+---
 
-- `SERVER_HOST`
-- `SERVER_USER`
-- `SSH_PRIVATE_KEY`
-- `POSTGRES_PASSWORD`
-- `JWT_SECRET`
-- `CORS_ORIGIN`
-- `RESEND_API_KEY`
-- `CONTACT_EMAIL`
-- `VITE_API_URL`
+## Testing
 
-Recommended values in the current `sslip.io` single-host setup:
-
-```env
-CORS_ORIGIN=http://34.71.234.176.sslip.io,http://portfolio.34.71.234.176.sslip.io
-VITE_API_URL=/api
-```
-
-Important: `CORS_ORIGIN` must contain the browser origin exactly, without the `/api` path. If the public site is opened at `http://34.71.234.176.sslip.io`, that exact origin must be present in the allowed list.
-
-### Current `sslip.io` Pattern
-
-Current public hostname shape:
-
-```text
-http://34.71.234.176.sslip.io
-```
-
-For practical consistency, prefer one public hostname and use that same hostname in `CORS_ORIGIN`.
-
-## API Reference
-
-All successful responses use:
-
-```json
-{ "data": ... }
-```
-
-Errors use:
-
-```json
-{ "error": "message" }
-```
-
-### Public Endpoints
-
-- `GET /projects`
-- `GET /projects/:slug`
-- `GET /skills`
-- `GET /experiences`
-- `POST /messages`
-- `POST /visits`
-- `PATCH /visits/:sessionId`
-- `POST /dialogue-logs`
-- `GET /analytics/summary`
-- `GET /analytics/timeseries?days=30` — visits over time + device/country breakdowns (max 90 days)
-- `GET /goals`
-- `GET /trophies`
-- `GET /posts`
-- `GET /posts/:slug`
-- `GET /devlog?limit=20` — auto-generated GitHub activity feed (max 50)
-
-### Auth
-
-- `POST /auth/login`
-
-### Webhooks
-
-- `POST /webhooks/github` — GitHub push webhook (HMAC-SHA256 signed with
-  `GITHUB_WEBHOOK_SECRET`); creates devlog entries for pushes to
-  `main`/`master`
-
-### Admin
-
-Requires `Authorization: Bearer <token>`.
-
-**Scope:** the admin panel is designed for a **single administrator** — the portfolio
-owner. Every authenticated user shares the same privilege level by design; there are
-no roles, permission tiers, or delegated access, so any account that can log in can
-also create and delete other accounts. This is a deliberate trade-off for a personal
-portfolio and is **not** an enterprise IAM system. Do not reuse this auth layer for
-multi-tenant or multi-role applications.
-
-Security controls on this surface: passwords hashed with bcrypt (cost 10, 12-character
-minimum), JWT access tokens that expire after 1 hour with the signing algorithm pinned
-to HS256, rate limiting of 5 login attempts per IP per 15 minutes, Zod validation on
-every request body, an explicit CORS allowlist, and `helmet` security headers.
-
-Known limitation: the token is held in `localStorage` rather than an `HttpOnly` cookie,
-so it is readable by JavaScript on the origin. The short expiry limits the window; a
-cookie-based session would close it fully at the cost of reintroducing CSRF handling.
-
-- `GET /admin/users`
-- `POST /admin/users`
-- `DELETE /admin/users/:id`
-- `POST /admin/projects`
-- `PATCH /admin/projects/:id`
-- `DELETE /admin/projects/:id`
-- `POST /admin/skills`
-- `PATCH /admin/skills/:id`
-- `DELETE /admin/skills/:id`
-- `POST /admin/experiences`
-- `PATCH /admin/experiences/:id`
-- `DELETE /admin/experiences/:id`
-- `POST /admin/goals`
-- `PATCH /admin/goals/:id`
-- `DELETE /admin/goals/:id`
-- `POST /admin/trophies`
-- `PATCH /admin/trophies/:id`
-- `DELETE /admin/trophies/:id`
-- `POST /admin/posts`
-- `PATCH /admin/posts/:id`
-- `DELETE /admin/posts/:id`
-- `DELETE /admin/devlog/:id`
-
-## Admin Access
-
-Production admin URLs:
-
-- Login: `http://<host>/#/admin/login`
-- Dashboard: `http://<host>/#/admin/dashboard`
-
-Do not use `/admin/login` without `#/` unless the router strategy changes.
-
-## Seeding Notes
-
-The backend seed command is currently:
+The suite runs on the Node.js built-in test runner with `tsx` for TypeScript — no extra framework to install.
 
 ```bash
-npm run db:seed --workspace @portfolio/backend
-```
-
-In development this works because `tsx` is available.
-
-In the current production container, dev dependencies are pruned, so `tsx` is not available by default. If you need to seed the running production container immediately, the temporary workaround is:
-
-```bash
-docker exec -it portfolio-backend sh -lc "npm install --no-save tsx && npm run db:seed --workspace @portfolio/backend"
-```
-
-Important caveat:
-
-- The seed script is destructive. It deletes existing users, projects, skills, experiences, messages, visits, and dialogue logs before recreating the seeded records.
-
-This is a temporary operational workaround, not the ideal long-term production seeding strategy.
-
-## Operational Checks
-
-Useful server-side checks:
-
-```bash
-docker compose -f docker-compose.prod.yml ps
-docker compose -f docker-compose.prod.yml logs -f
-docker stats
-free -h
-df -h
-```
-
-Useful API checks:
-
-```bash
-curl http://127.0.0.1:4000/projects
-curl http://127.0.0.1:4000/messages -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"name":"test","email":"test@example.com","message":"hello from server"}'
-curl http://34.71.234.176.sslip.io/api/projects
-```
-
-Useful frontend verification:
-
-- Confirm the deployed frontend bundle does not contain `34.71.234.176:4000`
-- Confirm it uses `/api`
-- Confirm recruiter routes are under `/#/recruiter/...`
-
-## Known Production Lessons
-
-These issues already occurred during deployment and are worth documenting explicitly:
-
-- If Nginx points to the wrong frontend port, the public site may return `502 Bad Gateway`.
-- If `VITE_API_URL` is built as `34.71.234.176:4000`, the browser may bypass the proxy and create CORS and timeout issues.
-- If `CORS_ORIGIN` changes in `.env`, the backend container must be recreated to pick up the new value.
-- If the browser still behaves like an old version after deploy, force a hard refresh or test in a private window because stale JS assets can hide server-side fixes.
-- The server currently has low disk headroom. Monitor `df -h` before large image pulls or repeated redeploys.
-
-## Challenges Encountered
-
-- The production server has limited resources, so building images on-host was an unnecessary risk for RAM and disk usage.
-- To avoid overloading the server, the deployment flow was adjusted so GitHub Actions builds the frontend and backend containers, pushes them to GHCR, and the server only pulls and recreates containers.
-- The frontend had to be aligned with a reverse-proxy `/api` setup to avoid CORS issues and direct-browser calls to the backend port.
-- Because the application uses `HashRouter`, deployment and documentation had to stay consistent with `/#/`-based routes for recruiter and admin flows.
-- The portfolio had to remain useful even when the API is unavailable, so the frontend uses fallback content while still demonstrating real async data fetching when the backend is up.
-
-## Future Improvements
-
-- Add more projects with richer case-study detail and more polished engineering writeups.
-- Add more demos and media captures for each project so the portfolio communicates implementation quality faster.
-- Add a dark mode without weakening the current visual identity of the room and recruiter views.
-
-## Tests
-
-The suite runs on the Node.js built-in test runner (`node:test`) with `tsx` for
-TypeScript, so there is no extra test framework to install or configure.
-
-Run everything from the repository root:
-
-```bash
-npm test
-```
-
-That builds `@portfolio/shared` first (the backend tests import its compiled
-schemas), then runs the backend and frontend suites. Individual workspaces:
-
-```bash
+npm test                                       # everything
 npm run test --workspace @portfolio/backend
 npm run test --workspace @portfolio/frontend
 ```
 
-### What Is Covered
+**Backend** — error-handler mapping, JWT sign/verify and tamper cases, bearer-token middleware, GitHub webhook signature verification, devlog message generation, record-to-DTO mapping, analytics aggregation, and the shared Zod contracts guarding every API boundary.
 
-`apps/backend/test`
+**Frontend** — battle store state machine (phases, PP consumption, damage, win/loss, reset) and room object selection (nearest interactable, range limits, per-object distance).
 
-- `errors.test.ts` — error handler mapping for `HttpError`, Zod validation failures, and rejected promises in `asyncHandler`
-- `auth.test.ts` — JWT sign/verify round-trip, tampered tokens, tokens signed with a foreign secret
-- `auth-middleware.test.ts` — bearer parsing, missing/malformed headers, invalid tokens
-- `github-webhook-middleware.test.ts` — HMAC-SHA256 signature verification, wrong secret, tampered body, missing signature, unconfigured secret
-- `devlog-phrases.test.ts` — devlog message generation for single and multi-commit pushes
-- `goals-trophies-service.test.ts` — record-to-DTO mapping, date serialization, unknown status fallback
-- `portfolio-service.test.ts` — analytics summary aggregation
-- `shared-schemas.test.ts` — the `@portfolio/shared` Zod contracts that guard every API boundary
+Tests target pure logic: services, middleware, stores, and schemas. Rendering and 3D scene code is not unit tested — covering it would require a DOM environment and a WebGL mock for very little signal.
 
-`apps/frontend/test`
-
-- `battle-store.test.ts` — battle phase transitions, PP consumption, damage application, win/loss resolution, reset
-- `room-objects.test.ts` — nearest-interactable selection, range limits, per-object interaction distance
-
-Tests target pure logic — services, middleware, stores, and schemas. Rendering
-and 3D scene code is not unit tested, because covering it would mean pulling in
-a DOM environment and a WebGL mock for very little signal.
-
-## Quality Commands
+### Quality commands
 
 ```bash
 npm test
@@ -467,21 +221,43 @@ npm run lint
 npm run format
 ```
 
-If local `node` tooling is unavailable in the shell you are using, `bunx tsc` can still be used for direct TypeScript verification.
+---
 
-## Current Status Summary
+## Deployment
 
-At the time of this README update, the project has been adapted to:
+Production runs on a 1 GB VM behind Nginx with Let's Encrypt TLS. Images are **built in CI, never on the server** — a build on the host would exhaust its RAM and disk.
 
-- serve the frontend through `HashRouter`
-- work behind a reverse-proxied `/api` path
-- support `sslip.io`-based server access
-- expose admin routes through hash-based URLs
-- tolerate browsers where `crypto.randomUUID()` is unavailable
-- avoid room keyboard crashes while typing inside the mailbox form
+Push to `main` → GitHub Actions builds both images → pushes them to GHCR → the server pulls and recreates containers via [docker-compose.prod.yml](docker-compose.prod.yml).
 
-The remaining long-term operational improvements are:
+Pipeline details, required secrets, and rollback: [documentations/deployment.md](documentations/deployment.md). Day-two operations and troubleshooting: [documentations/operations.md](documentations/operations.md).
 
-- make production seeding work without installing `tsx` manually
-- reduce disk pressure on the server
-- add timeout handling around Resend requests in the backend
+---
+
+## A Note on Project Sources
+
+This portfolio mixes public personal and academic projects — linked to their repositories — with professional client work whose source cannot be published because it belongs to a company or falls under an NDA.
+
+For private work, the portfolio still exposes what matters for evaluation: architecture summary, stack decisions, technical challenges, deployment notes, and demo media where available. The goal is to be explicit about code ownership boundaries rather than present confidential work as public.
+
+---
+
+## Roadmap
+
+- Richer case studies and demo captures per project
+- Dark mode that preserves the current visual identity
+- Production seeding without a manual `tsx` install
+- Timeout handling around outbound Resend requests
+
+---
+
+## License
+
+[MIT](LICENSE) © Marco Alejandro Díaz Castañeda
+
+---
+
+## Contact
+
+**Marco Alejandro Díaz Castañeda** — Full-Stack Developer
+
+[Portfolio](https://marcodiaz.me) · [GitHub](https://github.com/eldmark)
