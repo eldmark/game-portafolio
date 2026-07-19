@@ -7,7 +7,6 @@ This repository is a monorepo with:
 - `apps/frontend`: Vite + React portfolio client
 - `apps/backend`: Express + Prisma + PostgreSQL API
 - `packages/shared`: shared contracts and schemas
-- `docs/`: deployment and project documentation
 
 ## What This Project Does
 
@@ -31,7 +30,7 @@ It also includes:
 
 ## Why This Stack Was Chosen
 
-This stack is a good fit for this portfolio because it balances presentation, maintainability, and operational reality without overcomplicating the codebase. On the frontend, `React + Vite + TypeScript` give a fast iteration loop while still keeping the room experience and recruiter view strongly typed, and the code makes that decision concrete by using `React.lazy` and `Suspense` in [apps/frontend/src/App.tsx](/home/dmark123/Desktop/homework/web/game-portafolio/apps/frontend/src/App.tsx) to split the heaviest views into separate chunks instead of loading everything at startup. That matters here because the portfolio includes a 3D scene, animated overlays, audio, and a recruiter mode, so the app benefits from deferring non-critical code until it is actually needed. The same logic applies to the data layer: `usePortfolioData` in [apps/frontend/src/lib/usePortfolioData.ts](/home/dmark123/Desktop/homework/web/game-portafolio/apps/frontend/src/lib/usePortfolioData.ts) hydrates live backend data asynchronously but keeps fallback content ready immediately, which means the page stays useful even if the API is slow or unavailable. `React Router` and `HashRouter` are also a practical choice because this project is deployed behind a reverse proxy and should keep stable recruiter and admin routes without depending on server rewrite rules. For state, `Zustand` is the right amount of abstraction because the app only needs lightweight global UI state such as overlays, audio, tutorial visibility, and room interaction flags; using a heavier store pattern would add complexity without improving the user experience. `React Three Fiber + Drei` are justified because they let the portfolio use a 3D room as a differentiator while still staying inside the React component model, and the room can lazily load expensive pieces instead of blocking the rest of the interface. `Framer Motion` adds controlled transitions that make overlays feel intentional rather than bolted on, which helps the product feel polished without introducing expensive rendering logic. On the backend, `Express + Prisma + PostgreSQL` are a strong combination because the API is explicit, the database is relational, and the schema is expressive enough to support projects, skills, experiences, messages, visits, and dialogue analytics with predictable queries and migrations; that is a better fit than a more abstract stack because the portfolio needs to demonstrate real engineering judgment, not just framework usage. Finallya y, `Docker + Docker Compose` and `GitHub Actions + GHCR` are not cosmetic choices: they solve a real production constraint by moving image builds off the server, reducing CPU, RAM, and disk pressure during deployment, which is especially important for a low-resource host and makes the infrastructure easier to reason about, reproduce, and explain in an interview.
+This stack is a good fit for this portfolio because it balances presentation, maintainability, and operational reality without overcomplicating the codebase. On the frontend, `React + Vite + TypeScript` give a fast iteration loop while still keeping the room experience and recruiter view strongly typed, and the code makes that decision concrete by using `React.lazy` and `Suspense` in [apps/frontend/src/App.tsx](apps/frontend/src/App.tsx) to split the heaviest views into separate chunks instead of loading everything at startup. That matters here because the portfolio includes a 3D scene, animated overlays, audio, and a recruiter mode, so the app benefits from deferring non-critical code until it is actually needed. The same logic applies to the data layer: `usePortfolioData` in [apps/frontend/src/lib/usePortfolioData.ts](apps/frontend/src/lib/usePortfolioData.ts) hydrates live backend data asynchronously but keeps fallback content ready immediately, which means the page stays useful even if the API is slow or unavailable. `React Router` and `HashRouter` are also a practical choice because this project is deployed behind a reverse proxy and should keep stable recruiter and admin routes without depending on server rewrite rules. For state, `Zustand` is the right amount of abstraction because the app only needs lightweight global UI state such as overlays, audio, tutorial visibility, and room interaction flags; using a heavier store pattern would add complexity without improving the user experience. `React Three Fiber + Drei` are justified because they let the portfolio use a 3D room as a differentiator while still staying inside the React component model, and the room can lazily load expensive pieces instead of blocking the rest of the interface. `Framer Motion` adds controlled transitions that make overlays feel intentional rather than bolted on, which helps the product feel polished without introducing expensive rendering logic. On the backend, `Express + Prisma + PostgreSQL` are a strong combination because the API is explicit, the database is relational, and the schema is expressive enough to support projects, skills, experiences, messages, visits, and dialogue analytics with predictable queries and migrations; that is a better fit than a more abstract stack because the portfolio needs to demonstrate real engineering judgment, not just framework usage. Finally, `Docker + Docker Compose` and `GitHub Actions + GHCR` are not cosmetic choices: they solve a real production constraint by moving image builds off the server, reducing CPU, RAM, and disk pressure during deployment, which is especially important for a low-resource host and makes the infrastructure easier to reason about, reproduce, and explain in an interview.
 
 ## Project Proof And Repository Notes
 
@@ -66,11 +65,13 @@ Additional project demos are also embedded in the app through local media assets
 .
 ├── apps
 │   ├── backend
+│   │   ├── src
+│   │   └── test
 │   └── frontend
+│       ├── src
+│       └── test
 ├── packages
-│   ├── shared
-│   └── ui
-├── docs
+│   └── shared
 ├── docker-compose.prod.yml
 └── .github/workflows/deploy.yml
 ```
@@ -190,10 +191,6 @@ npm run docker:down
 
 The production stack is designed for low-memory servers and expects images to be built in GitHub Actions, not on the server.
 
-Primary reference:
-
-- [docs/production.md](/home/dmark123/Desktop/homework/web/game-portafolio/docs/production.md)
-
 ### Production Flow
 
 1. Push to `main`
@@ -206,7 +203,7 @@ This deployment design was chosen intentionally because the server is resource-c
 
 ### Production Compose File
 
-- [docker-compose.prod.yml](/home/dmark123/Desktop/homework/web/game-portafolio/docker-compose.prod.yml)
+- [docker-compose.prod.yml](docker-compose.prod.yml)
 
 Current production port mapping in that file:
 
@@ -291,8 +288,8 @@ Errors use:
 ### Webhooks
 
 - `POST /webhooks/github` — GitHub push webhook (HMAC-SHA256 signed with
-  `GITHUB_WEBHOOK_SECRET`, see `docs/devlog-webhook-workflow.md`); creates
-  devlog entries for pushes to `main`/`master`
+  `GITHUB_WEBHOOK_SECRET`); creates devlog entries for pushes to
+  `main`/`master`
 
 ### Admin
 
@@ -404,21 +401,57 @@ These issues already occurred during deployment and are worth documenting explic
 - Add more demos and media captures for each project so the portfolio communicates implementation quality faster.
 - Add a dark mode without weakening the current visual identity of the room and recruiter views.
 
+## Tests
+
+The suite runs on the Node.js built-in test runner (`node:test`) with `tsx` for
+TypeScript, so there is no extra test framework to install or configure.
+
+Run everything from the repository root:
+
+```bash
+npm test
+```
+
+That builds `@portfolio/shared` first (the backend tests import its compiled
+schemas), then runs the backend and frontend suites. Individual workspaces:
+
+```bash
+npm run test --workspace @portfolio/backend
+npm run test --workspace @portfolio/frontend
+```
+
+### What Is Covered
+
+`apps/backend/test`
+
+- `errors.test.ts` — error handler mapping for `HttpError`, Zod validation failures, and rejected promises in `asyncHandler`
+- `auth.test.ts` — JWT sign/verify round-trip, tampered tokens, tokens signed with a foreign secret
+- `auth-middleware.test.ts` — bearer parsing, missing/malformed headers, invalid tokens
+- `github-webhook-middleware.test.ts` — HMAC-SHA256 signature verification, wrong secret, tampered body, missing signature, unconfigured secret
+- `devlog-phrases.test.ts` — devlog message generation for single and multi-commit pushes
+- `goals-trophies-service.test.ts` — record-to-DTO mapping, date serialization, unknown status fallback
+- `portfolio-service.test.ts` — analytics summary aggregation
+- `shared-schemas.test.ts` — the `@portfolio/shared` Zod contracts that guard every API boundary
+
+`apps/frontend/test`
+
+- `battle-store.test.ts` — battle phase transitions, PP consumption, damage application, win/loss resolution, reset
+- `room-objects.test.ts` — nearest-interactable selection, range limits, per-object interaction distance
+
+Tests target pure logic — services, middleware, stores, and schemas. Rendering
+and 3D scene code is not unit tested, because covering it would mean pulling in
+a DOM environment and a WebGL mock for very little signal.
+
 ## Quality Commands
 
 ```bash
+npm test
 npm run typecheck
 npm run lint
 npm run format
 ```
 
 If local `node` tooling is unavailable in the shell you are using, `bunx tsc` can still be used for direct TypeScript verification.
-
-## Related Docs
-
-- [docs/production.md](/home/dmark123/Desktop/homework/web/game-portafolio/docs/production.md)
-- [docs/replace.md](/home/dmark123/Desktop/homework/web/game-portafolio/docs/replace.md)
-- [docs/architecture.md](/home/dmark123/Desktop/homework/web/game-portafolio/docs/architecture.md)
 
 ## Current Status Summary
 

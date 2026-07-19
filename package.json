@@ -12,6 +12,7 @@
     "build": "npm run build --workspace @portfolio/shared && npm run build --workspace @portfolio/backend && npm run build --workspace @portfolio/frontend",
     "lint": "npm run lint --workspace @portfolio/backend && npm run lint --workspace @portfolio/frontend",
     "typecheck": "npm run typecheck --workspace @portfolio/shared && npm run typecheck --workspace @portfolio/backend && npm run typecheck --workspace @portfolio/frontend",
+    "test": "npm run build --workspace @portfolio/shared && npm run test --workspace @portfolio/backend && npm run test --workspace @portfolio/frontend",
     "format": "prettier --write .",
     "db:migrate": "npm run db:migrate --workspace @portfolio/backend",
     "db:bootstrap": "npm run db:deploy --workspace @portfolio/backend && npm run db:seed --workspace @portfolio/backend",
