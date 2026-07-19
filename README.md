@@ -295,6 +295,22 @@ Errors use:
 
 Requires `Authorization: Bearer <token>`.
 
+**Scope:** the admin panel is designed for a **single administrator** — the portfolio
+owner. Every authenticated user shares the same privilege level by design; there are
+no roles, permission tiers, or delegated access, so any account that can log in can
+also create and delete other accounts. This is a deliberate trade-off for a personal
+portfolio and is **not** an enterprise IAM system. Do not reuse this auth layer for
+multi-tenant or multi-role applications.
+
+Security controls on this surface: passwords hashed with bcrypt (cost 10, 12-character
+minimum), JWT access tokens that expire after 1 hour with the signing algorithm pinned
+to HS256, rate limiting of 5 login attempts per IP per 15 minutes, Zod validation on
+every request body, an explicit CORS allowlist, and `helmet` security headers.
+
+Known limitation: the token is held in `localStorage` rather than an `HttpOnly` cookie,
+so it is readable by JavaScript on the origin. The short expiry limits the window; a
+cookie-based session would close it fully at the cost of reintroducing CSRF handling.
+
 - `GET /admin/users`
 - `POST /admin/users`
 - `DELETE /admin/users/:id`

@@ -23,7 +23,7 @@ export const adminRouter = Router();
 
 const createAdminUserSchema = z.object({
   email: z.string().trim().email(),
-  password: z.string().min(6),
+  password: z.string().min(12),
   name: z.string().trim().min(1).optional().nullable(),
 });
 

@@ -30,7 +30,16 @@ async function main() {
   /* -------------------------------------------------------------------------- */
 
   const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@portfolio.com';
-  const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD ?? 'admin123', 10);
+
+  // No fallback password: a default credential here would ship a known admin
+  // login to any environment where the seed is run.
+  const adminPasswordInput = process.env.ADMIN_PASSWORD;
+
+  if (!adminPasswordInput || adminPasswordInput.length < 12) {
+    throw new Error('ADMIN_PASSWORD is required and must be at least 12 characters');
+  }
+
+  const adminPassword = await bcrypt.hash(adminPasswordInput, 10);
   await prisma.user.create({
     data: {
       email: adminEmail,
