@@ -1688,17 +1688,40 @@ code {
     grid-template-columns: 1fr;
   }
 
+  /* ponytail: compact mobile bar — record hidden, single row */
   .vinyl-player {
-    grid-template-columns: auto minmax(0, 1fr);
+    width: calc(100vw - 24px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px 10px;
   }
 
   .vinyl-player-floating {
     top: 86px;
+    left: 12px;
+    width: calc(100vw - 24px);
   }
 
-  .vinyl-controls {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
+  .vinyl-record {
+    display: none;
+  }
+
+  .vinyl-track .eyebrow {
+    display: none;
+  }
+
+  .vinyl-track h2 {
+    font-size: 15px;
+  }
+
+  .vinyl-track p:last-child {
+    margin-top: 2px;
+    font-size: 12px;
+  }
+
+  .vinyl-controls button {
+    width: 30px;
+    height: 30px;
   }
 }
 
